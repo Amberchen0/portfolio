@@ -94,73 +94,165 @@ export default function Home() {
           </motion.p>
 
           <div className="relative">
-            {/* Amber gem — translucent, tilted, sitting behind "Xu" */}
+            {/* Amber gem — irregular organic blob, tilted top-left → bottom-right,
+                spanning behind both "Amber" and "Xu" */}
             <motion.div
               aria-hidden
               className="pointer-events-none absolute"
               style={{
-                // anchor near the second line ("Xu")
-                top: "55%",
-                left: "-4%",
-                width: "min(82%, 780px)",
-                aspectRatio: "1.55 / 1",
-                transform: "rotate(-22deg)",
-                borderRadius: "50%",
-                // layered radial gradients = depth + specular + warm core + soft halo
-                background: [
-                  // sharp highlight (top-right inner)
-                  "radial-gradient(ellipse 28% 22% at 72% 28%, rgba(255,238,200,0.95), rgba(255,220,160,0.4) 40%, transparent 70%)",
-                  // mid warm body
-                  "radial-gradient(ellipse 70% 80% at 55% 45%, rgba(217,165,116,0.78), rgba(184,132,63,0.45) 50%, transparent 78%)",
-                  // deep amber core shadow (bottom-left)
-                  "radial-gradient(ellipse 55% 60% at 35% 70%, rgba(120,62,22,0.55), transparent 70%)",
-                  // outer soft bloom
-                  "radial-gradient(ellipse 100% 100% at 50% 50%, rgba(217,165,116,0.18), transparent 75%)",
-                ].join(", "),
-                filter: "blur(1.5px)",
-                mixBlendMode: "screen",
+                // cover both lines of the h1
+                top: "-12%",
+                left: "-8%",
+                width: "min(115%, 1000px)",
+                height: "130%",
+                transform: "rotate(18deg)",
                 zIndex: 0,
               }}
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.92 }}
               animate={{
-                opacity: [0, 0.95, 0.85, 0.95],
-                scale: [0.9, 1, 1.015, 1],
+                opacity: [0, 0.92, 0.82, 0.92],
+                scale: [0.92, 1, 1.012, 1],
               }}
               transition={{
                 opacity: {
-                  duration: 8,
-                  delay: 0.2,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  ease: "easeInOut",
-                },
-                scale: {
                   duration: 9,
                   delay: 0.2,
                   repeat: Infinity,
                   repeatType: "reverse",
                   ease: "easeInOut",
                 },
+                scale: {
+                  duration: 10,
+                  delay: 0.2,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  ease: "easeInOut",
+                },
               }}
-            />
-            {/* tiny specular sparkle on top edge of gem */}
-            <motion.div
-              aria-hidden
-              className="pointer-events-none absolute"
-              style={{
-                top: "52%",
-                left: "48%",
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                background:
-                  "radial-gradient(circle, rgba(255,250,230,0.95), rgba(255,240,200,0) 70%)",
-                boxShadow: "0 0 16px 4px rgba(255,235,190,0.55)",
-                zIndex: 0,
-              }}
-              animate={{ opacity: [0.5, 1, 0.6] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            />
+            >
+              {/* Outer halo — soft warm bloom */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  borderRadius: "58% 42% 48% 52% / 52% 60% 40% 48%",
+                  background:
+                    "radial-gradient(ellipse 80% 75% at 50% 50%, rgba(217,165,116,0.22), transparent 75%)",
+                  filter: "blur(28px)",
+                  mixBlendMode: "screen",
+                }}
+              />
+
+              {/* Main body — organic blob, asymmetric radius */}
+              <div
+                className="absolute"
+                style={{
+                  inset: "10% 8% 10% 8%",
+                  borderRadius: "62% 38% 55% 45% / 48% 58% 42% 52%",
+                  background: [
+                    // deep core shadow on lower-right (since we rotated 18deg, this anchors weight)
+                    "radial-gradient(ellipse 55% 60% at 65% 70%, rgba(90,45,15,0.55), transparent 65%)",
+                    // mid warm body
+                    "radial-gradient(ellipse 75% 80% at 45% 45%, rgba(217,165,116,0.75), rgba(184,132,63,0.42) 50%, transparent 78%)",
+                    // upper-left inner glow (light entering from above)
+                    "radial-gradient(ellipse 35% 30% at 32% 28%, rgba(255,225,170,0.7), transparent 65%)",
+                  ].join(", "),
+                  filter: "blur(2px)",
+                  mixBlendMode: "screen",
+                }}
+              />
+
+              {/* Internal cloudy streak 1 — diagonal, faint */}
+              <div
+                className="absolute"
+                style={{
+                  top: "32%",
+                  left: "20%",
+                  width: "55%",
+                  height: "12%",
+                  borderRadius: "50%",
+                  background:
+                    "radial-gradient(ellipse, rgba(255,220,170,0.18), transparent 70%)",
+                  filter: "blur(8px)",
+                  transform: "rotate(-8deg)",
+                  mixBlendMode: "screen",
+                }}
+              />
+
+              {/* Internal cloudy streak 2 — opposite diagonal */}
+              <div
+                className="absolute"
+                style={{
+                  top: "55%",
+                  left: "30%",
+                  width: "45%",
+                  height: "8%",
+                  borderRadius: "50%",
+                  background:
+                    "radial-gradient(ellipse, rgba(140,75,30,0.35), transparent 70%)",
+                  filter: "blur(10px)",
+                  transform: "rotate(6deg)",
+                  mixBlendMode: "multiply",
+                }}
+              />
+
+              {/* Specular highlight 1 — large soft glow upper-left */}
+              <div
+                className="absolute"
+                style={{
+                  top: "18%",
+                  left: "28%",
+                  width: "18%",
+                  height: "14%",
+                  borderRadius: "50%",
+                  background:
+                    "radial-gradient(circle, rgba(255,245,215,0.85), rgba(255,235,190,0) 70%)",
+                  filter: "blur(4px)",
+                  mixBlendMode: "screen",
+                }}
+              />
+
+              {/* Specular sparkle 2 — small sharp dot near upper-left edge */}
+              <motion.div
+                className="absolute"
+                style={{
+                  top: "22%",
+                  left: "34%",
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  background:
+                    "radial-gradient(circle, rgba(255,250,235,1), rgba(255,240,200,0) 70%)",
+                  boxShadow: "0 0 18px 4px rgba(255,235,190,0.6)",
+                }}
+                animate={{ opacity: [0.4, 1, 0.5] }}
+                transition={{
+                  duration: 4.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+
+              {/* Specular sparkle 3 — tiny secondary near right side */}
+              <motion.div
+                className="absolute"
+                style={{
+                  top: "48%",
+                  left: "72%",
+                  width: 5,
+                  height: 5,
+                  borderRadius: "50%",
+                  background: "rgba(255,245,220,0.9)",
+                  boxShadow: "0 0 10px 2px rgba(255,225,180,0.5)",
+                }}
+                animate={{ opacity: [0.3, 0.85, 0.3] }}
+                transition={{
+                  duration: 6,
+                  delay: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            </motion.div>
 
             <h1
               className="relative font-serif text-[clamp(3.5rem,12vw,11rem)] leading-[0.9] tracking-tight"
