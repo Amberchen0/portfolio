@@ -17,7 +17,7 @@ const copy = {
   },
   zh: {
     eyebrow: "作品集 · 2026",
-    title: ["许", "瑒"],
+    title: ["Amber", "Xu"],
     subtitle: "多领域视觉设计师",
     body: "构建视觉体系、动态影像与交互世界 —— 从手作微缩模型到电影感界面。",
     soon: "完整作品归档正在装配中。",
@@ -93,29 +93,107 @@ export default function Home() {
             {t.eyebrow}
           </motion.p>
 
-          <h1
-            className="font-serif text-[clamp(3.5rem,12vw,11rem)] leading-[0.9] tracking-tight"
-            style={{ fontFamily: "'Cormorant Garamond', 'Times New Roman', serif" }}
-          >
-            <motion.span
-              key={`l1-${lang}`}
-              initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
-              className="block italic"
+          <div className="relative">
+            {/* Amber gem — translucent, tilted, sitting behind "Xu" */}
+            <motion.div
+              aria-hidden
+              className="pointer-events-none absolute"
+              style={{
+                // anchor near the second line ("Xu")
+                top: "55%",
+                left: "-4%",
+                width: "min(82%, 780px)",
+                aspectRatio: "1.55 / 1",
+                transform: "rotate(-22deg)",
+                borderRadius: "50%",
+                // layered radial gradients = depth + specular + warm core + soft halo
+                background: [
+                  // sharp highlight (top-right inner)
+                  "radial-gradient(ellipse 28% 22% at 72% 28%, rgba(255,238,200,0.95), rgba(255,220,160,0.4) 40%, transparent 70%)",
+                  // mid warm body
+                  "radial-gradient(ellipse 70% 80% at 55% 45%, rgba(217,165,116,0.78), rgba(184,132,63,0.45) 50%, transparent 78%)",
+                  // deep amber core shadow (bottom-left)
+                  "radial-gradient(ellipse 55% 60% at 35% 70%, rgba(120,62,22,0.55), transparent 70%)",
+                  // outer soft bloom
+                  "radial-gradient(ellipse 100% 100% at 50% 50%, rgba(217,165,116,0.18), transparent 75%)",
+                ].join(", "),
+                filter: "blur(1.5px)",
+                mixBlendMode: "screen",
+                zIndex: 0,
+              }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{
+                opacity: [0, 0.95, 0.85, 0.95],
+                scale: [0.9, 1, 1.015, 1],
+              }}
+              transition={{
+                opacity: {
+                  duration: 8,
+                  delay: 0.2,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  ease: "easeInOut",
+                },
+                scale: {
+                  duration: 9,
+                  delay: 0.2,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  ease: "easeInOut",
+                },
+              }}
+            />
+            {/* tiny specular sparkle on top edge of gem */}
+            <motion.div
+              aria-hidden
+              className="pointer-events-none absolute"
+              style={{
+                top: "52%",
+                left: "48%",
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background:
+                  "radial-gradient(circle, rgba(255,250,230,0.95), rgba(255,240,200,0) 70%)",
+                boxShadow: "0 0 16px 4px rgba(255,235,190,0.55)",
+                zIndex: 0,
+              }}
+              animate={{ opacity: [0.5, 1, 0.6] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            />
+
+            <h1
+              className="relative font-serif text-[clamp(3.5rem,12vw,11rem)] leading-[0.9] tracking-tight"
+              style={{
+                fontFamily: "'Cormorant Garamond', 'Times New Roman', serif",
+                zIndex: 1,
+              }}
             >
-              {t.title[0]}
-            </motion.span>
-            <motion.span
-              key={`l2-${lang}`}
-              initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: 0.9, delay: 0.15, ease: [0.2, 0.8, 0.2, 1] }}
-              className="block text-amber"
-            >
-              {t.title[1]}
-            </motion.span>
-          </h1>
+              <motion.span
+                key={`l1-${lang}`}
+                initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
+                className="block italic"
+              >
+                {t.title[0]}
+              </motion.span>
+              <motion.span
+                key={`l2-${lang}`}
+                initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: 0.9, delay: 0.15, ease: [0.2, 0.8, 0.2, 1] }}
+                className="block text-amber"
+                style={{
+                  // subtle warm shadow so text reads cleanly against the gem
+                  textShadow:
+                    "0 2px 30px rgba(10,8,7,0.55), 0 0 1px rgba(10,8,7,0.6)",
+                }}
+              >
+                {t.title[1]}
+              </motion.span>
+            </h1>
+          </div>
 
           <motion.div
             key={`body-${lang}`}
