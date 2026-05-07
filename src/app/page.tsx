@@ -1,65 +1,167 @@
-import Image from "next/image";
+"use client";
+
+import { motion } from "framer-motion";
+import { useState } from "react";
+
+type Lang = "en" | "zh";
+
+const copy = {
+  en: {
+    eyebrow: "Portfolio · 2026",
+    title: ["Amber", "Xu"],
+    subtitle: "Multidisciplinary Visual Designer",
+    body: "Crafting visual systems, motion, and interactive worlds — from stop-motion miniatures to cinematic interfaces.",
+    soon: "The full archive is being assembled.",
+    cta: "Selected works arriving soon.",
+    footer: "Sydney · Available for select collaborations",
+  },
+  zh: {
+    eyebrow: "作品集 · 2026",
+    title: ["许", "瑒"],
+    subtitle: "多领域视觉设计师",
+    body: "构建视觉体系、动态影像与交互世界 —— 从手作微缩模型到电影感界面。",
+    soon: "完整作品归档正在装配中。",
+    cta: "精选作品即将上线。",
+    footer: "悉尼 · 接受精选合作",
+  },
+} as const;
 
 export default function Home() {
+  const [lang, setLang] = useState<Lang>("en");
+  const t = copy[lang];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="relative flex min-h-screen flex-col overflow-hidden">
+      {/* warm ambient glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-1/3 left-1/2 -z-10 h-[120vh] w-[120vh] -translate-x-1/2 rounded-full"
+        style={{
+          background:
+            "radial-gradient(closest-side, rgba(217,165,116,0.18), rgba(184,132,63,0.06) 40%, transparent 70%)",
+          filter: "blur(40px)",
+        }}
+      />
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-1/4 -right-1/4 -z-10 h-[80vh] w-[80vh] rounded-full"
+        style={{
+          background:
+            "radial-gradient(closest-side, rgba(217,165,116,0.10), transparent 70%)",
+          filter: "blur(60px)",
+        }}
+        animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* top bar */}
+      <header className="flex items-center justify-between px-6 py-6 sm:px-12 sm:py-8">
+        <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+          AX · {new Date().getFullYear()}
+        </span>
+        <nav className="font-mono text-xs uppercase tracking-[0.2em]">
+          <button
+            onClick={() => setLang("en")}
+            className={`transition-colors ${
+              lang === "en" ? "text-amber" : "text-muted hover:text-foreground"
+            }`}
+          >
+            EN
+          </button>
+          <span className="mx-2 text-muted/50">/</span>
+          <button
+            onClick={() => setLang("zh")}
+            className={`transition-colors ${
+              lang === "zh" ? "text-amber" : "text-muted hover:text-foreground"
+            }`}
+          >
+            中
+          </button>
+        </nav>
+      </header>
+
+      {/* hero */}
+      <main className="flex flex-1 flex-col justify-center px-6 sm:px-12">
+        <div className="mx-auto w-full max-w-5xl">
+          <motion.p
+            key={`eyebrow-${lang}`}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="mb-8 font-mono text-xs uppercase tracking-[0.3em] text-muted"
+          >
+            {t.eyebrow}
+          </motion.p>
+
+          <h1
+            className="font-serif text-[clamp(3.5rem,12vw,11rem)] leading-[0.9] tracking-tight"
+            style={{ fontFamily: "'Cormorant Garamond', 'Times New Roman', serif" }}
+          >
+            <motion.span
+              key={`l1-${lang}`}
+              initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
+              className="block italic"
+            >
+              {t.title[0]}
+            </motion.span>
+            <motion.span
+              key={`l2-${lang}`}
+              initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.9, delay: 0.15, ease: [0.2, 0.8, 0.2, 1] }}
+              className="block text-amber"
+            >
+              {t.title[1]}
+            </motion.span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+          <motion.div
+            key={`body-${lang}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="mt-12 max-w-xl space-y-4"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <p className="text-lg font-light tracking-wide text-foreground/90 sm:text-xl">
+              {t.subtitle}
+            </p>
+            <p className="text-sm leading-relaxed text-muted sm:text-base">
+              {t.body}
+            </p>
+          </motion.div>
+
+          {/* divider line, slowly drawing */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 1.4, delay: 0.6, ease: "easeOut" }}
+            className="mt-16 h-px w-32 origin-left bg-amber/40"
+          />
+
+          <motion.div
+            key={`cta-${lang}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.9 }}
+            className="mt-8 font-mono text-xs uppercase tracking-[0.2em] text-muted"
           >
-            Documentation
-          </a>
+            <span className="mr-3 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-amber" />
+            {t.soon}
+          </motion.div>
         </div>
       </main>
+
+      {/* footer */}
+      <footer className="flex flex-col items-start justify-between gap-3 px-6 py-6 sm:flex-row sm:items-center sm:px-12 sm:py-8">
+        <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+          {t.footer}
+        </span>
+        <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+          {t.cta}
+        </span>
+      </footer>
     </div>
   );
 }
