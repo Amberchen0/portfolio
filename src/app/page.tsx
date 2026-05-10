@@ -96,69 +96,11 @@ export default function Home() {
           </motion.p>
 
           <div className="relative">
-            {/* Hover-reveal hotspot — cursor inside the gem area summons a small
-                translucent crystal-clear amber lens, transforming the etching into
-                real material under the cursor. */}
-            <div
-              className="absolute left-1/2 top-1/2"
-              style={{
-                width: "min(80%, 640px)",
-                aspectRatio: "1 / 1",
-                marginLeft: "calc(min(80%, 640px) / -2)",
-                marginTop: "calc(min(80%, 640px) / -2)",
-                zIndex: 2,
-                pointerEvents: "auto",
-              }}
-              onPointerMove={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                setReveal({
-                  x: e.clientX - rect.left,
-                  y: e.clientY - rect.top,
-                  active: true,
-                });
-              }}
-              onPointerLeave={() => setReveal((r) => ({ ...r, active: false }))}
-            >
-              {/* Reveal layer: masked to a small circle around the cursor.
-                  The photo gets a static transform to compensate for the source-
-                  image misalignment between the etching and the photo (their gem
-                  shapes were drawn at slightly different angles + offsets). */}
-              <div
-                className="absolute inset-0"
-                style={{
-                  WebkitMaskImage: `radial-gradient(circle 130px at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 36%, rgba(0,0,0,0) 100%)`,
-                  maskImage: `radial-gradient(circle 130px at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 36%, rgba(0,0,0,0) 100%)`,
-                  opacity: reveal.active ? 1 : 0,
-                  transition: "opacity 0.45s ease",
-                }}
-              >
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    // measured offset to align photo's gem onto etching's gem:
-                    // photo is rotated ~6.65° less than the etching, and shifted
-                    // a few pixels — apply the inverse here.
-                    transform:
-                      "translate(-0.5%, 2.1%) rotate(6.65deg) scale(1.005)",
-                    transformOrigin: "center",
-                  }}
-                >
-                  <Image
-                    src="/amber-real.png"
-                    alt=""
-                    fill
-                    sizes="(max-width: 768px) 80vw, 640px"
-                    style={{ objectFit: "contain" }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Amber resin specimen — STATIC now (was breathing, but that broke
-                alignment with the photo lens). Just a graceful fade-in on mount. */}
+            {/* Single breathing wrapper containing BOTH the etching and the
+                hover-reveal photo lens. Because they share the same animated
+                transform, they stay in perfect lockstep — no drift. */}
             <motion.div
-              aria-hidden
-              className="pointer-events-none absolute left-1/2 top-1/2"
+              className="absolute left-1/2 top-1/2"
               style={{
                 width: "min(80%, 640px)",
                 aspectRatio: "1 / 1",
@@ -167,9 +109,30 @@ export default function Home() {
                 zIndex: 0,
               }}
               initial={{ opacity: 0, scale: 0.97 }}
-              animate={{ opacity: 0.92, scale: 1 }}
-              transition={{ duration: 1.4, delay: 0.2, ease: "easeOut" }}
+              animate={{
+                opacity: [0, 0.95, 0.88, 0.95],
+                scale: [0.97, 1, 1.012, 1],
+                rotate: [0, 0.5, -0.3, 0.5],
+              }}
+              transition={{
+                opacity: { duration: 1.4, delay: 0.2, ease: "easeOut" },
+                scale: {
+                  duration: 11,
+                  delay: 1.4,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  ease: "easeInOut",
+                },
+                rotate: {
+                  duration: 22,
+                  delay: 1.4,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  ease: "easeInOut",
+                },
+              }}
             >
+              {/* Etching layer (white linework, base) */}
               <Image
                 src="/amber-hero.png"
                 alt=""
@@ -180,8 +143,55 @@ export default function Home() {
                   objectFit: "contain",
                   filter:
                     "sepia(0.18) hue-rotate(-8deg) saturate(1.05) brightness(1.05)",
+                  pointerEvents: "none",
                 }}
               />
+
+              {/* Hover hotspot + reveal lens — sibling of etching, same bounds */}
+              <div
+                className="absolute inset-0"
+                style={{ zIndex: 2, pointerEvents: "auto" }}
+                onPointerMove={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setReveal({
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top,
+                    active: true,
+                  });
+                }}
+                onPointerLeave={() =>
+                  setReveal((r) => ({ ...r, active: false }))
+                }
+              >
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    WebkitMaskImage: `radial-gradient(circle 130px at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 36%, rgba(0,0,0,0) 100%)`,
+                    maskImage: `radial-gradient(circle 130px at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 36%, rgba(0,0,0,0) 100%)`,
+                    opacity: reveal.active ? 1 : 0,
+                    transition: "opacity 0.45s ease",
+                  }}
+                >
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      // measured static offset to align new photo onto etching:
+                      // 2.20° rotation, ~1.3% Y shift, ~0.99x scale
+                      transform:
+                        "translate(-0.05%, 1.34%) rotate(2.20deg) scale(1.009)",
+                      transformOrigin: "center",
+                    }}
+                  >
+                    <Image
+                      src="/amber-real.png"
+                      alt=""
+                      fill
+                      sizes="(max-width: 768px) 80vw, 640px"
+                      style={{ objectFit: "contain" }}
+                    />
+                  </div>
+                </div>
+              </div>
             </motion.div>
 
             {/* warm inner glow under the gem */}
