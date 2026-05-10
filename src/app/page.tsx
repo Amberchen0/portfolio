@@ -120,9 +120,9 @@ export default function Home() {
               onPointerLeave={() => setReveal((r) => ({ ...r, active: false }))}
             >
               {/* Reveal layer: masked to a small circle around the cursor.
-                  Inside the circle, the realistic amber photo shows; its black
-                  background uses screen-blend so anything outside the gem shape
-                  naturally stays unchanged (no fake square in the corners). */}
+                  The photo gets a static transform to compensate for the source-
+                  image misalignment between the etching and the photo (their gem
+                  shapes were drawn at slightly different angles + offsets). */}
               <div
                 className="absolute inset-0"
                 style={{
@@ -132,17 +132,30 @@ export default function Home() {
                   transition: "opacity 0.45s ease",
                 }}
               >
-                <Image
-                  src="/amber-real.png"
-                  alt=""
-                  fill
-                  sizes="(max-width: 768px) 80vw, 640px"
-                  style={{ objectFit: "contain" }}
-                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    // measured offset to align photo's gem onto etching's gem:
+                    // photo is rotated ~6.65° less than the etching, and shifted
+                    // a few pixels — apply the inverse here.
+                    transform:
+                      "translate(-0.5%, 2.1%) rotate(6.65deg) scale(1.005)",
+                    transformOrigin: "center",
+                  }}
+                >
+                  <Image
+                    src="/amber-real.png"
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 80vw, 640px"
+                    style={{ objectFit: "contain" }}
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Amber resin specimen — half size now, sits behind the signature */}
+            {/* Amber resin specimen — STATIC now (was breathing, but that broke
+                alignment with the photo lens). Just a graceful fade-in on mount. */}
             <motion.div
               aria-hidden
               className="pointer-events-none absolute left-1/2 top-1/2"
@@ -153,35 +166,9 @@ export default function Home() {
                 marginTop: "calc(min(80%, 640px) / -2)",
                 zIndex: 0,
               }}
-              initial={{ opacity: 0, scale: 0.96, rotate: -1 }}
-              animate={{
-                opacity: [0, 0.82, 0.74, 0.82],
-                scale: [0.96, 1, 1.015, 1],
-                rotate: [-1, 0.6, -0.4, 0.6],
-              }}
-              transition={{
-                opacity: {
-                  duration: 9,
-                  delay: 0.3,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  ease: "easeInOut",
-                },
-                scale: {
-                  duration: 11,
-                  delay: 0.3,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  ease: "easeInOut",
-                },
-                rotate: {
-                  duration: 22,
-                  delay: 0.3,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  ease: "easeInOut",
-                },
-              }}
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 0.92, scale: 1 }}
+              transition={{ duration: 1.4, delay: 0.2, ease: "easeOut" }}
             >
               <Image
                 src="/amber-hero.png"
@@ -191,7 +178,6 @@ export default function Home() {
                 sizes="(max-width: 768px) 80vw, 640px"
                 style={{
                   objectFit: "contain",
-                  // alpha PNG already strips background; subtle warm tint to fit palette
                   filter:
                     "sepia(0.18) hue-rotate(-8deg) saturate(1.05) brightness(1.05)",
                 }}
