@@ -140,9 +140,9 @@ export default function Home() {
                 className="absolute inset-0"
                 style={
                   {
-                    "--lens-radius": reveal.active ? "130px" : "0px",
-                    WebkitMaskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 70%, rgba(0,0,0,1) 100%)`,
-                    maskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 70%, rgba(0,0,0,1) 100%)`,
+                    "--lens-radius": reveal.active ? "100px" : "0px",
+                    WebkitMaskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.6) 65%, rgba(0,0,0,1) 100%)`,
+                    maskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.6) 65%, rgba(0,0,0,1) 100%)`,
                     transition: "--lens-radius 0.45s cubic-bezier(0.2, 0.8, 0.2, 1)",
                     pointerEvents: "none",
                   } as React.CSSProperties
@@ -182,9 +182,9 @@ export default function Home() {
                   className="absolute inset-0"
                   style={
                     {
-                      "--lens-radius": reveal.active ? "130px" : "0px",
-                      WebkitMaskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)`,
-                      maskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)`,
+                      "--lens-radius": reveal.active ? "100px" : "0px",
+                      WebkitMaskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0) 100%)`,
+                      maskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0) 100%)`,
                       transition:
                         "--lens-radius 0.45s cubic-bezier(0.2, 0.8, 0.2, 1)",
                     } as React.CSSProperties
