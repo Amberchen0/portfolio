@@ -29,6 +29,7 @@ const copy = {
 
 export default function Home() {
   const [lang, setLang] = useState<Lang>("en");
+  const [reveal, setReveal] = useState({ x: 0, y: 0, active: false });
   const t = copy[lang];
 
   return (
@@ -94,24 +95,137 @@ export default function Home() {
             {t.eyebrow}
           </motion.p>
 
-          <div className="relative">
-            {/* Amber resin specimen — etched-line illustration, layered behind title.
-                Black background of source image is killed by mix-blend-mode: screen,
-                leaving only the white linework. A soft warm tint keeps it within the
-                "cinematic dark + handcraft warmth" palette. */}
+          <div className="relative isolate">
+            {/* Hover-reveal hotspot — cursor inside the gem area summons a small
+                translucent crystal-clear amber lens, transforming the etching into
+                real material under the cursor. */}
+            <div
+              className="absolute left-1/2 top-1/2"
+              style={{
+                width: "min(80%, 640px)",
+                aspectRatio: "1 / 1",
+                marginLeft: "min(-40%, -320px)",
+                marginTop: "min(-40%, -320px)",
+                zIndex: 2,
+                pointerEvents: "auto",
+              }}
+              onPointerMove={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                setReveal({
+                  x: e.clientX - rect.left,
+                  y: e.clientY - rect.top,
+                  active: true,
+                });
+              }}
+              onPointerLeave={() => setReveal((r) => ({ ...r, active: false }))}
+            >
+              {/* the reveal layer itself — masked to a ~110px radius around cursor */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  WebkitMaskImage: `radial-gradient(circle 130px at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 38%, rgba(0,0,0,0) 100%)`,
+                  maskImage: `radial-gradient(circle 130px at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 38%, rgba(0,0,0,0) 100%)`,
+                  opacity: reveal.active ? 1 : 0,
+                  transition: "opacity 0.45s ease",
+                }}
+              >
+                {/* crystal-clear amber body — translucent honey-gold with bright core */}
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: [
+                      // bright translucent core (slight upper-right bias)
+                      "radial-gradient(ellipse 35% 30% at 60% 38%, rgba(255,235,180,0.95) 0%, rgba(255,205,140,0.55) 40%, transparent 70%)",
+                      // mid honey body — vivid but luminous
+                      "radial-gradient(ellipse 70% 75% at 50% 50%, rgba(232,160,75,0.92) 0%, rgba(190,115,45,0.78) 55%, rgba(120,65,22,0.65) 90%)",
+                      // cool deep edge for depth
+                      "radial-gradient(ellipse 100% 100% at 50% 50%, transparent 60%, rgba(60,30,10,0.55) 100%)",
+                    ].join(", "),
+                    filter: "blur(0.5px)",
+                  }}
+                />
+                {/* subtle internal swirl / inclusion */}
+                <div
+                  className="absolute"
+                  style={{
+                    top: "55%",
+                    left: "28%",
+                    width: "44%",
+                    height: "10%",
+                    borderRadius: "50%",
+                    background:
+                      "radial-gradient(ellipse, rgba(60,30,10,0.45), transparent 70%)",
+                    filter: "blur(6px)",
+                    transform: "rotate(-8deg)",
+                  }}
+                />
+                {/* soft inner luminous mist */}
+                <div
+                  className="absolute"
+                  style={{
+                    top: "30%",
+                    left: "30%",
+                    width: "44%",
+                    height: "20%",
+                    borderRadius: "50%",
+                    background:
+                      "radial-gradient(ellipse, rgba(255,225,170,0.35), transparent 70%)",
+                    filter: "blur(10px)",
+                  }}
+                />
+                {/* sharp specular highlight — small bright sparkle */}
+                <div
+                  className="absolute"
+                  style={{
+                    top: "32%",
+                    left: "58%",
+                    width: 10,
+                    height: 10,
+                    borderRadius: "50%",
+                    background:
+                      "radial-gradient(circle, rgba(255,250,235,1), rgba(255,240,200,0) 70%)",
+                    boxShadow: "0 0 18px 5px rgba(255,235,190,0.7)",
+                  }}
+                />
+                {/* secondary sparkle */}
+                <div
+                  className="absolute"
+                  style={{
+                    top: "62%",
+                    left: "68%",
+                    width: 4,
+                    height: 4,
+                    borderRadius: "50%",
+                    background: "rgba(255,245,210,0.95)",
+                    boxShadow: "0 0 8px 2px rgba(255,225,180,0.6)",
+                  }}
+                />
+                {/* outer warm glow halo bleeding outside the lens */}
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: "transparent",
+                    boxShadow: "inset 0 0 60px 20px rgba(255,200,130,0.18)",
+                    mixBlendMode: "screen",
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Amber resin specimen — half size now, sits behind the signature */}
             <motion.div
               aria-hidden
-              className="pointer-events-none absolute"
+              className="pointer-events-none absolute left-1/2 top-1/2"
               style={{
-                top: "-55%",
-                left: "-25%",
-                width: "min(160%, 1300px)",
+                width: "min(80%, 640px)",
                 aspectRatio: "1 / 1",
+                marginLeft: "min(-40%, -320px)",
+                marginTop: "min(-40%, -320px)",
                 zIndex: 0,
               }}
               initial={{ opacity: 0, scale: 0.96, rotate: -1 }}
               animate={{
-                opacity: [0, 0.85, 0.78, 0.85],
+                opacity: [0, 0.82, 0.74, 0.82],
                 scale: [0.96, 1, 1.015, 1],
                 rotate: [-1, 0.6, -0.4, 0.6],
               }}
@@ -144,65 +258,63 @@ export default function Home() {
                 alt=""
                 fill
                 priority
-                sizes="(max-width: 768px) 160vw, 1300px"
+                sizes="(max-width: 768px) 80vw, 640px"
                 style={{
                   objectFit: "contain",
                   mixBlendMode: "screen",
-                  // gentle warm tint so the white linework reads as warm ivory instead of cold white
                   filter:
                     "sepia(0.22) hue-rotate(-8deg) saturate(1.1) brightness(1.02) contrast(1.04)",
                 }}
               />
             </motion.div>
 
-            {/* warm inner glow under the gem so it feels lit from within */}
+            {/* warm inner glow under the gem */}
             <div
               aria-hidden
-              className="pointer-events-none absolute"
+              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
               style={{
-                top: "0%",
-                left: "10%",
-                width: "70%",
-                height: "100%",
+                width: "min(70%, 560px)",
+                height: "min(70%, 560px)",
                 borderRadius: "50%",
                 background:
-                  "radial-gradient(ellipse 60% 70% at 55% 50%, rgba(217,165,116,0.18), transparent 72%)",
-                filter: "blur(40px)",
+                  "radial-gradient(ellipse 60% 70% at 55% 50%, rgba(217,165,116,0.16), transparent 72%)",
+                filter: "blur(36px)",
                 mixBlendMode: "screen",
                 zIndex: 0,
               }}
             />
 
+            {/* Signature wordmark — replaces typed Amber Xu, sits on top so it's
+                always readable even through the hover lens */}
             <h1
-              className="relative font-serif text-[clamp(3.5rem,12vw,11rem)] leading-[0.9] tracking-tight"
-              style={{
-                fontFamily: "'Cormorant Garamond', 'Times New Roman', serif",
-                zIndex: 1,
-              }}
+              className="relative"
+              style={{ zIndex: 3, pointerEvents: "none" }}
             >
-              <motion.span
-                key={`l1-${lang}`}
-                initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
+              <span className="sr-only">Amber Xu</span>
+              <motion.div
+                initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ duration: 0.9, ease: [0.2, 0.8, 0.2, 1] }}
-                className="block italic"
-              >
-                {t.title[0]}
-              </motion.span>
-              <motion.span
-                key={`l2-${lang}`}
-                initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ duration: 0.9, delay: 0.15, ease: [0.2, 0.8, 0.2, 1] }}
-                className="block text-amber"
+                transition={{ duration: 1.2, delay: 0.1, ease: [0.2, 0.8, 0.2, 1] }}
+                className="relative mx-auto"
                 style={{
-                  // subtle warm shadow so text reads cleanly against the gem
-                  textShadow:
-                    "0 2px 30px rgba(10,8,7,0.55), 0 0 1px rgba(10,8,7,0.6)",
+                  width: "min(100%, 880px)",
+                  aspectRatio: "1536 / 1024",
                 }}
               >
-                {t.title[1]}
-              </motion.span>
+                <Image
+                  src="/signature.png"
+                  alt="Amber Xu"
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, 880px"
+                  style={{
+                    objectFit: "contain",
+                    // black ink on cream → invert to white ink, then screen-blend onto our dark page
+                    filter: "invert(1) brightness(1) contrast(1.05)",
+                    mixBlendMode: "screen",
+                  }}
+                />
+              </motion.div>
             </h1>
           </div>
 
