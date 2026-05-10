@@ -95,7 +95,7 @@ export default function Home() {
             {t.eyebrow}
           </motion.p>
 
-          <div className="relative isolate">
+          <div className="relative">
             {/* Hover-reveal hotspot — cursor inside the gem area summons a small
                 translucent crystal-clear amber lens, transforming the etching into
                 real material under the cursor. */}
@@ -137,12 +137,7 @@ export default function Home() {
                   alt=""
                   fill
                   sizes="(max-width: 768px) 80vw, 640px"
-                  style={{
-                    objectFit: "contain",
-                    // black background of the photo screen-blends to nothing,
-                    // so the lens only paints over the actual gem shape
-                    mixBlendMode: "screen",
-                  }}
+                  style={{ objectFit: "contain" }}
                 />
               </div>
             </div>
@@ -196,9 +191,9 @@ export default function Home() {
                 sizes="(max-width: 768px) 80vw, 640px"
                 style={{
                   objectFit: "contain",
-                  mixBlendMode: "screen",
+                  // alpha PNG already strips background; subtle warm tint to fit palette
                   filter:
-                    "sepia(0.22) hue-rotate(-8deg) saturate(1.1) brightness(1.02) contrast(1.04)",
+                    "sepia(0.18) hue-rotate(-8deg) saturate(1.05) brightness(1.05)",
                 }}
               />
             </motion.div>
@@ -212,9 +207,8 @@ export default function Home() {
                 height: "min(70%, 560px)",
                 borderRadius: "50%",
                 background:
-                  "radial-gradient(ellipse 60% 70% at 55% 50%, rgba(217,165,116,0.16), transparent 72%)",
+                  "radial-gradient(ellipse 60% 70% at 55% 50%, rgba(217,165,116,0.18), transparent 72%)",
                 filter: "blur(36px)",
-                mixBlendMode: "screen",
                 zIndex: 0,
               }}
             />
@@ -242,12 +236,7 @@ export default function Home() {
                   fill
                   priority
                   sizes="(max-width: 768px) 100vw, 880px"
-                  style={{
-                    objectFit: "contain",
-                    // black ink on cream → invert to white ink, then screen-blend onto our dark page
-                    filter: "invert(1) brightness(1) contrast(1.05)",
-                    mixBlendMode: "screen",
-                  }}
+                  style={{ objectFit: "contain" }}
                 />
               </motion.div>
             </h1>
