@@ -104,8 +104,8 @@ export default function Home() {
               style={{
                 width: "min(80%, 640px)",
                 aspectRatio: "1 / 1",
-                marginLeft: "min(-40%, -320px)",
-                marginTop: "min(-40%, -320px)",
+                marginLeft: "calc(min(80%, 640px) / -2)",
+                marginTop: "calc(min(80%, 640px) / -2)",
                 zIndex: 2,
                 pointerEvents: "auto",
               }}
@@ -119,93 +119,28 @@ export default function Home() {
               }}
               onPointerLeave={() => setReveal((r) => ({ ...r, active: false }))}
             >
-              {/* the reveal layer itself — masked to a ~110px radius around cursor */}
+              {/* Reveal layer: masked to a small circle around the cursor.
+                  Inside the circle, the realistic amber photo shows; its black
+                  background uses screen-blend so anything outside the gem shape
+                  naturally stays unchanged (no fake square in the corners). */}
               <div
                 className="absolute inset-0"
                 style={{
-                  WebkitMaskImage: `radial-gradient(circle 130px at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 38%, rgba(0,0,0,0) 100%)`,
-                  maskImage: `radial-gradient(circle 130px at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 38%, rgba(0,0,0,0) 100%)`,
+                  WebkitMaskImage: `radial-gradient(circle 130px at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 36%, rgba(0,0,0,0) 100%)`,
+                  maskImage: `radial-gradient(circle 130px at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 36%, rgba(0,0,0,0) 100%)`,
                   opacity: reveal.active ? 1 : 0,
                   transition: "opacity 0.45s ease",
                 }}
               >
-                {/* crystal-clear amber body — translucent honey-gold with bright core */}
-                <div
-                  className="absolute inset-0"
+                <Image
+                  src="/amber-real.png"
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 80vw, 640px"
                   style={{
-                    background: [
-                      // bright translucent core (slight upper-right bias)
-                      "radial-gradient(ellipse 35% 30% at 60% 38%, rgba(255,235,180,0.95) 0%, rgba(255,205,140,0.55) 40%, transparent 70%)",
-                      // mid honey body — vivid but luminous
-                      "radial-gradient(ellipse 70% 75% at 50% 50%, rgba(232,160,75,0.92) 0%, rgba(190,115,45,0.78) 55%, rgba(120,65,22,0.65) 90%)",
-                      // cool deep edge for depth
-                      "radial-gradient(ellipse 100% 100% at 50% 50%, transparent 60%, rgba(60,30,10,0.55) 100%)",
-                    ].join(", "),
-                    filter: "blur(0.5px)",
-                  }}
-                />
-                {/* subtle internal swirl / inclusion */}
-                <div
-                  className="absolute"
-                  style={{
-                    top: "55%",
-                    left: "28%",
-                    width: "44%",
-                    height: "10%",
-                    borderRadius: "50%",
-                    background:
-                      "radial-gradient(ellipse, rgba(60,30,10,0.45), transparent 70%)",
-                    filter: "blur(6px)",
-                    transform: "rotate(-8deg)",
-                  }}
-                />
-                {/* soft inner luminous mist */}
-                <div
-                  className="absolute"
-                  style={{
-                    top: "30%",
-                    left: "30%",
-                    width: "44%",
-                    height: "20%",
-                    borderRadius: "50%",
-                    background:
-                      "radial-gradient(ellipse, rgba(255,225,170,0.35), transparent 70%)",
-                    filter: "blur(10px)",
-                  }}
-                />
-                {/* sharp specular highlight — small bright sparkle */}
-                <div
-                  className="absolute"
-                  style={{
-                    top: "32%",
-                    left: "58%",
-                    width: 10,
-                    height: 10,
-                    borderRadius: "50%",
-                    background:
-                      "radial-gradient(circle, rgba(255,250,235,1), rgba(255,240,200,0) 70%)",
-                    boxShadow: "0 0 18px 5px rgba(255,235,190,0.7)",
-                  }}
-                />
-                {/* secondary sparkle */}
-                <div
-                  className="absolute"
-                  style={{
-                    top: "62%",
-                    left: "68%",
-                    width: 4,
-                    height: 4,
-                    borderRadius: "50%",
-                    background: "rgba(255,245,210,0.95)",
-                    boxShadow: "0 0 8px 2px rgba(255,225,180,0.6)",
-                  }}
-                />
-                {/* outer warm glow halo bleeding outside the lens */}
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background: "transparent",
-                    boxShadow: "inset 0 0 60px 20px rgba(255,200,130,0.18)",
+                    objectFit: "contain",
+                    // black background of the photo screen-blends to nothing,
+                    // so the lens only paints over the actual gem shape
                     mixBlendMode: "screen",
                   }}
                 />
@@ -219,8 +154,8 @@ export default function Home() {
               style={{
                 width: "min(80%, 640px)",
                 aspectRatio: "1 / 1",
-                marginLeft: "min(-40%, -320px)",
-                marginTop: "min(-40%, -320px)",
+                marginLeft: "calc(min(80%, 640px) / -2)",
+                marginTop: "calc(min(80%, 640px) / -2)",
                 zIndex: 0,
               }}
               initial={{ opacity: 0, scale: 0.96, rotate: -1 }}
