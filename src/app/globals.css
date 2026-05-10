@@ -42,3 +42,13 @@ body::before {
   background: var(--amber);
   color: #0a0807;
 }
+
+/* Animatable custom property used by the hover-lens.
+   Both the etching's hole and the photo's circle reference this same variable,
+   so they grow and shrink in perfect sync — never a frame where both layers
+   overlap (which would expose any sub-pixel alignment drift). */
+@property --lens-radius {
+  syntax: "<length>";
+  initial-value: 0px;
+  inherits: false;
+}

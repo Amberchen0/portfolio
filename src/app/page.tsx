@@ -132,20 +132,35 @@ export default function Home() {
                 },
               }}
             >
-              {/* Etching layer (white linework, base) */}
-              <Image
-                src="/amber-hero.png"
-                alt=""
-                fill
-                priority
-                sizes="(max-width: 768px) 80vw, 640px"
-                style={{
-                  objectFit: "contain",
-                  filter:
-                    "sepia(0.18) hue-rotate(-8deg) saturate(1.05) brightness(1.05)",
-                  pointerEvents: "none",
-                }}
-              />
+              {/* Etching layer — wrapped so we can punch a hole in it at the
+                  cursor. The hole's radius is the animatable --lens-radius
+                  custom property, shared with the photo layer below so they
+                  open and close in perfect sync. */}
+              <div
+                className="absolute inset-0"
+                style={
+                  {
+                    "--lens-radius": reveal.active ? "130px" : "0px",
+                    WebkitMaskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 70%, rgba(0,0,0,1) 100%)`,
+                    maskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 70%, rgba(0,0,0,1) 100%)`,
+                    transition: "--lens-radius 0.45s cubic-bezier(0.2, 0.8, 0.2, 1)",
+                    pointerEvents: "none",
+                  } as React.CSSProperties
+                }
+              >
+                <Image
+                  src="/amber-hero.png"
+                  alt=""
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 80vw, 640px"
+                  style={{
+                    objectFit: "contain",
+                    filter:
+                      "sepia(0.18) hue-rotate(-8deg) saturate(1.05) brightness(1.05)",
+                  }}
+                />
+              </div>
 
               {/* Hover hotspot + reveal lens — sibling of etching, same bounds */}
               <div
@@ -165,12 +180,15 @@ export default function Home() {
               >
                 <div
                   className="absolute inset-0"
-                  style={{
-                    WebkitMaskImage: `radial-gradient(circle 130px at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 36%, rgba(0,0,0,0) 100%)`,
-                    maskImage: `radial-gradient(circle 130px at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 36%, rgba(0,0,0,0) 100%)`,
-                    opacity: reveal.active ? 1 : 0,
-                    transition: "opacity 0.45s ease",
-                  }}
+                  style={
+                    {
+                      "--lens-radius": reveal.active ? "130px" : "0px",
+                      WebkitMaskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)`,
+                      maskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)`,
+                      transition:
+                        "--lens-radius 0.45s cubic-bezier(0.2, 0.8, 0.2, 1)",
+                    } as React.CSSProperties
+                  }
                 >
                   <div
                     className="absolute inset-0"
