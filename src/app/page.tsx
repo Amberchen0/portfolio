@@ -284,10 +284,18 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.9 }}
-            className="mt-8 font-mono text-xs uppercase tracking-[0.2em] text-muted"
+            className="mt-8 flex items-center gap-6 font-mono text-xs uppercase tracking-[0.2em] text-muted"
           >
-            <span className="mr-3 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-amber" />
-            {t.soon}
+            <span className="flex items-center">
+              <span className="mr-3 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-amber" />
+              {t.soon}
+            </span>
+            <a
+              href="/work"
+              className="border-b border-amber/40 pb-0.5 text-amber transition-colors hover:text-foreground"
+            >
+              Enter Universe →
+            </a>
           </motion.div>
         </div>
       </main>
