@@ -1,8 +1,8 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, Float, Html } from "@react-three/drei";
-import { useRef, useMemo, useState } from "react";
+import { Environment, Float, Text, Billboard } from "@react-three/drei";
+import { useRef, useMemo, useState, useEffect } from "react";
 import * as THREE from "three";
 
 /** A moon orbits a parent planet (not the sun). */
@@ -30,7 +30,10 @@ type Planet = {
   iridescenceColor: string;
   size: number;
   orbitRadius: number;
+  /** starting angle on its orbit, in radians */
   angle: number;
+  /** how fast it revolves around the sun, radians/second — always on, mouse-independent */
+  orbitSpeed: number;
   orbitTilt: [number, number];
   moons?: Moon[];
 };
@@ -38,28 +41,31 @@ type Planet = {
 // Per-planet orbital tilts pushed to 10–18° so the orbital planes are CLEARLY
 // stacked at different angles (vs the 3–5° earlier which read as "flat").
 // X-axis tilt makes the orbit dip front-to-back; Z-axis tilt makes it dip left-right.
+// All 8 planets share the same angular speed: one full revolution per 60s
+// (2π / 60 ≈ 0.1047 rad/s). HYSTON moon keeps its own much-faster speed.
+const ORBIT_SPEED = Math.PI / 30;
 const PLANETS: Planet[] = [
   // ── real works ──
   { slug: "model",     name: "Model",           color: "#8b4513", iridescenceColor: "#f29a4a",
-    size: 1.00, orbitRadius: 4.6, angle: Math.PI / 2,                          orbitTilt: [0.22, -0.10] },
+    size: 1.00, orbitRadius: 4.6, angle: Math.PI / 2,                          orbitSpeed: ORBIT_SPEED, orbitTilt: [0.22, -0.10] },
   { slug: "nemo",      name: "Nemo",            color: "#1a6b8e", iridescenceColor: "#3dd5b0",
-    size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 8,     orbitTilt: [-0.30, 0.12] },
+    size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.30, 0.12] },
   { slug: "concept",   name: "Concept Design",  color: "#1d5b58", iridescenceColor: "#7ad5e8",
-    size: 1.00, orbitRadius: 6.0, angle: Math.PI / 2 + (4 * Math.PI) / 8,     orbitTilt: [0.15, 0.26] },
+    size: 1.00, orbitRadius: 6.0, angle: Math.PI / 2 + (4 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [0.15, 0.26] },
   { slug: "moonlight", name: "Moonlight",       color: "#2a1f3d", iridescenceColor: "#c08af0",
-    size: 0.85, orbitRadius: 7.2, angle: Math.PI / 2 + (6 * Math.PI) / 8,     orbitTilt: [-0.24, -0.18] },
+    size: 0.85, orbitRadius: 7.2, angle: Math.PI / 2 + (6 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.24, -0.18] },
   { slug: "mask",      name: "Under the Mask",  color: "#8b1d22", iridescenceColor: "#f0c050",
-    size: 0.85, orbitRadius: 5.3, angle: Math.PI / 2 + Math.PI,                orbitTilt: [0.30, 0.05] },
+    size: 0.85, orbitRadius: 5.3, angle: Math.PI / 2 + Math.PI,                orbitSpeed: ORBIT_SPEED, orbitTilt: [0.30, 0.05] },
   { slug: "game",      name: "Game",            color: "#666666", iridescenceColor: "#cccccc",
-    size: 0.55, orbitRadius: 8.2, angle: Math.PI / 2 + (10 * Math.PI) / 8,    orbitTilt: [-0.14, 0.28] },
+    size: 0.55, orbitRadius: 8.2, angle: Math.PI / 2 + (10 * Math.PI) / 8,    orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.14, 0.28] },
 
   // Drawing — placeholder (ink-toned)
   { slug: "drawing",      name: "Drawing",      color: "#2a2a32", iridescenceColor: "#b0a8b8",
-    size: 0.55, orbitRadius: 7.6, angle: Math.PI / 2 + (12 * Math.PI) / 8,    orbitTilt: [0.28, 0.10] },
+    size: 0.55, orbitRadius: 7.6, angle: Math.PI / 2 + (12 * Math.PI) / 8,    orbitSpeed: ORBIT_SPEED, orbitTilt: [0.28, 0.10] },
 
   // Photography — placeholder + HYSTON moon-system parent (sized up to be believable parent)
   { slug: "photography",  name: "Photography",  color: "#3a4a58", iridescenceColor: "#a8c0d8",
-    size: 0.95, orbitRadius: 6.7, angle: Math.PI / 2 + (14 * Math.PI) / 8,    orbitTilt: [-0.20, 0.30],
+    size: 0.95, orbitRadius: 6.7, angle: Math.PI / 2 + (14 * Math.PI) / 8,    orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.20, 0.30],
     moons: [
       {
         slug: "hyston",
@@ -101,6 +107,68 @@ function OrbitRing({
   );
 }
 
+/** 3D chromatic glass-text label — replaces flat HTML overlay.
+ *  Three layered Text meshes with sub-pixel X offsets in RGB to mimic the
+ *  "off-axis printing / RGB shift" glitch language. Billboard keeps them
+ *  readable as the universe rotates. */
+function PlanetLabel({
+  name,
+  offset,
+  hovered,
+}: {
+  name: string;
+  /** distance from anchor (planet/moon center) to where label starts, screen-right */
+  offset: number;
+  hovered: boolean;
+}) {
+  const shift = hovered ? 0.028 : 0.012;
+  const fontSize = hovered ? 0.22 : 0.19;
+  const fillOpacity = hovered ? 0.95 : 0.7;
+  return (
+    <Billboard>
+      {/* magenta-red ghost (left of main) */}
+      <Text
+        position={[offset - shift, 0, 0]}
+        color="#ff2860"
+        fontSize={fontSize}
+        letterSpacing={0.22}
+        anchorX="left"
+        anchorY="middle"
+        fillOpacity={fillOpacity * 0.7}
+        raycast={() => null}
+      >
+        {name.toUpperCase()}
+      </Text>
+      {/* cyan ghost (right of main) */}
+      <Text
+        position={[offset + shift, 0, 0]}
+        color="#00e0ff"
+        fontSize={fontSize}
+        letterSpacing={0.22}
+        anchorX="left"
+        anchorY="middle"
+        fillOpacity={fillOpacity * 0.7}
+        raycast={() => null}
+      >
+        {name.toUpperCase()}
+      </Text>
+      {/* warm-cream main fill, drawn last on top */}
+      <Text
+        position={[offset, 0, 0.002]}
+        color={hovered ? "#f0e0c5" : "#c8bca0"}
+        fontSize={fontSize}
+        letterSpacing={0.22}
+        anchorX="left"
+        anchorY="middle"
+        fillOpacity={fillOpacity}
+        raycast={() => null}
+      >
+        {name.toUpperCase()}
+      </Text>
+    </Billboard>
+  );
+}
+
 /** A moon revolving around its parent planet on its own tilted local orbit. */
 function MoonSystem({
   moon,
@@ -113,6 +181,12 @@ function MoonSystem({
   const moonRef = useRef<THREE.Mesh>(null!);
   const [hovered, setHovered] = useState(false);
 
+  // seed initial orbital angle once via ref (avoid JSX `rotation` prop being
+  // re-applied on hover re-renders, which would reset accumulated rotation).
+  useEffect(() => {
+    if (orbitRef.current) orbitRef.current.rotation.y = moon.initialAngle;
+  }, [moon.initialAngle]);
+
   useFrame((_, delta) => {
     if (orbitRef.current) orbitRef.current.rotation.y += moon.orbitSpeed * delta;
     if (moonRef.current) moonRef.current.rotation.y += delta * 0.3;
@@ -121,7 +195,7 @@ function MoonSystem({
   return (
     <group rotation={[moon.orbitTilt[0], 0, moon.orbitTilt[1]]}>
       <OrbitRing radius={moon.orbitRadius} opacity={0.12} segments={96} />
-      <group ref={orbitRef} rotation={[0, moon.initialAngle, 0]}>
+      <group ref={orbitRef}>
         <group position={[moon.orbitRadius, 0, 0]}>
           <mesh
             ref={moonRef}
@@ -158,30 +232,23 @@ function MoonSystem({
               envMapIntensity={1.4}
             />
           </mesh>
-          <Html
-            position={[0, -(moon.size + 0.28), 0]}
-            center
-            style={{
-              pointerEvents: "none",
-              fontFamily: "var(--font-geist-mono), monospace",
-              fontSize: hovered ? "10px" : "9px",
-              letterSpacing: "0.25em",
-              textTransform: "uppercase",
-              color: hovered ? "#f0e0c5" : "#8a7e6a",
-              transition: "all 0.4s ease",
-              whiteSpace: "nowrap",
-              textShadow: "0 2px 12px rgba(0,0,0,0.8)",
-            }}
-          >
-            {moon.name}
-          </Html>
+          <PlanetLabel
+            name={moon.name}
+            offset={moon.size + 0.28}
+            hovered={hovered}
+          />
         </group>
       </group>
     </group>
   );
 }
 
-/** Single glass-bead planet — dichroic / iridescent physical material */
+/** Single glass-bead planet — dichroic / iridescent physical material.
+ *  Structure: tilted-plane (parent) → orbitRef (revolves around sun) →
+ *  radial offset → Float (bob) → bodyRef (self-rotates) + label + moons.
+ *  The orbit rotation runs every frame independent of mouse, so the planet
+ *  always glides along its ring. Mouse-driven system rotation in PlanetSystem
+ *  layers on top. */
 function Planet({
   planet,
   onClick,
@@ -189,94 +256,82 @@ function Planet({
   planet: Planet;
   onClick: (slug: string) => void;
 }) {
-  const groupRef = useRef<THREE.Group>(null!);
+  const orbitRef = useRef<THREE.Group>(null!);
+  const bodyRef = useRef<THREE.Group>(null!);
   const [hovered, setHovered] = useState(false);
 
-  const position = useMemo<[number, number, number]>(
-    () => [
-      Math.cos(planet.angle) * planet.orbitRadius,
-      0,
-      Math.sin(planet.angle) * planet.orbitRadius,
-    ],
-    [planet.angle, planet.orbitRadius]
-  );
+  // seed initial orbital angle once via ref (avoid JSX `rotation` prop being
+  // re-applied on hover re-renders, which would reset accumulated rotation).
+  useEffect(() => {
+    if (orbitRef.current) orbitRef.current.rotation.y = planet.angle;
+  }, [planet.angle]);
 
   useFrame((_, delta) => {
-    if (groupRef.current) groupRef.current.rotation.y += delta * 0.15;
+    if (orbitRef.current) orbitRef.current.rotation.y += planet.orbitSpeed * delta;
+    if (bodyRef.current) bodyRef.current.rotation.y += delta * 0.15;
   });
 
   return (
-    <Float
-      position={position}
-      speed={0.8}
-      rotationIntensity={0.15}
-      floatIntensity={0.12}
-    >
-      {/* planet body — self-rotates */}
-      <group
-        ref={groupRef}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          setHovered(true);
-          document.body.style.cursor = "pointer";
-        }}
-        onPointerOut={() => {
-          setHovered(false);
-          document.body.style.cursor = "default";
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-          onClick(planet.slug);
-        }}
-      >
-        <mesh scale={hovered ? 1.1 : 1}>
-          <sphereGeometry args={[planet.size, 64, 64]} />
-          <meshPhysicalMaterial
-            color={planet.color}
-            roughness={0.18}
-            metalness={0.05}
-            transmission={0.85}
-            thickness={1.2}
-            ior={1.5}
-            iridescence={1.0}
-            iridescenceIOR={1.3}
-            iridescenceThicknessRange={[100, 800]}
-            clearcoat={1.0}
-            clearcoatRoughness={0.08}
-            attenuationColor={planet.iridescenceColor}
-            attenuationDistance={2.5}
-            envMapIntensity={1.4}
+    <group ref={orbitRef}>
+      <group position={[planet.orbitRadius, 0, 0]}>
+        <Float speed={0.8} rotationIntensity={0.15} floatIntensity={0.12}>
+          {/* planet body — self-rotates */}
+          <group
+            ref={bodyRef}
+            onPointerOver={(e) => {
+              e.stopPropagation();
+              setHovered(true);
+              document.body.style.cursor = "pointer";
+            }}
+            onPointerOut={() => {
+              setHovered(false);
+              document.body.style.cursor = "default";
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick(planet.slug);
+            }}
+          >
+            <mesh scale={hovered ? 1.1 : 1}>
+              <sphereGeometry args={[planet.size, 64, 64]} />
+              <meshPhysicalMaterial
+                color={planet.color}
+                roughness={0.18}
+                metalness={0.05}
+                transmission={0.85}
+                thickness={1.2}
+                ior={1.5}
+                iridescence={1.0}
+                iridescenceIOR={1.3}
+                iridescenceThicknessRange={[100, 800]}
+                clearcoat={1.0}
+                clearcoatRoughness={0.08}
+                attenuationColor={planet.iridescenceColor}
+                attenuationDistance={2.5}
+                envMapIntensity={1.4}
+              />
+            </mesh>
+          </group>
+
+          {/* floating 3D chromatic label beside planet — outside body self-rotation */}
+          <PlanetLabel
+            name={planet.name}
+            offset={planet.size + 0.35}
+            hovered={hovered}
           />
-        </mesh>
 
-        <Html
-          position={[0, -(planet.size + 0.35), 0]}
-          center
-          style={{
-            pointerEvents: "none",
-            fontFamily: "var(--font-geist-mono), monospace",
-            fontSize: hovered ? "11px" : "10px",
-            letterSpacing: "0.25em",
-            textTransform: "uppercase",
-            color: hovered ? "#f0e0c5" : "#8a7e6a",
-            transition: "all 0.4s ease",
-            whiteSpace: "nowrap",
-            textShadow: "0 2px 12px rgba(0,0,0,0.8)",
-          }}
-        >
-          {planet.name}
-        </Html>
+          {/* moons — orbit the planet's center independently */}
+          {planet.moons?.map((m) => (
+            <MoonSystem key={m.slug} moon={m} onClick={onClick} />
+          ))}
+        </Float>
       </group>
-
-      {/* moons — orbit the planet's center independently of planet self-rotation */}
-      {planet.moons?.map((m) => (
-        <MoonSystem key={m.slug} moon={m} onClick={onClick} />
-      ))}
-    </Float>
+    </group>
   );
 }
 
-/** Central amber sun — placeholder; ChatGPT round-amber will swap in later */
+/** Central amber sun — glass-bead language matching the 9 planets, just
+ *  amber-colored and emissive enough to read as the system's light source. */
 function AmberSun() {
   const ref = useRef<THREE.Mesh>(null!);
   useFrame((_, delta) => {
@@ -289,16 +344,21 @@ function AmberSun() {
         <sphereGeometry args={[1.2, 96, 96]} />
         <meshPhysicalMaterial
           color="#d9a574"
-          emissive="#b8843f"
-          emissiveIntensity={0.55}
-          roughness={0.35}
-          transmission={0.5}
-          thickness={1.2}
-          ior={1.6}
+          emissive="#f0c885"
+          emissiveIntensity={0.8}
+          roughness={0.12}
+          metalness={0.05}
+          transmission={0.75}
+          thickness={1.4}
+          ior={1.55}
+          iridescence={1.0}
+          iridescenceIOR={1.3}
+          iridescenceThicknessRange={[200, 900]}
           clearcoat={1.0}
-          clearcoatRoughness={0.2}
+          clearcoatRoughness={0.06}
           attenuationColor="#f0c885"
-          attenuationDistance={1.8}
+          attenuationDistance={2.2}
+          envMapIntensity={1.6}
         />
       </mesh>
       <pointLight color="#f0c885" intensity={4} distance={28} decay={1.5} />
@@ -377,20 +437,39 @@ function StarField({ count = 1500 }) {
   );
 }
 
-/** Mouse-velocity driven rotation of the entire planet system */
+/** Mouse-velocity driven rotation of the entire planet system.
+ *  Two deadzones both clamp targetVelocity → 0 (system smoothly rests):
+ *  - cursor on sun (raycast against a sphere slightly larger than the sun)
+ *  - cursor outside the page entirely (via onPointerLeave on outer div) */
 function PlanetSystem({
   onPlanetClick,
+  cursorInsideRef,
 }: {
   onPlanetClick: (slug: string) => void;
+  cursorInsideRef: React.MutableRefObject<boolean>;
 }) {
   const groupRef = useRef<THREE.Group>(null!);
   const rotationVelocity = useRef(0);
   const currentRotation = useRef(0);
   const mouse = useThree((s) => s.mouse);
+  const camera = useThree((s) => s.camera);
+
+  const raycaster = useMemo(() => new THREE.Raycaster(), []);
+  // sun is at world origin, radius 1.2; expand to 1.5 for forgiving deadzone
+  const sunDeadzone = useMemo(
+    () => new THREE.Sphere(new THREE.Vector3(0, 0, 0), 1.5),
+    []
+  );
 
   useFrame((_, delta) => {
-    // mouse.x in [-1, +1]. Spec: mouse-left → CW (negative Y), mouse-right → CCW (positive Y)
-    const targetVelocity = mouse.x * 0.35;
+    raycaster.setFromCamera(mouse, camera);
+    const cursorOnSun = raycaster.ray.intersectsSphere(sunDeadzone);
+    const cursorOffPage = !cursorInsideRef.current;
+
+    // mouse.x in [-1, +1]. Spec: mouse-left → CW (negative Y), mouse-right → CCW (positive Y).
+    // Treat sun-hover and off-page as "no input" — system rests, only planet
+    // self-orbits and sun spin continue (they're outside this group).
+    const targetVelocity = cursorOnSun || cursorOffPage ? 0 : mouse.x * 0.35;
     rotationVelocity.current +=
       (targetVelocity - rotationVelocity.current) * Math.min(1, delta * 4);
     currentRotation.current += rotationVelocity.current * delta;
@@ -417,8 +496,10 @@ function PlanetSystem({
 /** Main scene composition */
 function SceneContent({
   onPlanetClick,
+  cursorInsideRef,
 }: {
   onPlanetClick: (slug: string) => void;
+  cursorInsideRef: React.MutableRefObject<boolean>;
 }) {
   return (
     <>
@@ -438,16 +519,30 @@ function SceneContent({
 
       <AmberSun />
 
-      <PlanetSystem onPlanetClick={onPlanetClick} />
+      <PlanetSystem
+        onPlanetClick={onPlanetClick}
+        cursorInsideRef={cursorInsideRef}
+      />
     </>
   );
 }
 
 export default function Universe() {
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
+  // tracked via DOM pointer events on the fullscreen wrapper; read by
+  // PlanetSystem in useFrame to gate mouse-driven rotation
+  const cursorInsideRef = useRef(true);
 
   return (
-    <div className="fixed inset-0 bg-background">
+    <div
+      className="fixed inset-0 bg-background"
+      onPointerEnter={() => {
+        cursorInsideRef.current = true;
+      }}
+      onPointerLeave={() => {
+        cursorInsideRef.current = false;
+      }}
+    >
       <Canvas
         // low-side angle so orbital rings read as thin flattened ellipses,
         // matching the reference solar-system diagram. Roughly 14° elevation.
@@ -464,7 +559,10 @@ export default function Universe() {
       >
         <color attach="background" args={["#0a0807"]} />
         <fog attach="fog" args={["#0a0807", 15, 40]} />
-        <SceneContent onPlanetClick={setActiveSlug} />
+        <SceneContent
+          onPlanetClick={setActiveSlug}
+          cursorInsideRef={cursorInsideRef}
+        />
       </Canvas>
 
       {/* brand */}
