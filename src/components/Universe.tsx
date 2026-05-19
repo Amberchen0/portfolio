@@ -23,24 +23,28 @@ type Planet = {
 };
 
 const PLANETS: Planet[] = [
-  // 模型 — innermost prominent orbit, default front
+  // ── 6 real works ──
   { slug: "model",     name: "Model",           color: "#8b4513", iridescenceColor: "#f29a4a",
-    size: 1.15, orbitRadius: 4.6, angle: Math.PI / 2,                       orbitTilt: [0.05, -0.02] },
-  // Nemo — innermost orbit, complete project
+    size: 1.15, orbitRadius: 4.6, angle: Math.PI / 2,                          orbitTilt: [0.05, -0.02] },
   { slug: "nemo",      name: "Nemo",            color: "#1a6b8e", iridescenceColor: "#3dd5b0",
-    size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 6,    orbitTilt: [-0.08, 0.03] },
-  // 概念设计 — mid-outer, broad
+    size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 9,     orbitTilt: [-0.08, 0.03] },
   { slug: "concept",   name: "Concept Design",  color: "#1d5b58", iridescenceColor: "#7ad5e8",
-    size: 1.00, orbitRadius: 6.0, angle: Math.PI / 2 + (4 * Math.PI) / 6,    orbitTilt: [0.04, 0.06] },
-  // Moonlight — outer
+    size: 1.00, orbitRadius: 6.0, angle: Math.PI / 2 + (4 * Math.PI) / 9,     orbitTilt: [0.04, 0.06] },
   { slug: "moonlight", name: "Moonlight",       color: "#2a1f3d", iridescenceColor: "#c08af0",
-    size: 0.85, orbitRadius: 7.0, angle: Math.PI / 2 + Math.PI,              orbitTilt: [-0.06, -0.04] },
-  // 面具之下 — mid
+    size: 0.85, orbitRadius: 7.2, angle: Math.PI / 2 + (6 * Math.PI) / 9,     orbitTilt: [-0.06, -0.04] },
   { slug: "mask",      name: "Under the Mask",  color: "#8b1d22", iridescenceColor: "#f0c050",
-    size: 0.85, orbitRadius: 5.3, angle: Math.PI / 2 + (8 * Math.PI) / 6,    orbitTilt: [0.09, 0.01] },
-  // Game — outermost, smallest, placeholder
+    size: 0.85, orbitRadius: 5.3, angle: Math.PI / 2 + (8 * Math.PI) / 9,     orbitTilt: [0.09, 0.01] },
   { slug: "game",      name: "Game",            color: "#666666", iridescenceColor: "#cccccc",
-    size: 0.55, orbitRadius: 7.8, angle: Math.PI / 2 + (10 * Math.PI) / 6,   orbitTilt: [-0.03, 0.07] },
+    size: 0.55, orbitRadius: 8.1, angle: Math.PI / 2 + (10 * Math.PI) / 9,    orbitTilt: [-0.03, 0.07] },
+
+  // ── 3 placeholders for upcoming works ──
+  // muted neutral palette so they hint "not yet themed"; click → "still forming" modal
+  { slug: "untitled-vii",  name: "Untitled · VII",  color: "#404858", iridescenceColor: "#9fb0c8",
+    size: 0.70, orbitRadius: 4.0, angle: Math.PI / 2 + (12 * Math.PI) / 9,    orbitTilt: [0.06, -0.05] },
+  { slug: "untitled-viii", name: "Untitled · VIII", color: "#3a3a44", iridescenceColor: "#a8a0b8",
+    size: 0.60, orbitRadius: 6.7, angle: Math.PI / 2 + (14 * Math.PI) / 9,    orbitTilt: [-0.05, 0.08] },
+  { slug: "untitled-ix",   name: "Untitled · IX",   color: "#48413c", iridescenceColor: "#beb0a0",
+    size: 0.50, orbitRadius: 7.6, angle: Math.PI / 2 + (16 * Math.PI) / 9,    orbitTilt: [0.07, 0.02] },
 ];
 
 /** Faint orbital ring drawn on the XZ plane at the planet's distance from sun.
@@ -387,7 +391,7 @@ function PlanetModal({
           {planet.name}
         </h2>
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
-          {slug === "game"
+          {slug === "game" || slug.startsWith("untitled-")
             ? "This world is still forming. Come back when the dust settles."
             : "World detail page — coming soon."}
         </p>
