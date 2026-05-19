@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, Float, Text, Billboard } from "@react-three/drei";
+import { Environment, Float, Text } from "@react-three/drei";
 import { useRef, useMemo, useState, useEffect } from "react";
 import * as THREE from "three";
 
@@ -107,11 +107,14 @@ function OrbitRing({
   );
 }
 
-/** 3D chromatic glass-text label that wraps around the planet's equator.
- *  Uses troika's `curveRadius` to bend the text along a cylinder coincident
- *  with the planet's vertical axis, so the text appears glued to the
- *  sphere surface. Three RGB-shifted layers give the chromatic-glass feel.
- *  Billboard keeps the wrap facing the camera regardless of orbit/spin. */
+/** 3D chromatic glass-text label that truly wraps around the planet's
+ *  equator in 3D. Three copies of the name are placed at 120° intervals
+ *  around the planet's local vertical axis, each curved via troika's
+ *  `curveRadius` to hug the sphere surface. No Billboard — the wrap lives
+ *  in the planet's local frame, so as the planet orbits/spins the band
+ *  rotates with it, giving a "ring on the sphere" feel. With three copies
+ *  120° apart, at any orbital angle at least one copy is within 60° of
+ *  facing the camera, so the name is always legible from one side. */
 function PlanetLabel({
   name,
   planetRadius,
@@ -122,62 +125,67 @@ function PlanetLabel({
   planetRadius: number;
   hovered: boolean;
 }) {
-  const shift = hovered ? 0.016 : 0.007;
-  const fontSize = hovered ? 0.14 : 0.11;
+  const shift = hovered ? 0.014 : 0.006;
+  const fontSize = hovered ? 0.13 : 0.10;
   const fillOpacity = hovered ? 0.95 : 0.8;
-  // Close to the sphere so the text feels like a band on its surface (the
-  // "Universal globe" wrap), while staying just outside the hover-scaled
-  // sphere (1.1x). For R=1.0 → distance=1.12; for R=0.55 → distance=0.634.
+  // Hug the sphere — just outside the hover-scaled (1.1x) radius.
+  // For R=1.0 → distance=1.12; for R=0.55 → distance=0.634.
   const distance = planetRadius * 1.08 + 0.04;
   const letterSpacing = 0.35;
+  const ringAngles = [0, (2 * Math.PI) / 3, (4 * Math.PI) / 3];
+
   return (
-    <Billboard>
-      {/* magenta-red ghost */}
-      <Text
-        position={[shift, 0, distance]}
-        color="#ff2860"
-        fontSize={fontSize}
-        letterSpacing={letterSpacing}
-        anchorX="center"
-        anchorY="middle"
-        // @ts-expect-error troika supports curveRadius; drei type omits it
-        curveRadius={distance}
-        fillOpacity={fillOpacity * 0.7}
-        raycast={() => null}
-      >
-        {name.toUpperCase()}
-      </Text>
-      {/* cyan ghost */}
-      <Text
-        position={[-shift, 0, distance]}
-        color="#00e0ff"
-        fontSize={fontSize}
-        letterSpacing={letterSpacing}
-        anchorX="center"
-        anchorY="middle"
-        // @ts-expect-error troika supports curveRadius; drei type omits it
-        curveRadius={distance}
-        fillOpacity={fillOpacity * 0.7}
-        raycast={() => null}
-      >
-        {name.toUpperCase()}
-      </Text>
-      {/* warm-cream main fill, drawn last on top — slightly closer to camera */}
-      <Text
-        position={[0, 0, distance + 0.004]}
-        color={hovered ? "#f0e0c5" : "#c8bca0"}
-        fontSize={fontSize}
-        letterSpacing={letterSpacing}
-        anchorX="center"
-        anchorY="middle"
-        // @ts-expect-error troika supports curveRadius; drei type omits it
-        curveRadius={distance + 0.004}
-        fillOpacity={fillOpacity}
-        raycast={() => null}
-      >
-        {name.toUpperCase()}
-      </Text>
-    </Billboard>
+    <group>
+      {ringAngles.map((angle) => (
+        <group key={angle} rotation={[0, angle, 0]}>
+          {/* magenta-red ghost */}
+          <Text
+            position={[shift, 0, distance]}
+            color="#ff2860"
+            fontSize={fontSize}
+            letterSpacing={letterSpacing}
+            anchorX="center"
+            anchorY="middle"
+            // @ts-expect-error troika supports curveRadius; drei type omits it
+            curveRadius={distance}
+            fillOpacity={fillOpacity * 0.7}
+            raycast={() => null}
+          >
+            {name.toUpperCase()}
+          </Text>
+          {/* cyan ghost */}
+          <Text
+            position={[-shift, 0, distance]}
+            color="#00e0ff"
+            fontSize={fontSize}
+            letterSpacing={letterSpacing}
+            anchorX="center"
+            anchorY="middle"
+            // @ts-expect-error troika supports curveRadius; drei type omits it
+            curveRadius={distance}
+            fillOpacity={fillOpacity * 0.7}
+            raycast={() => null}
+          >
+            {name.toUpperCase()}
+          </Text>
+          {/* warm-cream main fill, drawn last on top — slightly closer to camera */}
+          <Text
+            position={[0, 0, distance + 0.004]}
+            color={hovered ? "#f0e0c5" : "#c8bca0"}
+            fontSize={fontSize}
+            letterSpacing={letterSpacing}
+            anchorX="center"
+            anchorY="middle"
+            // @ts-expect-error troika supports curveRadius; drei type omits it
+            curveRadius={distance + 0.004}
+            fillOpacity={fillOpacity}
+            raycast={() => null}
+          >
+            {name.toUpperCase()}
+          </Text>
+        </group>
+      ))}
+    </group>
   );
 }
 
