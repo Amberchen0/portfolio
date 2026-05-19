@@ -35,28 +35,31 @@ type Planet = {
   moons?: Moon[];
 };
 
+// Per-planet orbital tilts pushed to 10–18° so the orbital planes are CLEARLY
+// stacked at different angles (vs the 3–5° earlier which read as "flat").
+// X-axis tilt makes the orbit dip front-to-back; Z-axis tilt makes it dip left-right.
 const PLANETS: Planet[] = [
   // ── real works ──
   { slug: "model",     name: "Model",           color: "#8b4513", iridescenceColor: "#f29a4a",
-    size: 1.00, orbitRadius: 4.6, angle: Math.PI / 2,                          orbitTilt: [0.05, -0.02] },
+    size: 1.00, orbitRadius: 4.6, angle: Math.PI / 2,                          orbitTilt: [0.22, -0.10] },
   { slug: "nemo",      name: "Nemo",            color: "#1a6b8e", iridescenceColor: "#3dd5b0",
-    size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 8,     orbitTilt: [-0.08, 0.03] },
+    size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 8,     orbitTilt: [-0.30, 0.12] },
   { slug: "concept",   name: "Concept Design",  color: "#1d5b58", iridescenceColor: "#7ad5e8",
-    size: 1.00, orbitRadius: 6.0, angle: Math.PI / 2 + (4 * Math.PI) / 8,     orbitTilt: [0.04, 0.06] },
+    size: 1.00, orbitRadius: 6.0, angle: Math.PI / 2 + (4 * Math.PI) / 8,     orbitTilt: [0.15, 0.26] },
   { slug: "moonlight", name: "Moonlight",       color: "#2a1f3d", iridescenceColor: "#c08af0",
-    size: 0.85, orbitRadius: 7.2, angle: Math.PI / 2 + (6 * Math.PI) / 8,     orbitTilt: [-0.06, -0.04] },
+    size: 0.85, orbitRadius: 7.2, angle: Math.PI / 2 + (6 * Math.PI) / 8,     orbitTilt: [-0.24, -0.18] },
   { slug: "mask",      name: "Under the Mask",  color: "#8b1d22", iridescenceColor: "#f0c050",
-    size: 0.85, orbitRadius: 5.3, angle: Math.PI / 2 + Math.PI,                orbitTilt: [0.09, 0.01] },
+    size: 0.85, orbitRadius: 5.3, angle: Math.PI / 2 + Math.PI,                orbitTilt: [0.30, 0.05] },
   { slug: "game",      name: "Game",            color: "#666666", iridescenceColor: "#cccccc",
-    size: 0.55, orbitRadius: 8.2, angle: Math.PI / 2 + (10 * Math.PI) / 8,    orbitTilt: [-0.03, 0.07] },
+    size: 0.55, orbitRadius: 8.2, angle: Math.PI / 2 + (10 * Math.PI) / 8,    orbitTilt: [-0.14, 0.28] },
 
   // Drawing — placeholder (ink-toned)
   { slug: "drawing",      name: "Drawing",      color: "#2a2a32", iridescenceColor: "#b0a8b8",
-    size: 0.55, orbitRadius: 7.6, angle: Math.PI / 2 + (12 * Math.PI) / 8,    orbitTilt: [0.07, 0.02] },
+    size: 0.55, orbitRadius: 7.6, angle: Math.PI / 2 + (12 * Math.PI) / 8,    orbitTilt: [0.28, 0.10] },
 
   // Photography — placeholder + HYSTON moon-system parent (sized up to be believable parent)
   { slug: "photography",  name: "Photography",  color: "#3a4a58", iridescenceColor: "#a8c0d8",
-    size: 0.95, orbitRadius: 6.7, angle: Math.PI / 2 + (14 * Math.PI) / 8,    orbitTilt: [-0.05, 0.08],
+    size: 0.95, orbitRadius: 6.7, angle: Math.PI / 2 + (14 * Math.PI) / 8,    orbitTilt: [-0.20, 0.30],
     moons: [
       {
         slug: "hyston",
@@ -67,7 +70,7 @@ const PLANETS: Planet[] = [
         orbitRadius: 1.55,
         orbitSpeed: Math.PI / 4, // ~8s per revolution
         initialAngle: 0,
-        orbitTilt: [0.15, 0.08],
+        orbitTilt: [0.35, 0.15],
       },
     ],
   },
@@ -205,9 +208,9 @@ function Planet({
   return (
     <Float
       position={position}
-      speed={1.0}
-      rotationIntensity={0.25}
-      floatIntensity={0.3}
+      speed={0.8}
+      rotationIntensity={0.15}
+      floatIntensity={0.12}
     >
       {/* planet body — self-rotates */}
       <group
@@ -386,8 +389,8 @@ function PlanetSystem({
   const mouse = useThree((s) => s.mouse);
 
   useFrame((_, delta) => {
-    // mouse.x is in [-1, +1]; negative so left-cursor rotates clockwise per spec
-    const targetVelocity = -mouse.x * 0.35;
+    // mouse.x in [-1, +1]. Spec: mouse-left → CW (negative Y), mouse-right → CCW (positive Y)
+    const targetVelocity = mouse.x * 0.35;
     rotationVelocity.current +=
       (targetVelocity - rotationVelocity.current) * Math.min(1, delta * 4);
     currentRotation.current += rotationVelocity.current * delta;
