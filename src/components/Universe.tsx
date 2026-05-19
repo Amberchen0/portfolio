@@ -5,12 +5,24 @@ import { Environment, Float, Html } from "@react-three/drei";
 import { useRef, useMemo, useState } from "react";
 import * as THREE from "three";
 
-/** Each work-planet's identity.
- *  size        = sphere radius (varied for visual hierarchy by importance)
- *  orbitRadius = distance from sun in scene units
- *  angle       = initial position on orbital ring (radians)
- *  orbitTilt   = each orbit slightly tilted on its own axes (like real planets)
- *                  → [tiltX, tiltZ] in radians (~0.05 = 3°) */
+/** A moon orbits a parent planet (not the sun). */
+type Moon = {
+  slug: string;
+  name: string;
+  color: string;
+  iridescenceColor: string;
+  size: number;
+  /** distance from parent planet's center */
+  orbitRadius: number;
+  /** how fast it orbits parent, radians/second */
+  orbitSpeed: number;
+  /** starting angle on its local orbit */
+  initialAngle: number;
+  /** moon's own orbital plane tilt relative to parent's local frame */
+  orbitTilt: [number, number];
+};
+
+/** Each work-planet's identity. */
 type Planet = {
   slug: string;
   name: string;
@@ -20,48 +32,149 @@ type Planet = {
   orbitRadius: number;
   angle: number;
   orbitTilt: [number, number];
+  moons?: Moon[];
 };
 
 const PLANETS: Planet[] = [
-  // ── 6 real works ──
+  // ── real works ──
   { slug: "model",     name: "Model",           color: "#8b4513", iridescenceColor: "#f29a4a",
-    size: 1.15, orbitRadius: 4.6, angle: Math.PI / 2,                          orbitTilt: [0.05, -0.02] },
+    size: 1.00, orbitRadius: 4.6, angle: Math.PI / 2,                          orbitTilt: [0.05, -0.02] },
   { slug: "nemo",      name: "Nemo",            color: "#1a6b8e", iridescenceColor: "#3dd5b0",
-    size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 9,     orbitTilt: [-0.08, 0.03] },
+    size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 8,     orbitTilt: [-0.08, 0.03] },
   { slug: "concept",   name: "Concept Design",  color: "#1d5b58", iridescenceColor: "#7ad5e8",
-    size: 1.00, orbitRadius: 6.0, angle: Math.PI / 2 + (4 * Math.PI) / 9,     orbitTilt: [0.04, 0.06] },
+    size: 1.00, orbitRadius: 6.0, angle: Math.PI / 2 + (4 * Math.PI) / 8,     orbitTilt: [0.04, 0.06] },
   { slug: "moonlight", name: "Moonlight",       color: "#2a1f3d", iridescenceColor: "#c08af0",
-    size: 0.85, orbitRadius: 7.2, angle: Math.PI / 2 + (6 * Math.PI) / 9,     orbitTilt: [-0.06, -0.04] },
+    size: 0.85, orbitRadius: 7.2, angle: Math.PI / 2 + (6 * Math.PI) / 8,     orbitTilt: [-0.06, -0.04] },
   { slug: "mask",      name: "Under the Mask",  color: "#8b1d22", iridescenceColor: "#f0c050",
-    size: 0.85, orbitRadius: 5.3, angle: Math.PI / 2 + (8 * Math.PI) / 9,     orbitTilt: [0.09, 0.01] },
+    size: 0.85, orbitRadius: 5.3, angle: Math.PI / 2 + Math.PI,                orbitTilt: [0.09, 0.01] },
   { slug: "game",      name: "Game",            color: "#666666", iridescenceColor: "#cccccc",
-    size: 0.55, orbitRadius: 8.1, angle: Math.PI / 2 + (10 * Math.PI) / 9,    orbitTilt: [-0.03, 0.07] },
+    size: 0.55, orbitRadius: 8.2, angle: Math.PI / 2 + (10 * Math.PI) / 8,    orbitTilt: [-0.03, 0.07] },
 
-  // HYSTON — real (documentary interview, warm cinematic palette)
-  { slug: "hyston",       name: "HYSTON",       color: "#7a4520", iridescenceColor: "#e8b070",
-    size: 0.85, orbitRadius: 4.0, angle: Math.PI / 2 + (12 * Math.PI) / 9,    orbitTilt: [0.06, -0.05] },
-  // Photography — placeholder (cool documentary blue-grey)
-  { slug: "photography",  name: "Photography",  color: "#3a4a58", iridescenceColor: "#a8c0d8",
-    size: 0.60, orbitRadius: 6.7, angle: Math.PI / 2 + (14 * Math.PI) / 9,    orbitTilt: [-0.05, 0.08] },
   // Drawing — placeholder (ink-toned)
   { slug: "drawing",      name: "Drawing",      color: "#2a2a32", iridescenceColor: "#b0a8b8",
-    size: 0.55, orbitRadius: 7.6, angle: Math.PI / 2 + (16 * Math.PI) / 9,    orbitTilt: [0.07, 0.02] },
+    size: 0.55, orbitRadius: 7.6, angle: Math.PI / 2 + (12 * Math.PI) / 8,    orbitTilt: [0.07, 0.02] },
+
+  // Photography — placeholder + HYSTON moon-system parent (sized up to be believable parent)
+  { slug: "photography",  name: "Photography",  color: "#3a4a58", iridescenceColor: "#a8c0d8",
+    size: 0.95, orbitRadius: 6.7, angle: Math.PI / 2 + (14 * Math.PI) / 8,    orbitTilt: [-0.05, 0.08],
+    moons: [
+      {
+        slug: "hyston",
+        name: "HYSTON",
+        color: "#7a4520",
+        iridescenceColor: "#e8b070",
+        size: 0.38,
+        orbitRadius: 1.55,
+        orbitSpeed: Math.PI / 4, // ~8s per revolution
+        initialAngle: 0,
+        orbitTilt: [0.15, 0.08],
+      },
+    ],
+  },
 ];
 
 /** Faint orbital ring drawn on the XZ plane at the planet's distance from sun.
  *  Used to visualize the orbit, like in the reference solar-system diagram. */
-function OrbitRing({ radius }: { radius: number }) {
+function OrbitRing({
+  radius,
+  opacity = 0.16,
+  segments = 196,
+}: {
+  radius: number;
+  opacity?: number;
+  segments?: number;
+}) {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} renderOrder={-1}>
-      <ringGeometry args={[radius - 0.018, radius + 0.018, 196]} />
+      <ringGeometry args={[radius - 0.014, radius + 0.014, segments]} />
       <meshBasicMaterial
         color="#d9a574"
         transparent
-        opacity={0.16}
+        opacity={opacity}
         side={THREE.DoubleSide}
         depthWrite={false}
       />
     </mesh>
+  );
+}
+
+/** A moon revolving around its parent planet on its own tilted local orbit. */
+function MoonSystem({
+  moon,
+  onClick,
+}: {
+  moon: Moon;
+  onClick: (slug: string) => void;
+}) {
+  const orbitRef = useRef<THREE.Group>(null!);
+  const moonRef = useRef<THREE.Mesh>(null!);
+  const [hovered, setHovered] = useState(false);
+
+  useFrame((_, delta) => {
+    if (orbitRef.current) orbitRef.current.rotation.y += moon.orbitSpeed * delta;
+    if (moonRef.current) moonRef.current.rotation.y += delta * 0.3;
+  });
+
+  return (
+    <group rotation={[moon.orbitTilt[0], 0, moon.orbitTilt[1]]}>
+      <OrbitRing radius={moon.orbitRadius} opacity={0.12} segments={96} />
+      <group ref={orbitRef} rotation={[0, moon.initialAngle, 0]}>
+        <group position={[moon.orbitRadius, 0, 0]}>
+          <mesh
+            ref={moonRef}
+            scale={hovered ? 1.15 : 1}
+            onPointerOver={(e) => {
+              e.stopPropagation();
+              setHovered(true);
+              document.body.style.cursor = "pointer";
+            }}
+            onPointerOut={() => {
+              setHovered(false);
+              document.body.style.cursor = "default";
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick(moon.slug);
+            }}
+          >
+            <sphereGeometry args={[moon.size, 48, 48]} />
+            <meshPhysicalMaterial
+              color={moon.color}
+              roughness={0.18}
+              metalness={0.05}
+              transmission={0.85}
+              thickness={0.8}
+              ior={1.5}
+              iridescence={1.0}
+              iridescenceIOR={1.3}
+              iridescenceThicknessRange={[100, 800]}
+              clearcoat={1.0}
+              clearcoatRoughness={0.08}
+              attenuationColor={moon.iridescenceColor}
+              attenuationDistance={2.0}
+              envMapIntensity={1.4}
+            />
+          </mesh>
+          <Html
+            position={[0, -(moon.size + 0.28), 0]}
+            center
+            style={{
+              pointerEvents: "none",
+              fontFamily: "var(--font-geist-mono), monospace",
+              fontSize: hovered ? "10px" : "9px",
+              letterSpacing: "0.25em",
+              textTransform: "uppercase",
+              color: hovered ? "#f0e0c5" : "#8a7e6a",
+              transition: "all 0.4s ease",
+              whiteSpace: "nowrap",
+              textShadow: "0 2px 12px rgba(0,0,0,0.8)",
+            }}
+          >
+            {moon.name}
+          </Html>
+        </group>
+      </group>
+    </group>
   );
 }
 
@@ -96,6 +209,7 @@ function Planet({
       rotationIntensity={0.25}
       floatIntensity={0.3}
     >
+      {/* planet body — self-rotates */}
       <group
         ref={groupRef}
         onPointerOver={(e) => {
@@ -150,6 +264,11 @@ function Planet({
           {planet.name}
         </Html>
       </group>
+
+      {/* moons — orbit the planet's center independently of planet self-rotation */}
+      {planet.moons?.map((m) => (
+        <MoonSystem key={m.slug} moon={m} onClick={onClick} />
+      ))}
     </Float>
   );
 }
@@ -164,19 +283,19 @@ function AmberSun() {
   return (
     <Float speed={0.6} rotationIntensity={0.08} floatIntensity={0.12}>
       <mesh ref={ref}>
-        <sphereGeometry args={[1.8, 96, 96]} />
+        <sphereGeometry args={[1.2, 96, 96]} />
         <meshPhysicalMaterial
           color="#d9a574"
           emissive="#b8843f"
-          emissiveIntensity={0.5}
+          emissiveIntensity={0.55}
           roughness={0.35}
           transmission={0.5}
-          thickness={1.5}
+          thickness={1.2}
           ior={1.6}
           clearcoat={1.0}
           clearcoatRoughness={0.2}
           attenuationColor="#f0c885"
-          attenuationDistance={2.0}
+          attenuationDistance={1.8}
         />
       </mesh>
       <pointLight color="#f0c885" intensity={4} distance={28} decay={1.5} />
