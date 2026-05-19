@@ -37,14 +37,15 @@ const PLANETS: Planet[] = [
   { slug: "game",      name: "Game",            color: "#666666", iridescenceColor: "#cccccc",
     size: 0.55, orbitRadius: 8.1, angle: Math.PI / 2 + (10 * Math.PI) / 9,    orbitTilt: [-0.03, 0.07] },
 
-  // ── 3 placeholders for upcoming works ──
-  // muted neutral palette so they hint "not yet themed"; click → "still forming" modal
-  { slug: "untitled-vii",  name: "Untitled · VII",  color: "#404858", iridescenceColor: "#9fb0c8",
-    size: 0.70, orbitRadius: 4.0, angle: Math.PI / 2 + (12 * Math.PI) / 9,    orbitTilt: [0.06, -0.05] },
-  { slug: "untitled-viii", name: "Untitled · VIII", color: "#3a3a44", iridescenceColor: "#a8a0b8",
+  // HYSTON — real (documentary interview, warm cinematic palette)
+  { slug: "hyston",       name: "HYSTON",       color: "#7a4520", iridescenceColor: "#e8b070",
+    size: 0.85, orbitRadius: 4.0, angle: Math.PI / 2 + (12 * Math.PI) / 9,    orbitTilt: [0.06, -0.05] },
+  // Photography — placeholder (cool documentary blue-grey)
+  { slug: "photography",  name: "Photography",  color: "#3a4a58", iridescenceColor: "#a8c0d8",
     size: 0.60, orbitRadius: 6.7, angle: Math.PI / 2 + (14 * Math.PI) / 9,    orbitTilt: [-0.05, 0.08] },
-  { slug: "untitled-ix",   name: "Untitled · IX",   color: "#48413c", iridescenceColor: "#beb0a0",
-    size: 0.50, orbitRadius: 7.6, angle: Math.PI / 2 + (16 * Math.PI) / 9,    orbitTilt: [0.07, 0.02] },
+  // Drawing — placeholder (ink-toned)
+  { slug: "drawing",      name: "Drawing",      color: "#2a2a32", iridescenceColor: "#b0a8b8",
+    size: 0.55, orbitRadius: 7.6, angle: Math.PI / 2 + (16 * Math.PI) / 9,    orbitTilt: [0.07, 0.02] },
 ];
 
 /** Faint orbital ring drawn on the XZ plane at the planet's distance from sun.
@@ -391,7 +392,7 @@ function PlanetModal({
           {planet.name}
         </h2>
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
-          {slug === "game" || slug.startsWith("untitled-")
+          {["game", "photography", "drawing"].includes(slug)
             ? "This world is still forming. Come back when the dust settles."
             : "World detail page — coming soon."}
         </p>
