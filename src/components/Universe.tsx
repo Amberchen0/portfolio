@@ -122,11 +122,14 @@ function PlanetLabel({
   planetRadius: number;
   hovered: boolean;
 }) {
-  const shift = hovered ? 0.022 : 0.010;
-  const fontSize = hovered ? 0.18 : 0.14;
-  const fillOpacity = hovered ? 0.95 : 0.78;
-  // sit just outside hover-scaled sphere (1.1x), so label never clips in
-  const distance = planetRadius * 1.15 + 0.06;
+  const shift = hovered ? 0.016 : 0.007;
+  const fontSize = hovered ? 0.14 : 0.11;
+  const fillOpacity = hovered ? 0.95 : 0.8;
+  // Close to the sphere so the text feels like a band on its surface (the
+  // "Universal globe" wrap), while staying just outside the hover-scaled
+  // sphere (1.1x). For R=1.0 → distance=1.12; for R=0.55 → distance=0.634.
+  const distance = planetRadius * 1.08 + 0.04;
+  const letterSpacing = 0.35;
   return (
     <Billboard>
       {/* magenta-red ghost */}
@@ -134,7 +137,7 @@ function PlanetLabel({
         position={[shift, 0, distance]}
         color="#ff2860"
         fontSize={fontSize}
-        letterSpacing={0.2}
+        letterSpacing={letterSpacing}
         anchorX="center"
         anchorY="middle"
         // @ts-expect-error troika supports curveRadius; drei type omits it
@@ -149,7 +152,7 @@ function PlanetLabel({
         position={[-shift, 0, distance]}
         color="#00e0ff"
         fontSize={fontSize}
-        letterSpacing={0.2}
+        letterSpacing={letterSpacing}
         anchorX="center"
         anchorY="middle"
         // @ts-expect-error troika supports curveRadius; drei type omits it
@@ -164,7 +167,7 @@ function PlanetLabel({
         position={[0, 0, distance + 0.004]}
         color={hovered ? "#f0e0c5" : "#c8bca0"}
         fontSize={fontSize}
-        letterSpacing={0.2}
+        letterSpacing={letterSpacing}
         anchorX="center"
         anchorY="middle"
         // @ts-expect-error troika supports curveRadius; drei type omits it
