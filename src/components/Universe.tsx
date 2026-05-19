@@ -377,33 +377,16 @@ function StarField({ count = 1500 }) {
   );
 }
 
-/** Mouse-velocity driven rotation of the entire planet system */
+/** The static planet system — everything is fixed in space; only the camera
+ *  moves around it (see CameraOrbit). This matches real astronomy: orbits
+ *  are paths, they don't rotate. */
 function PlanetSystem({
   onPlanetClick,
 }: {
   onPlanetClick: (slug: string) => void;
 }) {
-  const groupRef = useRef<THREE.Group>(null!);
-  const rotationVelocity = useRef(0);
-  const currentRotation = useRef(0);
-  const mouse = useThree((s) => s.mouse);
-
-  useFrame((_, delta) => {
-    // mouse.x in [-1, +1]. Spec: mouse-left → CW (negative Y), mouse-right → CCW (positive Y)
-    const targetVelocity = mouse.x * 0.35;
-    rotationVelocity.current +=
-      (targetVelocity - rotationVelocity.current) * Math.min(1, delta * 4);
-    currentRotation.current += rotationVelocity.current * delta;
-    if (groupRef.current) {
-      groupRef.current.rotation.y = currentRotation.current;
-    }
-  });
-
   return (
-    <group ref={groupRef}>
-      {/* Each planet and its orbital ring share a tilted subgroup so they
-          stay locked together. Tilts vary 3–8° to mimic real planetary
-          orbital inclinations and add 3D depth to the scene. */}
+    <group>
       {PLANETS.map((p) => (
         <group key={p.slug} rotation={[p.orbitTilt[0], 0, p.orbitTilt[1]]}>
           <OrbitRing radius={p.orbitRadius} />
@@ -412,6 +395,32 @@ function PlanetSystem({
       ))}
     </group>
   );
+}
+
+/** Mouse-velocity driven CAMERA orbit around the sun.
+ *  Universe stays still; viewer flies around it.
+ *  Spec: mouse-left → the user sees the scene rotate CW (camera goes CCW), etc. */
+function CameraOrbit() {
+  const camera = useThree((s) => s.camera);
+  const mouse = useThree((s) => s.mouse);
+  const angle = useRef(0);
+  const velocity = useRef(0);
+  const RADIUS = 12;
+  const HEIGHT = 3;
+
+  useFrame((_, delta) => {
+    const targetVelocity = mouse.x * 0.35;
+    velocity.current +=
+      (targetVelocity - velocity.current) * Math.min(1, delta * 4);
+    angle.current += velocity.current * delta;
+
+    camera.position.x = RADIUS * Math.sin(angle.current);
+    camera.position.z = RADIUS * Math.cos(angle.current);
+    camera.position.y = HEIGHT;
+    camera.lookAt(0, 0, 0);
+  });
+
+  return null;
 }
 
 /** Main scene composition */
@@ -439,6 +448,9 @@ function SceneContent({
       <AmberSun />
 
       <PlanetSystem onPlanetClick={onPlanetClick} />
+
+      {/* Mouse-driven camera orbit — keeps the universe static */}
+      <CameraOrbit />
     </>
   );
 }
