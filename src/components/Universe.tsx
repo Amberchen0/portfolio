@@ -6,9 +6,11 @@ import { useRef, useMemo, useState } from "react";
 import * as THREE from "three";
 
 /** Each work-planet's identity.
- *  size       = sphere radius (varied to give visual hierarchy by importance)
- *  orbitRadius = how far from the sun, in scene units
- *  angle      = initial position on its orbital ring (radians) */
+ *  size        = sphere radius (varied for visual hierarchy by importance)
+ *  orbitRadius = distance from sun in scene units
+ *  angle       = initial position on orbital ring (radians)
+ *  orbitTilt   = each orbit slightly tilted on its own axes (like real planets)
+ *                  → [tiltX, tiltZ] in radians (~0.05 = 3°) */
 type Planet = {
   slug: string;
   name: string;
@@ -17,23 +19,28 @@ type Planet = {
   size: number;
   orbitRadius: number;
   angle: number;
+  orbitTilt: [number, number];
 };
 
-// Inner orbits = smaller works / placeholder, outer = bigger / more important.
-// 模型 sits at the most prominent position (front-and-center on load).
 const PLANETS: Planet[] = [
-  // 模型 — your most differentiating physical-craft piece — front, large
-  { slug: "model",     name: "Model",           color: "#8b4513", iridescenceColor: "#f29a4a", size: 1.15, orbitRadius: 4.6, angle: Math.PI / 2 },
-  // Nemo — most complete portfolio piece — slightly off, large
-  { slug: "nemo",      name: "Nemo",            color: "#1a6b8e", iridescenceColor: "#3dd5b0", size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 6 },
-  // 概念设计 — visual breadth — outer, large
-  { slug: "concept",   name: "Concept Design",  color: "#1d5b58", iridescenceColor: "#7ad5e8", size: 1.00, orbitRadius: 6.0, angle: Math.PI / 2 + (4 * Math.PI) / 6 },
-  // Moonlight — strong visual concept — mid
-  { slug: "moonlight", name: "Moonlight",       color: "#2a1f3d", iridescenceColor: "#c08af0", size: 0.85, orbitRadius: 7.0, angle: Math.PI / 2 + Math.PI },
-  // 面具之下 — cultural piece — mid-outer
-  { slug: "mask",      name: "Under the Mask",  color: "#8b1d22", iridescenceColor: "#f0c050", size: 0.85, orbitRadius: 5.3, angle: Math.PI / 2 + (8 * Math.PI) / 6 },
-  // Game — placeholder — small, far outer
-  { slug: "game",      name: "Game",            color: "#666666", iridescenceColor: "#cccccc", size: 0.55, orbitRadius: 7.8, angle: Math.PI / 2 + (10 * Math.PI) / 6 },
+  // 模型 — innermost prominent orbit, default front
+  { slug: "model",     name: "Model",           color: "#8b4513", iridescenceColor: "#f29a4a",
+    size: 1.15, orbitRadius: 4.6, angle: Math.PI / 2,                       orbitTilt: [0.05, -0.02] },
+  // Nemo — innermost orbit, complete project
+  { slug: "nemo",      name: "Nemo",            color: "#1a6b8e", iridescenceColor: "#3dd5b0",
+    size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 6,    orbitTilt: [-0.08, 0.03] },
+  // 概念设计 — mid-outer, broad
+  { slug: "concept",   name: "Concept Design",  color: "#1d5b58", iridescenceColor: "#7ad5e8",
+    size: 1.00, orbitRadius: 6.0, angle: Math.PI / 2 + (4 * Math.PI) / 6,    orbitTilt: [0.04, 0.06] },
+  // Moonlight — outer
+  { slug: "moonlight", name: "Moonlight",       color: "#2a1f3d", iridescenceColor: "#c08af0",
+    size: 0.85, orbitRadius: 7.0, angle: Math.PI / 2 + Math.PI,              orbitTilt: [-0.06, -0.04] },
+  // 面具之下 — mid
+  { slug: "mask",      name: "Under the Mask",  color: "#8b1d22", iridescenceColor: "#f0c050",
+    size: 0.85, orbitRadius: 5.3, angle: Math.PI / 2 + (8 * Math.PI) / 6,    orbitTilt: [0.09, 0.01] },
+  // Game — outermost, smallest, placeholder
+  { slug: "game",      name: "Game",            color: "#666666", iridescenceColor: "#cccccc",
+    size: 0.55, orbitRadius: 7.8, angle: Math.PI / 2 + (10 * Math.PI) / 6,   orbitTilt: [-0.03, 0.07] },
 ];
 
 /** Faint orbital ring drawn on the XZ plane at the planet's distance from sun.
@@ -265,22 +272,16 @@ function PlanetSystem({
     }
   });
 
-  // unique orbit radii for ring rendering
-  const orbitRadii = useMemo(
-    () => Array.from(new Set(PLANETS.map((p) => p.orbitRadius))),
-    []
-  );
-
   return (
     <group ref={groupRef}>
-      {/* faint orbital rings, each planet has its own */}
-      {orbitRadii.map((r) => (
-        <OrbitRing key={r} radius={r} />
-      ))}
-
-      {/* planets */}
+      {/* Each planet and its orbital ring share a tilted subgroup so they
+          stay locked together. Tilts vary 3–8° to mimic real planetary
+          orbital inclinations and add 3D depth to the scene. */}
       {PLANETS.map((p) => (
-        <Planet key={p.slug} planet={p} onClick={onPlanetClick} />
+        <group key={p.slug} rotation={[p.orbitTilt[0], 0, p.orbitTilt[1]]}>
+          <OrbitRing radius={p.orbitRadius} />
+          <Planet planet={p} onClick={onPlanetClick} />
+        </group>
       ))}
     </group>
   );
@@ -321,8 +322,9 @@ export default function Universe() {
   return (
     <div className="fixed inset-0 bg-background">
       <Canvas
-        // tilted angle so circular orbits read as ellipses (side-view solar system)
-        camera={{ position: [0, 5.5, 11], fov: 50 }}
+        // low-side angle so orbital rings read as thin flattened ellipses,
+        // matching the reference solar-system diagram. Roughly 14° elevation.
+        camera={{ position: [0, 3.0, 12], fov: 48 }}
         gl={{
           antialias: true,
           alpha: false,
