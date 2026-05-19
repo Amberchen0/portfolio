@@ -2,69 +2,106 @@
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Float, Html } from "@react-three/drei";
-import { useRef, useMemo, useState, useEffect } from "react";
+import { useRef, useMemo, useState } from "react";
 import * as THREE from "three";
 
-/** Each work-planet's identity */
+/** Each work-planet's identity.
+ *  size       = sphere radius (varied to give visual hierarchy by importance)
+ *  orbitRadius = how far from the sun, in scene units
+ *  angle      = initial position on its orbital ring (radians) */
 type Planet = {
   slug: string;
   name: string;
-  /** base body tint */
   color: string;
-  /** which iridescence color band to bias toward */
   iridescenceColor: string;
+  size: number;
+  orbitRadius: number;
+  angle: number;
 };
 
+// Inner orbits = smaller works / placeholder, outer = bigger / more important.
+// 模型 sits at the most prominent position (front-and-center on load).
 const PLANETS: Planet[] = [
-  { slug: "nemo",      name: "Nemo",            color: "#1a6b8e", iridescenceColor: "#3dd5b0" },
-  { slug: "moonlight", name: "Moonlight",       color: "#2a1f3d", iridescenceColor: "#c08af0" },
-  { slug: "mask",      name: "Under the Mask",  color: "#8b1d22", iridescenceColor: "#f0c050" },
-  { slug: "model",     name: "Model",           color: "#8b4513", iridescenceColor: "#f29a4a" },
-  { slug: "concept",   name: "Concept Design",  color: "#1d5b58", iridescenceColor: "#7ad5e8" },
-  { slug: "game",      name: "Game",            color: "#666666", iridescenceColor: "#cccccc" },
+  // 模型 — your most differentiating physical-craft piece — front, large
+  { slug: "model",     name: "Model",           color: "#8b4513", iridescenceColor: "#f29a4a", size: 1.15, orbitRadius: 4.6, angle: Math.PI / 2 },
+  // Nemo — most complete portfolio piece — slightly off, large
+  { slug: "nemo",      name: "Nemo",            color: "#1a6b8e", iridescenceColor: "#3dd5b0", size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 6 },
+  // 概念设计 — visual breadth — outer, large
+  { slug: "concept",   name: "Concept Design",  color: "#1d5b58", iridescenceColor: "#7ad5e8", size: 1.00, orbitRadius: 6.0, angle: Math.PI / 2 + (4 * Math.PI) / 6 },
+  // Moonlight — strong visual concept — mid
+  { slug: "moonlight", name: "Moonlight",       color: "#2a1f3d", iridescenceColor: "#c08af0", size: 0.85, orbitRadius: 7.0, angle: Math.PI / 2 + Math.PI },
+  // 面具之下 — cultural piece — mid-outer
+  { slug: "mask",      name: "Under the Mask",  color: "#8b1d22", iridescenceColor: "#f0c050", size: 0.85, orbitRadius: 5.3, angle: Math.PI / 2 + (8 * Math.PI) / 6 },
+  // Game — placeholder — small, far outer
+  { slug: "game",      name: "Game",            color: "#666666", iridescenceColor: "#cccccc", size: 0.55, orbitRadius: 7.8, angle: Math.PI / 2 + (10 * Math.PI) / 6 },
 ];
+
+/** Faint orbital ring drawn on the XZ plane at the planet's distance from sun.
+ *  Used to visualize the orbit, like in the reference solar-system diagram. */
+function OrbitRing({ radius }: { radius: number }) {
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} renderOrder={-1}>
+      <ringGeometry args={[radius - 0.018, radius + 0.018, 196]} />
+      <meshBasicMaterial
+        color="#d9a574"
+        transparent
+        opacity={0.16}
+        side={THREE.DoubleSide}
+        depthWrite={false}
+      />
+    </mesh>
+  );
+}
 
 /** Single glass-bead planet — dichroic / iridescent physical material */
 function Planet({
   planet,
-  angle,
-  radius,
   onClick,
 }: {
   planet: Planet;
-  angle: number;
-  radius: number;
   onClick: (slug: string) => void;
 }) {
   const groupRef = useRef<THREE.Group>(null!);
   const [hovered, setHovered] = useState(false);
 
-  const position = useMemo<[number, number, number]>(() => {
-    return [Math.cos(angle) * radius, 0, Math.sin(angle) * radius];
-  }, [angle, radius]);
+  const position = useMemo<[number, number, number]>(
+    () => [
+      Math.cos(planet.angle) * planet.orbitRadius,
+      0,
+      Math.sin(planet.angle) * planet.orbitRadius,
+    ],
+    [planet.angle, planet.orbitRadius]
+  );
 
-  // gentle self-rotation
   useFrame((_, delta) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.15;
-    }
+    if (groupRef.current) groupRef.current.rotation.y += delta * 0.15;
   });
 
   return (
     <Float
       position={position}
-      speed={1.2}
-      rotationIntensity={0.3}
-      floatIntensity={0.4}
+      speed={1.0}
+      rotationIntensity={0.25}
+      floatIntensity={0.3}
     >
       <group
         ref={groupRef}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
-        onClick={() => onClick(planet.slug)}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          setHovered(true);
+          document.body.style.cursor = "pointer";
+        }}
+        onPointerOut={() => {
+          setHovered(false);
+          document.body.style.cursor = "default";
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick(planet.slug);
+        }}
       >
-        <mesh scale={hovered ? 1.12 : 1}>
-          <sphereGeometry args={[0.9, 64, 64]} />
+        <mesh scale={hovered ? 1.1 : 1}>
+          <sphereGeometry args={[planet.size, 64, 64]} />
           <meshPhysicalMaterial
             color={planet.color}
             roughness={0.18}
@@ -83,9 +120,8 @@ function Planet({
           />
         </mesh>
 
-        {/* name label */}
         <Html
-          position={[0, -1.3, 0]}
+          position={[0, -(planet.size + 0.35), 0]}
           center
           style={{
             pointerEvents: "none",
@@ -106,7 +142,7 @@ function Planet({
   );
 }
 
-/** Central amber sun — placeholder for now (user's ChatGPT round-amber will replace this) */
+/** Central amber sun — placeholder; ChatGPT round-amber will swap in later */
 function AmberSun() {
   const ref = useRef<THREE.Mesh>(null!);
   useFrame((_, delta) => {
@@ -114,16 +150,15 @@ function AmberSun() {
   });
 
   return (
-    <Float speed={0.6} rotationIntensity={0.1} floatIntensity={0.15}>
+    <Float speed={0.6} rotationIntensity={0.08} floatIntensity={0.12}>
       <mesh ref={ref}>
-        <sphereGeometry args={[1.6, 96, 96]} />
+        <sphereGeometry args={[1.8, 96, 96]} />
         <meshPhysicalMaterial
           color="#d9a574"
           emissive="#b8843f"
-          emissiveIntensity={0.45}
+          emissiveIntensity={0.5}
           roughness={0.35}
-          metalness={0.0}
-          transmission={0.55}
+          transmission={0.5}
           thickness={1.5}
           ior={1.6}
           clearcoat={1.0}
@@ -132,13 +167,12 @@ function AmberSun() {
           attenuationDistance={2.0}
         />
       </mesh>
-      {/* warm halo light */}
-      <pointLight color="#f0c885" intensity={3} distance={20} decay={1.5} />
+      <pointLight color="#f0c885" intensity={4} distance={28} decay={1.5} />
     </Float>
   );
 }
 
-/** Iridescent nebula wisps — translucent volumetric clouds drifting through the scene */
+/** Iridescent nebula wisps — translucent volumetric clouds drifting through */
 function NebulaWisp({
   position,
   scale,
@@ -164,7 +198,6 @@ function NebulaWisp({
       <meshPhysicalMaterial
         color={color}
         roughness={0.9}
-        metalness={0.0}
         transmission={0.95}
         thickness={4.0}
         iridescence={1.0}
@@ -179,13 +212,13 @@ function NebulaWisp({
 }
 
 /** Distant background stars */
-function StarField({ count = 1200 }) {
+function StarField({ count = 1500 }) {
   const points = useMemo(() => {
     const arr = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
-      const r = 40 + Math.random() * 30;
+      const r = 45 + Math.random() * 35;
       arr[i * 3] = r * Math.sin(phi) * Math.cos(theta);
       arr[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
       arr[i * 3 + 2] = r * Math.cos(phi);
@@ -196,10 +229,7 @@ function StarField({ count = 1200 }) {
   return (
     <points>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[points, 3]}
-        />
+        <bufferAttribute attach="attributes-position" args={[points, 3]} />
       </bufferGeometry>
       <pointsMaterial
         size={0.08}
@@ -214,16 +244,19 @@ function StarField({ count = 1200 }) {
 }
 
 /** Mouse-velocity driven rotation of the entire planet system */
-function PlanetSystem({ onPlanetClick }: { onPlanetClick: (slug: string) => void }) {
+function PlanetSystem({
+  onPlanetClick,
+}: {
+  onPlanetClick: (slug: string) => void;
+}) {
   const groupRef = useRef<THREE.Group>(null!);
   const rotationVelocity = useRef(0);
   const currentRotation = useRef(0);
   const mouse = useThree((s) => s.mouse);
 
   useFrame((_, delta) => {
-    // mouse.x is in [-1, +1]; map to a max rotation speed
-    const targetVelocity = -mouse.x * 0.35; // negative so left-mouse rotates clockwise (your spec)
-    // smooth velocity changes
+    // mouse.x is in [-1, +1]; negative so left-cursor rotates clockwise per spec
+    const targetVelocity = -mouse.x * 0.35;
     rotationVelocity.current +=
       (targetVelocity - rotationVelocity.current) * Math.min(1, delta * 4);
     currentRotation.current += rotationVelocity.current * delta;
@@ -232,59 +265,51 @@ function PlanetSystem({ onPlanetClick }: { onPlanetClick: (slug: string) => void
     }
   });
 
-  const radius = 4.5;
+  // unique orbit radii for ring rendering
+  const orbitRadii = useMemo(
+    () => Array.from(new Set(PLANETS.map((p) => p.orbitRadius))),
+    []
+  );
 
   return (
     <group ref={groupRef}>
-      {PLANETS.map((p, i) => {
-        const angle = (i / PLANETS.length) * Math.PI * 2;
-        return (
-          <Planet
-            key={p.slug}
-            planet={p}
-            angle={angle}
-            radius={radius}
-            onClick={onPlanetClick}
-          />
-        );
-      })}
+      {/* faint orbital rings, each planet has its own */}
+      {orbitRadii.map((r) => (
+        <OrbitRing key={r} radius={r} />
+      ))}
+
+      {/* planets */}
+      {PLANETS.map((p) => (
+        <Planet key={p.slug} planet={p} onClick={onPlanetClick} />
+      ))}
     </group>
   );
 }
 
 /** Main scene composition */
-function SceneContent({ onPlanetClick }: { onPlanetClick: (slug: string) => void }) {
+function SceneContent({
+  onPlanetClick,
+}: {
+  onPlanetClick: (slug: string) => void;
+}) {
   return (
     <>
-      {/* environment provides reflections for the physical glass material */}
       <Environment preset="night" environmentIntensity={0.4} />
 
-      {/* lighting */}
       <ambientLight intensity={0.15} />
-      <directionalLight
-        position={[5, 8, 5]}
-        intensity={0.6}
-        color="#e8d5a8"
-      />
-      <directionalLight
-        position={[-6, -2, -4]}
-        intensity={0.3}
-        color="#7ab0e0"
-      />
+      <directionalLight position={[5, 8, 5]} intensity={0.6} color="#e8d5a8" />
+      <directionalLight position={[-6, -2, -4]} intensity={0.3} color="#7ab0e0" />
 
-      {/* background */}
-      <StarField count={1200} />
+      <StarField count={1500} />
 
-      {/* iridescent nebula wisps */}
-      <NebulaWisp position={[-7, 2, -3]} scale={1.4} color="#8a4dff" />
-      <NebulaWisp position={[6, -1.5, -4]} scale={1.6} color="#3dd5b0" />
-      <NebulaWisp position={[2, 3.5, -5]} scale={1.2} color="#e070c0" />
-      <NebulaWisp position={[-5, -3, 1]} scale={1.0} color="#5a8de0" />
+      {/* iridescent nebula wisps — gas drifting through the universe */}
+      <NebulaWisp position={[-9, 2.5, -4]} scale={1.5} color="#8a4dff" />
+      <NebulaWisp position={[8, -1.5, -5]} scale={1.7} color="#3dd5b0" />
+      <NebulaWisp position={[3, 4.5, -7]} scale={1.3} color="#e070c0" />
+      <NebulaWisp position={[-6, -3, 2]} scale={1.1} color="#5a8de0" />
 
-      {/* sun in the center */}
       <AmberSun />
 
-      {/* 6 planet orbital system */}
       <PlanetSystem onPlanetClick={onPlanetClick} />
     </>
   );
@@ -296,20 +321,24 @@ export default function Universe() {
   return (
     <div className="fixed inset-0 bg-background">
       <Canvas
-        camera={{ position: [0, 1.5, 9], fov: 50 }}
+        // tilted angle so circular orbits read as ellipses (side-view solar system)
+        camera={{ position: [0, 5.5, 11], fov: 50 }}
         gl={{
           antialias: true,
           alpha: false,
           powerPreference: "high-performance",
         }}
         dpr={[1, 2]}
+        onCreated={({ camera }) => {
+          camera.lookAt(0, 0, 0);
+        }}
       >
         <color attach="background" args={["#0a0807"]} />
-        <fog attach="fog" args={["#0a0807", 12, 35]} />
+        <fog attach="fog" args={["#0a0807", 15, 40]} />
         <SceneContent onPlanetClick={setActiveSlug} />
       </Canvas>
 
-      {/* top-left brand */}
+      {/* brand */}
       <div className="pointer-events-none absolute left-6 top-6 font-mono text-xs uppercase tracking-[0.3em] text-muted sm:left-12 sm:top-8">
         Amber Xu · Universe
       </div>
@@ -319,7 +348,7 @@ export default function Universe() {
         ← move cursor to rotate →
       </div>
 
-      {/* tiny back-to-home link */}
+      {/* back-to-home */}
       <a
         href="/"
         className="absolute right-6 top-6 font-mono text-xs uppercase tracking-[0.3em] text-muted transition-colors hover:text-amber sm:right-12 sm:top-8"
@@ -327,7 +356,6 @@ export default function Universe() {
         ← home
       </a>
 
-      {/* clicked planet modal placeholder */}
       {activeSlug && (
         <PlanetModal slug={activeSlug} onClose={() => setActiveSlug(null)} />
       )}
@@ -335,7 +363,13 @@ export default function Universe() {
   );
 }
 
-function PlanetModal({ slug, onClose }: { slug: string; onClose: () => void }) {
+function PlanetModal({
+  slug,
+  onClose,
+}: {
+  slug: string;
+  onClose: () => void;
+}) {
   const planet = PLANETS.find((p) => p.slug === slug);
   if (!planet) return null;
   return (
