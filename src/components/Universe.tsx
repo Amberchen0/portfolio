@@ -107,12 +107,10 @@ function OrbitRing({
   );
 }
 
-/** Single chromatic-glass name label that always faces the camera AND
- *  curves inward toward the sphere — each letter sits at the same radial
- *  distance from the sphere's center, mimicking the Universal Studios
- *  globe wrap. troika's `curveRadius` bends the text along a cylinder
- *  whose axis coincides with the sphere's vertical axis; <Billboard>
- *  re-orients the whole wrap so it always reads forward from the camera. */
+/** Single chromatic-glass name label that always faces the camera.
+ *  One Text wrapped in <Billboard> so it stays readable regardless of
+ *  orbital position or self-rotation. Three RGB-shifted layers (magenta /
+ *  cyan / warm-cream) give the chromatic "off-axis print" look. */
 function PlanetLabel({
   name,
   planetRadius,
@@ -125,10 +123,8 @@ function PlanetLabel({
   const shift = hovered ? 0.018 : 0.008;
   const fontSize = hovered ? 0.16 : 0.13;
   const fillOpacity = hovered ? 0.95 : 0.8;
-  // close to the sphere — tighter curveRadius = each char visibly inward-bent.
-  // R*1.10+0.03 sits just outside hover-scaled (1.1x) so it never clips.
-  const distance = planetRadius * 1.1 + 0.03;
-  const letterSpacing = 0.35;
+  // sit just outside hover-scaled (1.1x) sphere, on the camera-facing side
+  const distance = planetRadius * 1.1 + 0.06;
   return (
     <Billboard>
       {/* magenta-red ghost */}
@@ -136,11 +132,9 @@ function PlanetLabel({
         position={[shift, 0, distance]}
         color="#ff2860"
         fontSize={fontSize}
-        letterSpacing={letterSpacing}
+        letterSpacing={0.22}
         anchorX="center"
         anchorY="middle"
-        // @ts-expect-error troika supports curveRadius; drei type omits it
-        curveRadius={distance}
         fillOpacity={fillOpacity * 0.7}
         raycast={() => null}
       >
@@ -151,11 +145,9 @@ function PlanetLabel({
         position={[-shift, 0, distance]}
         color="#00e0ff"
         fontSize={fontSize}
-        letterSpacing={letterSpacing}
+        letterSpacing={0.22}
         anchorX="center"
         anchorY="middle"
-        // @ts-expect-error troika supports curveRadius; drei type omits it
-        curveRadius={distance}
         fillOpacity={fillOpacity * 0.7}
         raycast={() => null}
       >
@@ -163,14 +155,12 @@ function PlanetLabel({
       </Text>
       {/* warm-cream main fill, drawn last on top */}
       <Text
-        position={[0, 0, distance + 0.003]}
+        position={[0, 0, distance + 0.002]}
         color={hovered ? "#f0e0c5" : "#c8bca0"}
         fontSize={fontSize}
-        letterSpacing={letterSpacing}
+        letterSpacing={0.22}
         anchorX="center"
         anchorY="middle"
-        // @ts-expect-error troika supports curveRadius; drei type omits it
-        curveRadius={distance + 0.003}
         fillOpacity={fillOpacity}
         raycast={() => null}
       >
