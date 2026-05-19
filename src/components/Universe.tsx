@@ -1,7 +1,13 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, Float, Text, Billboard } from "@react-three/drei";
+import {
+  Environment,
+  Float,
+  Text,
+  Billboard,
+  MeshTransmissionMaterial,
+} from "@react-three/drei";
 import { useRef, useMemo, useState, useEffect } from "react";
 import * as THREE from "three";
 
@@ -332,37 +338,69 @@ function Planet({
   );
 }
 
-/** Central amber sun — glass-bead language matching the 9 planets, just
- *  amber-colored and emissive enough to read as the system's light source. */
+/** Central amber sun — a "breathing glass" star.
+ *  Three-layer sandwich gives both the glowing-source feel and the wavy
+ *  organic glass texture from the user's reference:
+ *    1. Inner plasma core (emissive solid) — light source visible through glass
+ *    2. Middle transmission shell with distortion + chromatic aberration —
+ *       the "uneven, alive" glass that ripples over time
+ *    3. Outer additive halo — soft amber bloom around the silhouette
+ *  Slow self-rotation drifts the wavy noise field across the surface. */
 function AmberSun() {
-  const ref = useRef<THREE.Mesh>(null!);
+  const shellRef = useRef<THREE.Mesh>(null!);
   useFrame((_, delta) => {
-    if (ref.current) ref.current.rotation.y += delta * 0.05;
+    if (shellRef.current) shellRef.current.rotation.y += delta * 0.05;
   });
 
   return (
     <Float speed={0.6} rotationIntensity={0.08} floatIntensity={0.12}>
-      <mesh ref={ref}>
-        <sphereGeometry args={[1.2, 96, 96]} />
-        <meshPhysicalMaterial
+      {/* 1 — inner emissive plasma core (rendered first so the transmission
+             shell can refract light through it). */}
+      <mesh>
+        <sphereGeometry args={[0.78, 48, 48]} />
+        <meshBasicMaterial color="#f0c885" toneMapped={false} />
+      </mesh>
+
+      {/* 2 — wavy iridescent glass shell. distortion gives the bumpy / oil-
+             film surface; temporalDistortion makes the surface noise drift
+             so it "breathes". chromaticAberration paints the colored edges. */}
+      <mesh ref={shellRef}>
+        <sphereGeometry args={[1.2, 128, 128]} />
+        <MeshTransmissionMaterial
           color="#d9a574"
-          emissive="#f0c885"
-          emissiveIntensity={0.8}
-          roughness={0.12}
-          metalness={0.05}
-          transmission={0.75}
-          thickness={1.4}
+          transmission={1}
+          thickness={1.6}
+          roughness={0.05}
           ior={1.55}
-          iridescence={1.0}
-          iridescenceIOR={1.3}
-          iridescenceThicknessRange={[200, 900]}
-          clearcoat={1.0}
-          clearcoatRoughness={0.06}
+          chromaticAberration={0.6}
+          distortion={0.55}
+          distortionScale={0.4}
+          temporalDistortion={0.2}
           attenuationColor="#f0c885"
           attenuationDistance={2.2}
-          envMapIntensity={1.6}
+          samples={8}
+          resolution={512}
+          backside
+          backsideThickness={1.2}
+          anisotropy={0.3}
         />
       </mesh>
+
+      {/* 3 — soft outer halo: additive blending warm amber so it reads as a
+             star's light bleeding into the void. depthWrite off so it never
+             occludes anything behind. */}
+      <mesh>
+        <sphereGeometry args={[1.55, 32, 32]} />
+        <meshBasicMaterial
+          color="#f0c885"
+          transparent
+          opacity={0.16}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </mesh>
+
       <pointLight color="#f0c885" intensity={4} distance={28} decay={1.5} />
     </Float>
   );
