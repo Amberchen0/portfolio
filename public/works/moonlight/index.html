@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Moonlight — A Dream Demon · Amber Xu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Caveat:wght@500;700&family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@600&family=Sacramento&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#05060e;
+    --bg-1:#0a0c1a;
+    --ink-0:#f4f1ff;
+    --ink-1:#c9c4e6;
+    --ink-2:#7d76a8;
+    --moon:#7be0ff;
+    --moon-dim:#2a8cb0;
+    --magenta:#ff4ea1;
+    --violet:#8a5cff;
+    --cream:#f7ecd6;
+    --line:rgba(255,255,255,.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg-0);color:var(--ink-0);font-family:'Inter',sans-serif;overflow-x:hidden}
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+    background:
+      radial-gradient(900px 600px at 18% 12%, rgba(123,224,255,.10), transparent 60%),
+      radial-gradient(700px 500px at 82% 88%, rgba(255,78,161,.08), transparent 60%);
+    mix-blend-mode:screen;
+  }
+
+  /* — Top navigation bar — */
+  .top-nav{
+    position:fixed;top:0;left:0;right:0;z-index:115;
+    padding:18px clamp(20px,4vw,48px);
+    pointer-events:none;
+    transition:background .5s ease, backdrop-filter .5s ease, border-color .5s ease, padding .4s;
+    border-bottom:1px solid transparent;
+  }
+  .top-nav-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    max-width:1400px;margin:0 auto;
+    pointer-events:auto;
+  }
+  .top-brand{
+    font-family:'Cinzel',serif;font-weight:700;
+    font-size:clamp(11px,1vw,13px);
+    letter-spacing:.45em;
+    color:rgba(255,255,255,.88);
+    text-decoration:none;
+    text-shadow:0 0 14px rgba(180,200,255,.30);
+    transition:color .3s;
+  }
+  .top-brand:hover{color:var(--moon)}
+  .top-nav-links{
+    display:flex;gap:clamp(14px,1.8vw,32px);
+  }
+  .top-nav-links a{
+    font-family:'Cinzel',serif;
+    font-size:clamp(9px,0.78vw,11px);
+    letter-spacing:.4em;
+    color:rgba(220,225,245,.58);
+    text-decoration:none;
+    text-transform:uppercase;
+    white-space:nowrap;
+    transition:color .3s;
+    position:relative;
+  }
+  .top-nav-links a:hover{color:var(--moon)}
+  .top-nav-links a.active{color:var(--magenta)}
+  .top-nav-links a.active::after{
+    content:"";position:absolute;left:0;right:0;bottom:-6px;
+    height:1px;background:var(--magenta);
+    opacity:.7;
+  }
+  .top-nav.scrolled{
+    background:rgba(8,8,18,.65);
+    backdrop-filter:blur(14px) saturate(1.1);
+    -webkit-backdrop-filter:blur(14px) saturate(1.1);
+    border-bottom-color:var(--line);
+    padding-top:14px;padding-bottom:14px;
+  }
+  @media (max-width:780px){
+    .top-nav-links{display:none}
+  }
+
+  /* — Scroll progress — */
+  .progress{position:fixed;top:0;left:0;height:2px;width:0%;background:linear-gradient(90deg,var(--moon),var(--magenta));z-index:200;box-shadow:0 0 12px var(--moon)}
+
+  /* — Side nav (chapter dots) — */
+  nav.dots{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:120;display:flex;flex-direction:column;gap:14px}
+  nav.dots a{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.16);position:relative;transition:transform .3s, background .3s}
+  nav.dots a span{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-family:'Cinzel',serif;font-size:11px;letter-spacing:.18em;color:var(--ink-1);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .3s, transform .3s}
+  nav.dots a:hover span{opacity:1;transform:translate(-4px,-50%)}
+  nav.dots a:hover{background:var(--moon);transform:scale(1.4);box-shadow:0 0 14px var(--moon)}
+  nav.dots a.active{background:var(--magenta);box-shadow:0 0 16px var(--magenta)}
+
+  /* — Hero (frosted-window scene) — */
+  .hero{
+    position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;
+    overflow:hidden;isolation:isolate;background:#0a0e22;
+  }
+  /* Clear scene that sits BEHIND the frost — visible only through the cutout */
+  .scene{position:absolute;inset:0;z-index:1;pointer-events:none;
+    background-image:url('./img/hero-bg.jpg');
+    background-size:cover;
+    background-position:center center;
+    background-repeat:no-repeat;
+    animation:sceneDrift 24s ease-in-out infinite alternate;
+  }
+  @keyframes sceneDrift{from{transform:scale(1.04) translate(-0.5%,-0.5%)}to{transform:scale(1.06) translate(0.5%,0.5%)}}
+
+  /* Frosted + bloomed glass — TWO stacked image layers + tint.
+     Layer A (frost-blur): same image lightly blurred → base.
+     Layer B (frost-bloom): same image heavily contrast+sat+brightness, then heavily blurred,
+                            screen-blended on top → light sources expand into big bokeh halos.
+     Combined under a mask cutout (the handwritten title). */
+  .frost-stack{
+    position:absolute;inset:0;z-index:3;
+    overflow:hidden;
+    isolation:isolate;
+    -webkit-mask:url(#frostMask);
+            mask:url(#frostMask);
+  }
+  .frost-blur, .frost-bloom, .frost-bloom-core{
+    position:absolute;
+    top:-80px;left:-80px;right:-80px;bottom:-80px;
+    background-image:url('./img/hero-bg.jpg');
+    background-size:cover;
+    background-position:center center;
+    background-repeat:no-repeat;
+    will-change:filter;
+  }
+  .frost-blur{
+    filter:blur(8px) saturate(.9) brightness(1.05);
+  }
+  /* WIDE bloom — outer soft halos */
+  .frost-bloom{
+    filter:brightness(.55) contrast(3) saturate(2.0) blur(65px) brightness(1.55);
+    mix-blend-mode:screen;
+    opacity:.85;
+  }
+  /* TIGHT bloom — small, harder-edged bright cores → more disc-like bokeh */
+  .frost-bloom-core{
+    filter:brightness(.4) contrast(5) saturate(2.4) blur(18px) brightness(1.9);
+    mix-blend-mode:screen;
+    opacity:.7;
+  }
+  /* Pale cold-white fog wash with a hint of violet preserved.
+     This is what makes the glass look like real winter condensation. */
+  .frost-tint{
+    position:absolute;inset:0;
+    background:
+      /* main cool-white haze */
+      linear-gradient(180deg, rgba(230,235,250,.22), rgba(215,222,240,.18)),
+      /* violet hint to keep the scene's purple soul */
+      linear-gradient(180deg, rgba(90,72,130,.05), rgba(50,32,80,.08)),
+      /* subtle warmer center spot */
+      radial-gradient(circle at 50% 40%, rgba(240,235,255,.10), transparent 65%);
+    pointer-events:none;
+  }
+  /* Soft cold halo on the frost edges, like real cold-window vignetting */
+  .frost-vignette{
+    position:absolute;inset:0;z-index:5;pointer-events:none;
+    background:radial-gradient(120% 90% at 50% 50%, transparent 60%, rgba(5,8,25,.6) 100%);
+    mix-blend-mode:multiply;
+  }
+
+  /* Visible printed text on the frost (not cleared) */
+  .hero-text{
+    position:relative;z-index:8;text-align:center;
+    pointer-events:none;
+    text-transform:uppercase;
+  }
+  /* The question that introduces the three-part description below it.
+     Visually paired with .sub — both italic serif caps, with tight spacing between them. */
+  .hero-text .prologue{
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic;font-weight:400;
+    font-size:clamp(15px,1.3vw,19px);
+    color:rgba(225,230,245,.62);
+    letter-spacing:.24em;
+    margin-top:calc(clamp(28px,3vw,52px) + 85px);
+    margin-bottom:clamp(10px,1.2vw,18px);
+    opacity:0;animation:fadein 1.4s ease 3.6s forwards;
+  }
+  /* Eyebrow — pressed tight against the title above it (film-poster intent) */
+  .hero-text .eyebrow{
+    font-family:'Cinzel',serif;font-size:calc(clamp(10px,0.95vw,12px) + 3px);
+    letter-spacing:.62em;color:rgba(220,225,245,.72);
+    text-shadow:0 0 18px rgba(180,200,255,.25);
+    margin-top:20px;
+    margin-bottom:clamp(4px,0.6vw,10px);
+  }
+  /* Vertical reservation for the absolutely-positioned SVG title overlay.
+     Sized close to the actual title height so eyebrow & prologue hug the title. */
+  .hero-text .title-spacer{
+    height:clamp(220px,22vw,340px);
+  }
+  /* Subtitle — the three-part answer to the question above. */
+  .hero-text .sub{
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic;font-weight:400;
+    font-size:clamp(13px,1.2vw,20px);
+    color:rgba(235,238,250,.80);
+    letter-spacing:.20em;
+    margin-top:20px;
+    opacity:0;animation:fadein 1.4s ease 3.95s forwards;
+  }
+  /* Versal — slightly larger first letter of each phrase, like a classical poem */
+  .hero-text .sub .cap{
+    font-size:1.55em;
+    font-style:italic;
+    color:rgba(255,255,255,.92);
+    letter-spacing:.04em;
+    vertical-align:-0.06em;
+    margin-right:0.02em;
+    text-shadow:0 0 22px rgba(200,215,255,.30);
+  }
+  /* Credit — sits below the subtitle, in normal flow */
+  .hero-text .author{
+    margin-top:clamp(36px,3.8vw,56px);
+    font-family:'Cinzel',serif;
+    font-size:clamp(10px,0.85vw,12px);
+    letter-spacing:.55em;
+    color:rgba(200,210,240,.48);
+    opacity:0;animation:fadein 1.4s ease 4.3s forwards;
+  }
+  @keyframes fadein{to{opacity:1}}
+
+  /* Mask SVG positioned to cover the hero — only its <mask> is used via id */
+  .mask-svg{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0}
+
+  .scroll-cue{
+    position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:9;
+    font-family:'Cinzel',serif;font-size:10px;letter-spacing:.5em;color:rgba(200,210,240,.6);
+    opacity:0;animation:fadein 1.2s ease 4.5s forwards;
+  }
+  .scroll-cue::after{content:"";display:block;width:1px;height:34px;margin:10px auto 0;background:linear-gradient(180deg,rgba(220,230,255,.7),transparent);animation:cue 2s ease-in-out infinite}
+  @keyframes cue{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+  /* — Sections — */
+  section.chapter{position:relative;padding:140px 6vw 160px;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+  .eyebrow{font-family:'Cinzel',serif;font-size:12px;letter-spacing:.55em;color:var(--moon);margin-bottom:18px}
+  .h1{font-family:'Cinzel',serif;font-size:clamp(34px,5vw,68px);letter-spacing:.04em;margin-bottom:26px;line-height:1.05}
+  .h1 em{color:var(--magenta);font-style:italic;font-family:'Cormorant Garamond',serif}
+  .lede{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,1.4vw,22px);line-height:1.6;color:var(--ink-1);max-width:62ch}
+
+  .grid{display:grid;gap:60px;align-items:center}
+  .grid.split{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+  /* 1/3 text, 2/3 video for the Environment section */
+  .grid.env-split{grid-template-columns:minmax(0,1fr) minmax(0,2fr)}
+  @media (max-width:900px){.grid.split, .grid.env-split{grid-template-columns:1fr}}
+
+  /* — Video card (thumbnail with play button overlay) — */
+  .video-card{
+    position:relative;
+    border-radius:18px;
+    overflow:hidden;
+    cursor:pointer;
+    box-shadow:0 30px 80px rgba(0,0,0,.55), 0 4px 20px rgba(123,224,255,.08);
+    isolation:isolate;
+    transition:transform .4s ease;
+  }
+  .video-card img{
+    width:100%;display:block;
+    transition:transform .8s ease, filter .4s ease;
+    filter:brightness(.85) saturate(.95);
+  }
+  .video-card::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg, rgba(0,0,0,.10) 0%, rgba(0,0,0,.18) 60%, rgba(0,0,0,.35) 100%);
+    transition:background .4s;pointer-events:none;
+  }
+  .video-card:hover img{
+    transform:scale(1.035);
+    filter:brightness(1) saturate(1.05);
+  }
+  .video-card:hover::after{
+    background:linear-gradient(180deg, rgba(0,0,0,.05) 0%, rgba(0,0,0,.12) 60%, rgba(0,0,0,.28) 100%);
+  }
+  .play-btn{
+    position:absolute;top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    z-index:3;
+    width:96px;height:96px;border-radius:50%;
+    background:rgba(255,255,255,.16);
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+    border:2px solid rgba(255,255,255,.85);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    transition:transform .35s cubic-bezier(.2,.7,.3,1), background .3s, border-color .3s, box-shadow .35s;
+    box-shadow:0 10px 36px rgba(0,0,0,.45), 0 0 0 0 rgba(255,255,255,.18);
+    animation:playPulse 2.8s ease-in-out infinite;
+  }
+  .play-btn svg{
+    width:34px;height:34px;
+    margin-left:5px; /* optical center for the triangle */
+    fill:#fff;
+    filter:drop-shadow(0 2px 6px rgba(0,0,0,.55));
+  }
+  .video-card:hover .play-btn{
+    transform:translate(-50%,-50%) scale(1.12);
+    background:rgba(255,255,255,.28);
+    border-color:var(--moon);
+    box-shadow:0 12px 40px rgba(0,0,0,.55), 0 0 0 10px rgba(123,224,255,.14);
+    animation:none;
+  }
+  @keyframes playPulse{
+    0%,100%{box-shadow:0 10px 36px rgba(0,0,0,.45), 0 0 0 0 rgba(255,255,255,.20)}
+    50%{box-shadow:0 10px 36px rgba(0,0,0,.45), 0 0 0 14px rgba(255,255,255,0)}
+  }
+  .video-card figcaption{
+    position:absolute;left:0;right:0;bottom:0;
+    padding:18px 22px;z-index:4;
+    background:linear-gradient(180deg, transparent, rgba(0,0,0,.72));
+    font-family:'Cormorant Garamond',serif;font-style:italic;
+    font-size:15px;color:#fff;letter-spacing:.04em;
+    opacity:0;transform:translateY(20px);transition:.5s;
+    pointer-events:none;
+  }
+  .video-card:hover figcaption{opacity:1;transform:translateY(0)}
+
+  /* — Standalone character portrait (transparent PNG, no card frame) — */
+  .character-portrait{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:20px;
+    isolation:isolate;
+    cursor:pointer;
+  }
+  /* Soft spotlight behind the character — a moonlight aura on dark space */
+  .character-portrait::before{
+    content:"";
+    position:absolute;
+    inset:8% 12%;
+    border-radius:50%;
+    background:
+      radial-gradient(closest-side, rgba(180,220,255,.18) 0%, rgba(140,180,230,.10) 25%, rgba(120,90,220,.08) 50%, transparent 75%);
+    filter:blur(40px);
+    z-index:-1;
+    transition:transform .8s ease, opacity .6s;
+    animation:portraitGlow 7s ease-in-out infinite;
+  }
+  @keyframes portraitGlow{
+    0%,100%{transform:scale(1);opacity:.85}
+    50%{transform:scale(1.05);opacity:1}
+  }
+  .character-portrait img{
+    width:100%;max-width:560px;height:auto;display:block;
+    filter:drop-shadow(0 20px 40px rgba(0,0,0,.55)) drop-shadow(0 0 32px rgba(123,224,255,.20));
+    transition:transform .6s cubic-bezier(.2,.7,.3,1);
+    will-change:transform;
+    position:relative;z-index:1;
+  }
+  .character-portrait:hover img{
+    transform:translateY(-8px) scale(1.02);
+  }
+  .character-portrait .tag{
+    align-self:flex-start;
+    background:rgba(0,0,0,.55);backdrop-filter:blur(8px);
+    border:1px solid var(--line);border-radius:999px;
+    padding:6px 14px;
+    font-family:'Cinzel',serif;font-size:10px;letter-spacing:.4em;
+    color:var(--moon);
+    margin-bottom:10px;z-index:2;
+  }
+  .character-portrait figcaption{
+    margin-top:18px;
+    font-family:'Cormorant Garamond',serif;font-style:italic;
+    font-size:15px;color:var(--ink-1);letter-spacing:.04em;
+    opacity:.85;text-align:center;
+    max-width:46ch;
+  }
+
+  /* — Static (non-interactive) card variant used inside the design chapter — */
+  .static-card{cursor:default}
+  .static-card::before{display:none !important}
+  .static-card:hover::before{opacity:0 !important}
+  .static-card .frame{transition:none !important;transform:none !important}
+  .static-card:hover .frame{transform:none !important}
+  .static-card:hover{transform:none}
+
+  /* — Big page card with tilt — */
+  .card{
+    position:relative;border-radius:18px;overflow:hidden;
+    transform-style:preserve-3d;perspective:1200px;
+    box-shadow:0 30px 80px rgba(0,0,0,.55), 0 4px 20px rgba(123,224,255,.08);
+    transition:transform .2s ease;
+    isolation:isolate;
+  }
+  .card .frame{
+    border-radius:18px;overflow:hidden;position:relative;
+    transform:translateZ(0);
+    transition:transform .3s cubic-bezier(.2,.7,.3,1);
+  }
+  .card img{width:100%;display:block;transition:transform .8s ease}
+  .card::before{
+    content:"";position:absolute;inset:-1px;border-radius:19px;z-index:-1;
+    background:linear-gradient(135deg,rgba(123,224,255,.55),rgba(255,78,161,.4),rgba(138,92,255,.5));
+    filter:blur(18px);opacity:.0;transition:opacity .5s;
+  }
+  .card:hover::before{opacity:.9}
+  .card .glare{
+    position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(400px 220px at var(--mx,50%) var(--my,40%), rgba(255,255,255,.22), transparent 55%);
+    mix-blend-mode:overlay;opacity:0;transition:opacity .3s;
+  }
+  .card:hover .glare{opacity:1}
+  .card .tag{
+    position:absolute;left:18px;top:18px;z-index:3;
+    background:rgba(0,0,0,.55);backdrop-filter:blur(8px);
+    border:1px solid var(--line);border-radius:999px;padding:6px 12px;
+    font-family:'Cinzel',serif;font-size:10px;letter-spacing:.4em;color:var(--moon);
+  }
+  .card .caption{
+    position:absolute;left:0;right:0;bottom:0;padding:18px 22px;
+    background:linear-gradient(180deg, transparent, rgba(0,0,0,.7));
+    font-family:'Cormorant Garamond',serif;font-size:15px;color:#fff;letter-spacing:.04em;
+    opacity:0;transform:translateY(20px);transition:.5s;
+    pointer-events:none;
+  }
+  .card:hover .caption{opacity:1;transform:translateY(0)}
+
+  /* — Quote / lyric divider — */
+  .lyric{padding:160px 6vw;text-align:center;position:relative}
+  .lyric blockquote{
+    font-family:'Cormorant Garamond',serif;font-style:italic;
+    font-size:clamp(22px,2.6vw,40px);line-height:1.4;
+    max-width:18ch;margin:0 auto;color:#fff;
+    text-shadow:0 0 28px rgba(123,224,255,.25);
+  }
+  .lyric .cite{margin-top:30px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.5em;color:var(--ink-2)}
+
+  /* — Research grid (page 3 deep-dive) — */
+  .swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:22px}
+  .swatch{aspect-ratio:1;border-radius:12px;display:flex;align-items:flex-end;padding:12px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.32em;color:rgba(255,255,255,.78);position:relative;overflow:hidden;transition:transform .3s}
+  .swatch:hover{transform:scale(1.04)}
+  .swatch::after{content:"";position:absolute;inset:0;background:radial-gradient(closest-side at 20% 20%, rgba(255,255,255,.25), transparent 70%);mix-blend-mode:overlay;pointer-events:none}
+
+  /* — Themes mind-map style — */
+  .keywords{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+  .kw{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;padding:8px 16px;border-radius:999px;border:1px solid var(--line);color:var(--ink-1);transition:.3s}
+  .kw:hover{color:#fff;border-color:var(--moon);background:rgba(123,224,255,.06);transform:translateY(-2px)}
+  .kw.pink:hover{border-color:var(--magenta);background:rgba(255,78,161,.08)}
+
+  /* — Process timeline (Page 6) — */
+  .timeline{margin-top:50px;display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+  @media (max-width:900px){.timeline{grid-template-columns:repeat(2,1fr)}}
+  .step{position:relative;padding:18px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.02);transition:.4s}
+  .step:hover{background:rgba(123,224,255,.05);border-color:var(--moon);transform:translateY(-4px)}
+  .step b{font-family:'Cinzel',serif;color:var(--moon);font-size:11px;letter-spacing:.4em;display:block;margin-bottom:8px}
+  .step p{font-family:'Cormorant Garamond',serif;font-size:15px;line-height:1.45;color:var(--ink-1)}
+
+  /* — Final reveal · pure-black "lamp room"
+     Initial state: vintage pendant lamp lit at the top, warm glow flooding
+     the empty space below. Click the lamp to flicker → extinguish → reveal
+     the finished illustration. ---------------------------------------- */
+  .finale{
+    position:relative;
+    min-height:100vh;
+    background:#000;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding-bottom:6vh;
+  }
+
+  /* Whispered prompt above the lamp — mirrors the hero's "urban legend"
+     line. Fades out when the lights go off. */
+  .finale-prompt{
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic;font-weight:400;
+    font-size:clamp(16px,1.4vw,22px);
+    color:rgba(225,232,250,.66);
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    text-align:center;
+    padding-top:clamp(60px,8vh,110px);
+    margin-bottom:clamp(20px,3vh,42px);
+    position:relative;z-index:2;
+    transition:opacity .6s ease;
+  }
+  .finale.is-lit-off .finale-prompt{ opacity:0 }
+
+  /* Lamp + cord — origin at TOP CENTER so the pendulum swings naturally */
+  .lamp-rig{
+    position:relative;
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    transform-origin:50% 0;
+    will-change:transform;
+  }
+  .lamp-img{
+    width:clamp(180px, 18vw, 320px);
+    height:auto;
+    display:block;
+    cursor:pointer;
+    user-select:none;
+    -webkit-user-drag:none;
+    position:relative;
+    z-index:2;
+    transition:filter .55s ease, opacity .55s ease;
+    filter:drop-shadow(0 0 25px rgba(255,170,80,.45))
+           drop-shadow(0 0 60px rgba(255,150,60,.25));
+  }
+  .lamp-img:hover{transform:translateY(-2px)}
+
+  /* Warm glow spilling down from the bulb */
+  .lamp-glow{
+    position:absolute;
+    top:55%;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(95vw, 1200px);
+    height:80vh;
+    pointer-events:none;
+    z-index:1;
+    background:radial-gradient(ellipse 60% 100% at 50% 0%,
+      rgba(255,210,130,.50) 0%,
+      rgba(255,180,80,.32) 18%,
+      rgba(255,155,60,.18) 35%,
+      rgba(255,140,50,.08) 55%,
+      transparent 80%);
+    filter:blur(18px);
+    transition:opacity .55s ease;
+  }
+
+  /* The final illustration — preloaded but hidden until lights are out */
+  .finale-img{
+    display:block;
+    max-width:90%;
+    max-height:72vh;
+    width:auto;height:auto;
+    object-fit:contain;
+    margin-top:30px;
+    border-radius:8px;
+    box-shadow:0 30px 80px rgba(0,0,0,.6);
+    position:relative;z-index:2;
+    opacity:0;
+    transition:opacity 1s ease .35s;
+  }
+
+  /* —— STATE: lamp clicked → flicker —— */
+  @keyframes lampFlicker{
+    0%   {filter:drop-shadow(0 0 25px rgba(255,170,80,.45)) drop-shadow(0 0 60px rgba(255,150,60,.25));}
+    14%  {filter:brightness(.35) drop-shadow(0 0 8px rgba(255,170,80,.15));}
+    28%  {filter:brightness(1.25) drop-shadow(0 0 35px rgba(255,200,100,.7)) drop-shadow(0 0 80px rgba(255,160,70,.4));}
+    44%  {filter:brightness(.22) drop-shadow(0 0 6px rgba(255,170,80,.1));}
+    62%  {filter:brightness(1.1) drop-shadow(0 0 28px rgba(255,180,90,.55)) drop-shadow(0 0 70px rgba(255,150,60,.3));}
+    78%  {filter:brightness(.3) drop-shadow(0 0 8px rgba(255,170,80,.12));}
+    100% {filter:brightness(1) drop-shadow(0 0 25px rgba(255,170,80,.45)) drop-shadow(0 0 60px rgba(255,150,60,.25));}
+  }
+  @keyframes glowFlicker{
+    0%,100%{opacity:1}
+    14%{opacity:.18} 28%{opacity:1.15} 44%{opacity:.10} 62%{opacity:.95} 78%{opacity:.20}
+  }
+  .finale.is-flickering .lamp-img{ animation:lampFlicker .65s ease both }
+  .finale.is-flickering .lamp-glow{ animation:glowFlicker .65s ease both }
+
+  /* —— STATE: lights out (after flicker) —— */
+  .finale.is-lit-off .lamp-img{
+    filter:brightness(.30) saturate(.40) drop-shadow(0 0 0 transparent);
+  }
+  .finale.is-lit-off .lamp-glow{ opacity:0 }
+  .finale.is-lit-off .finale-img{ opacity:1 }
+
+  /* Brief blackout overlay during the transition */
+  .blackout{
+    position:fixed;inset:0;
+    background:#000;
+    opacity:0;
+    pointer-events:none;
+    z-index:200;
+    transition:opacity .25s ease;
+  }
+  .blackout.on{opacity:1}
+
+  /* —— Pendulum swing when the reader tries to scroll past without clicking —— */
+  @keyframes lampSwingDamped{
+    0%   {transform:rotate(0deg);}
+    12%  {transform:rotate(-12deg);}
+    28%  {transform:rotate( 10deg);}
+    44%  {transform:rotate( -7deg);}
+    60%  {transform:rotate(  5deg);}
+    76%  {transform:rotate( -3deg);}
+    90%  {transform:rotate(  1.2deg);}
+    100% {transform:rotate(0deg);}
+  }
+  .lamp-rig.is-swinging{
+    animation:lampSwingDamped 2.4s cubic-bezier(.4,.05,.5,.95) both;
+  }
+
+  /* — Footer — */
+  footer{padding:80px 6vw 120px;text-align:center;border-top:1px solid var(--line);background:#04050b}
+  footer .signoff{font-family:'Dancing Script',cursive;font-size:38px;color:#fff;letter-spacing:.04em}
+  footer .meta{margin-top:10px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.5em;color:var(--ink-2)}
+  footer .links{margin-top:30px;display:flex;justify-content:center;gap:30px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.32em}
+  footer .links a{color:var(--ink-1);text-decoration:none;border-bottom:1px solid transparent;padding-bottom:2px;transition:.3s}
+  footer .links a:hover{color:var(--moon);border-color:var(--moon)}
+
+  /* — Reveal animations — */
+  .reveal{opacity:0;transform:translateY(40px) scale(.98);transition:opacity 1s cubic-bezier(.2,.7,.3,1), transform 1s cubic-bezier(.2,.7,.3,1)}
+  .reveal.in{opacity:1;transform:translateY(0) scale(1)}
+  .reveal.delay-1{transition-delay:.15s}
+  .reveal.delay-2{transition-delay:.30s}
+  .reveal.delay-3{transition-delay:.45s}
+
+  /* — Lightbox — */
+  .lb{position:fixed;inset:0;z-index:300;background:rgba(5,5,12,.92);display:none;align-items:center;justify-content:center;padding:6vh 6vw;backdrop-filter:blur(10px)}
+  .lb.open{display:flex;animation:lbIn .4s ease}
+  @keyframes lbIn{from{opacity:0}to{opacity:1}}
+  .lb img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .lb .close{position:absolute;top:24px;right:32px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.4em;color:#fff;border:1px solid var(--line);padding:10px 16px;border-radius:999px;backdrop-filter:blur(8px)}
+  .lb .close:hover{border-color:var(--moon);color:var(--moon)}
+
+  /* — Marquee — */
+  .marquee{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 0;background:linear-gradient(90deg, rgba(255,78,161,.05), rgba(123,224,255,.05))}
+  .marquee .track{display:flex;gap:60px;white-space:nowrap;animation:scroll 30s linear infinite;font-family:'Cinzel',serif;font-size:12px;letter-spacing:.5em;color:var(--ink-1)}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .marquee .dot{color:var(--magenta)}
+
+  /* — Mask hover transformation — */
+  .mask-swap{position:relative;display:inline-block}
+  .mask-swap .before,.mask-swap .after{display:block;transition:opacity .8s}
+  .mask-swap .after{position:absolute;inset:0;opacity:0}
+  .mask-swap:hover .before{opacity:0}
+  .mask-swap:hover .after{opacity:1}
+
+  /* — Design chapter: three parts merged under one section — */
+  .design-chapter{padding-top:160px;padding-bottom:180px}
+  .design-chapter .chapter-intro{margin-bottom:80px}
+  .design-part{
+    margin:120px 0;
+    padding-top:60px;
+    border-top:1px solid var(--line);
+  }
+  .design-part:first-of-type{border-top:none;margin-top:0;padding-top:0}
+  .part-header{
+    display:flex;align-items:center;gap:28px;
+    margin-bottom:32px;
+  }
+  .part-num{
+    font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;
+    font-size:clamp(64px,7vw,108px);line-height:1;
+    color:var(--magenta);opacity:.55;
+    letter-spacing:.02em;
+    min-width:80px;text-align:left;
+  }
+  .part-step{
+    display:block;font-family:'Cinzel',serif;font-size:11px;
+    letter-spacing:.5em;color:var(--moon);
+    margin-bottom:8px;
+  }
+  .part-title{
+    font-family:'Cinzel',serif;font-weight:500;
+    font-size:clamp(24px,2.6vw,38px);
+    letter-spacing:.04em;line-height:1.15;color:var(--ink-0);
+  }
+  .part-lede{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(17px,1.4vw,22px);line-height:1.6;color:var(--ink-1);
+    max-width:62ch;margin-bottom:30px;
+  }
+
+  /* Quote interlude between design parts */
+  .design-quote{
+    margin:100px auto;padding:60px 6vw;text-align:center;max-width:80ch;
+  }
+  .design-quote blockquote{
+    font-family:'Cormorant Garamond',serif;font-style:italic;
+    font-size:clamp(22px,2.6vw,38px);line-height:1.45;
+    color:#fff;text-shadow:0 0 28px rgba(123,224,255,.22);margin:0;
+  }
+  .design-quote-cite{
+    margin-top:24px;font-family:'Cinzel',serif;font-size:11px;
+    letter-spacing:.5em;color:var(--ink-2);
+  }
+
+  /* — Section connector lines — */
+  .seam{height:1px;width:60%;margin:0 auto;background:linear-gradient(90deg,transparent,var(--line) 30%,var(--line) 70%,transparent)}
+
+  /* — Util — */
+  .pill{display:inline-block;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.5em;color:var(--moon);border:1px solid var(--moon);padding:6px 12px;border-radius:999px;margin-right:8px}
+
+  /* — Story-card grid for page 5 design parts — */
+  .story{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:50px}
+  @media (max-width:900px){.story{grid-template-columns:1fr}}
+  .story article{padding:24px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.0));transition:.4s}
+  .story article:hover{transform:translateY(-6px);border-color:var(--magenta);background:rgba(255,78,161,.04)}
+  .story article h3{font-family:'Cinzel',serif;font-size:14px;letter-spacing:.4em;color:var(--magenta);margin-bottom:10px}
+  .story article .num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:60px;line-height:1;color:rgba(255,255,255,.06);position:absolute}
+  .story article{position:relative;overflow:hidden}
+  .story article p{font-family:'Cormorant Garamond',serif;font-size:16px;line-height:1.55;color:var(--ink-1);position:relative;z-index:1}
+
+  /* Hide custom cursor on touch */
+  @media (hover:none){.cursor-dot,.cursor-ring{display:none}html,body,*{cursor:auto!important}}
+</style>
+</head>
+<body><a href="/work" style="position:fixed;top:1.25rem;left:1.25rem;z-index:9999;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#d9a574;text-decoration:none;padding:0.5rem 0.85rem;border:1px solid rgba(217,165,116,0.4);border-radius:999px;background:rgba(10,8,7,0.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">← Universe</a>
+
+<div class="progress" id="progress"></div>
+
+<!-- Top navigation — chapter links, with a transparent-to-blurred background swap on scroll -->
+<header class="top-nav" id="topNav">
+  <div class="top-nav-inner">
+    <a href="#hero" class="top-brand">MOONLIGHT</a>
+    <nav class="top-nav-links">
+      <a href="#hero" data-target="hero">Overture</a>
+      <a href="#prologue" data-target="prologue">Prologue</a>
+      <a href="#design" data-target="design">Design</a>
+      <a href="#concept" data-target="concept">Concept</a>
+      <a href="#finale" data-target="finale">Finale</a>
+      <a href="#environment" data-target="environment">Dimensions</a>
+    </nav>
+  </div>
+</header>
+
+<nav class="dots" id="dots">
+  <a href="#hero" data-target="hero"><span>OVERTURE</span></a>
+  <a href="#prologue" data-target="prologue"><span>PROLOGUE</span></a>
+  <a href="#design" data-target="design"><span>DESIGN</span></a>
+  <a href="#concept" data-target="concept"><span>CONCEPT</span></a>
+  <a href="#finale" data-target="finale"><span>FINALE</span></a>
+  <a href="#environment" data-target="environment"><span>DIMENSIONS</span></a>
+</nav>
+
+<!-- HERO — frosted-window scene -->
+<section class="hero" id="hero">
+
+  <!-- Layer 1 · clear scene (visible only through cutout) -->
+  <div class="scene"></div>
+
+  <!-- Layer 2 · frosted + bloomed glass (with mask cutout of "Moonlight") -->
+  <div class="frost-stack">
+    <div class="frost-blur"></div>
+    <div class="frost-bloom"></div>
+    <div class="frost-bloom-core"></div>
+    <div class="frost-tint"></div>
+  </div>
+  <div class="frost-vignette"></div>
+
+  <!-- Layer 4 · printed text that sits on the glass -->
+  <div class="hero-text">
+    <p class="eyebrow">A · DREAM · DEMON · IN · SEVEN · ACTS</p>
+    <div class="title-spacer"></div>
+    <!-- These two lines form one unit: a question and its three answering details -->
+    <p class="prologue"><em>Have you ever heard an urban legend?</em></p>
+    <p class="sub"><span class="cap">C</span>rystal chimes for wings  ·  <span class="cap">M</span>asks that breathe peril  ·  <span class="cap">T</span>ears for feast</p>
+    <p class="author">AMBER · XU · 2020</p>
+  </div>
+
+  <div class="scroll-cue">SCROLL</div>
+
+  <!-- SVG that owns the mask. Sized to .hero exactly so mask region covers it. -->
+  <svg class="mask-svg" preserveAspectRatio="none"
+       xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <clipPath id="revealClip" clipPathUnits="userSpaceOnUse">
+        <rect id="wipeRect" x="0" y="0" width="0" height="9000"/>
+      </clipPath>
+
+      <filter id="wipeRough" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="7" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G"/>
+        <feGaussianBlur stdDeviation="0.6"/>
+      </filter>
+
+      <mask id="frostMask"
+            maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse"
+            x="-2000" y="-2000" width="12000" height="12000">
+        <rect x="-2000" y="-2000" width="12000" height="12000" fill="white"/>
+        <g clip-path="url(#revealClip)" filter="url(#wipeRough)">
+          <text id="cutText" x="0" y="0"
+                text-anchor="middle" dominant-baseline="central"
+                font-family="'Caveat', 'Caveat Brush', cursive"
+                font-size="200" font-weight="500"
+                fill="black" stroke="black" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"
+                paint-order="stroke fill">MOONLIGHT</text>
+        </g>
+      </mask>
+    </defs>
+  </svg>
+
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="track">
+    <span>FEATHERS LIKE PRECIOUS GEMS</span><span class="dot">✦</span>
+    <span>A BODY OF MASKS</span><span class="dot">✦</span>
+    <span>HE COLLECTS TEARS</span><span class="dot">✦</span>
+    <span>BENEATH THE STARS</span><span class="dot">✦</span>
+    <span>FEATHERS LIKE PRECIOUS GEMS</span><span class="dot">✦</span>
+    <span>A BODY OF MASKS</span><span class="dot">✦</span>
+    <span>HE COLLECTS TEARS</span><span class="dot">✦</span>
+    <span>BENEATH THE STARS</span><span class="dot">✦</span>
+  </div>
+</div>
+
+<!-- PROLOGUE -->
+<section class="chapter" id="prologue">
+  <div class="grid split">
+    <div>
+      <div class="eyebrow reveal">CHAPTER · I · PROLOGUE</div>
+      <h2 class="h1 reveal delay-1">Who is <em>Moonlight</em>?</h2>
+      <p class="lede reveal delay-2">
+        Moonlight is a dream demon who slips into children's bedrooms under the
+        cover of night. With feathers that shimmer like precious gems and a body
+        made entirely of haunting masks, he is both mesmerizing and terrifying.
+      </p>
+      <p class="lede reveal delay-3" style="margin-top:18px">
+        He places nightmare masks over sleeping faces, twisting dreams into
+        cries. In silence, he collects the tears they shed — each one a piece
+        of fear, feeding his endless hunger beneath the stars.
+      </p>
+      <div class="reveal delay-3" style="margin-top:34px">
+        <span class="pill">DREAM</span><span class="pill">DEMON</span><span class="pill">NIGHTMARE</span>
+      </div>
+    </div>
+    <div class="reveal delay-2">
+      <!-- Standalone character portrait: transparent PNG floating on the section background.
+           The descriptive text already lives in the left column — no need to duplicate it here. -->
+      <figure class="character-portrait" data-img="./img/page_02.png">        <img src="./img/page_02.png" alt="Moonlight — the dream demon" />
+        <figcaption>A silhouette assembled from a hundred grinning masks.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- VISUALS / RESEARCH -->
+<!-- DESIGN PROCESS — the three pages (Visuals · Themes · Iterations) live here as
+     one chapter, since they all belong to the same character-design journey. -->
+<section class="chapter design-chapter" id="design">
+  <!-- Part I — Brainstorm / Themes (was Part II) — the mind-map of words that
+       birthed Moonlight. Comes first because everything started from language. -->
+  <article class="design-part reveal">
+    <header class="part-header">
+      <span class="part-num">I</span>
+      <div>
+        <span class="part-step">FIRST STEP</span>
+        <h3 class="part-title">Words become feathers</h3>
+      </div>
+    </header>
+    <div class="card static-card">
+      <div class="frame"><img src="./img/page_04.jpg" alt="Themes brainstorm map" /></div>
+    </div>
+  </article>
+
+  <!-- Lyric interlude — a quiet pause between parts -->
+  <div class="design-quote reveal">
+    <blockquote>
+      &ldquo;He wears the smile of every child<br/>he has ever stolen.&rdquo;
+    </blockquote>
+    <p class="design-quote-cite">— FIELD NOTE · MOONLIGHT</p>
+  </div>
+
+  <!-- Part II — Character Iterations (was Part III) — three full revisions from
+       pink ballerina to teal nightmare. -->
+  <article class="design-part reveal">
+    <header class="part-header">
+      <span class="part-num">II</span>
+      <div>
+        <span class="part-step">SECOND STEP</span>
+        <h3 class="part-title">Three drafts, one demon</h3>
+      </div>
+    </header>
+    <p class="part-lede">Moonlight began as a person and ended as a creature. Pink turned
+      to teal, the smile slid from face to body, and a sword became a crystal mask.</p>
+
+    <div class="card static-card" style="margin-top:46px">
+      <div class="frame"><img src="./img/page_05.jpg" alt="Character iterations spread" /></div>
+    </div>
+  </article>
+
+  <!-- Part III — Visuals & References (was Part I) — the curated moodboard
+       that the final design pulled together. -->
+  <article class="design-part reveal">
+    <header class="part-header">
+      <span class="part-num">III</span>
+      <div>
+        <span class="part-step">THIRD STEP</span>
+        <h3 class="part-title">A wardrobe of references</h3>
+      </div>
+    </header>
+    <p class="part-lede">Four motifs collide inside Moonlight's body — the painted clown,
+      the crystalline lake, a feathered cloak of pale fire, and the soft horror of a
+      porcelain mask.</p>
+
+    <div class="card static-card" style="margin-top:36px">
+      <div class="frame"><img src="./img/page_03.jpg" alt="Visual research moodboard" /></div>
+    </div>
+  </article>
+</section>
+
+<div class="seam"></div>
+
+<!-- CONCEPT ART PROCESS — normal flow, no button at the bottom -->
+<section class="chapter" id="concept">
+  <div class="reveal">
+    <div class="eyebrow">CHAPTER · III · CONCEPT · ART · PROCESS</div>
+    <h2 class="h1">Staging the <em>nightmare</em>.</h2>
+    <p class="lede">Many passes through composition, perspective, and posture — until
+      the bedroom told a story by itself.</p>
+  </div>
+
+  <div class="reveal delay-2" style="margin-top:70px">
+    <div class="card static-card">
+      <div class="frame"><img src="./img/page_06.jpg" alt="Concept process spread" /></div>
+    </div>
+  </div>
+</section>
+
+<!-- FINALE — pure black room with a hanging vintage lamp.
+     Initial state: lamp lit, glow visible, illustration hidden, scroll locked.
+     Click the lamp → flicker → extinguish → brief black → page_08 fades in. -->
+<section class="finale" id="finale">
+  <p class="finale-prompt">Are you ready for night to fall?</p>
+  <div class="lamp-rig" id="lampRig">
+    <img src="./img/lamp.png" class="lamp-img" id="lampImg" alt="" draggable="false" />
+    <div class="lamp-glow"></div>
+  </div>
+  <img src="./img/page_08.jpg" alt="Final illustration" class="finale-img" />
+</section>
+
+<!-- ENVIRONMENT — the same bedroom, now modelled in 3D as a different medium -->
+<section class="chapter" id="environment">
+  <div class="grid split env-split">
+    <div>
+      <div class="eyebrow reveal">CHAPTER · V · DIMENSIONS</div>
+      <h2 class="h1 reveal delay-1">The same room, in <em>3D</em>.</h2>
+      <p class="lede reveal delay-2">The bedroom that hosts the nightmare — now rebuilt
+        in 3D, so the light has somewhere real to fall.</p>
+    </div>
+    <div class="reveal delay-2">
+      <figure class="video-card" data-video="./img/environment.mp4">
+        <img src="./img/page_07.jpg" alt="Environment modeling renders" />
+        <button class="play-btn" type="button" aria-label="Play environment video">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <polygon points="8,5 19,12 8,19"/>
+          </svg>
+        </button>
+        <figcaption>Plan view, perched specter, child beneath the mask.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="signoff">Amber Xu</div>
+  <div class="meta">MOONLIGHT · A · DREAM · DEMON · STUDY · 2026</div>
+  <div class="links">
+    <a href="#hero">RETURN TO OVERTURE</a>
+    <a href="mailto:wandali369@gmail.com">CONTACT</a>
+  </div>
+</footer>
+
+<!-- Brief blackout overlay used during the lamp-off transition -->
+<div class="blackout" id="blackout"></div>
+
+<!-- LIGHTBOX — handles both images and videos -->
+<div class="lb" id="lb">
+  <button class="close" id="lbClose">CLOSE · ESC</button>
+  <img id="lbImg" src="" alt="" />
+  <video id="lbVid" controls playsinline preload="metadata" style="display:none;max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 30px 80px rgba(0,0,0,.6);background:#000"></video>
+</div>
+
+<script>
+/* ---------- Hero mask + title sizing (responsive) ---------- */
+let __heroW = 0, __heroH = 0, __wipeProgress = 0;
+
+function recenterTitleByBBox(cx){
+  const cut = document.getElementById('cutText');
+  if(!cut) return;
+  try {
+    const bbox = cut.getBBox();
+    if(bbox.width > 0){
+      // text-anchor="middle" centers the typographic box; but script fonts
+      // (Caveat, Brush) have unequal sidebearings — the 'T' here trails further
+      // right. Shift x so the *visual* bbox center sits exactly at cx.
+      const bboxCx = bbox.x + bbox.width / 2;
+      const shift  = cx - bboxCx;
+      if(Math.abs(shift) > 0.5){
+        const curX = parseFloat(cut.getAttribute('x')) || cx;
+        cut.setAttribute('x', curX + shift);
+      }
+    }
+  } catch(e){}
+}
+
+function fitHero(){
+  const hero = document.getElementById('hero');
+  if(!hero) return;
+  // documentElement.clientWidth excludes the vertical scrollbar, giving the
+  // actual visible content width — what we want to center against.
+  __heroW = document.documentElement.clientWidth || hero.offsetWidth;
+  __heroH = hero.offsetHeight;
+  const cx = __heroW / 2;
+  const cy = __heroH * 0.5 - 50;
+  const fs = Math.min(__heroW * 0.18, __heroH * 0.29);
+
+  const cut = document.getElementById('cutText');
+  if(cut){
+    cut.setAttribute('x', cx);
+    cut.setAttribute('y', cy);
+    cut.setAttribute('font-size', fs);
+    // Once Caveat actually loads, the bbox shifts — re-center then.
+    if(document.fonts && document.fonts.ready){
+      document.fonts.ready.then(()=> recenterTitleByBBox(cx));
+    }
+    requestAnimationFrame(()=> recenterTitleByBBox(cx));
+  }
+
+  // Set wipe rect height so it spans the whole hero
+  const wipe = document.getElementById('wipeRect');
+  if(wipe){
+    wipe.setAttribute('x', 0);
+    wipe.setAttribute('y', 0);
+    wipe.setAttribute('height', __heroH + 2000);
+    wipe.setAttribute('width', __heroW * __wipeProgress);
+  }
+}
+addEventListener('load', fitHero);
+addEventListener('resize', fitHero);
+fitHero();
+
+/* ---------- Crystal chime sound effect — single-shot, no retry ---------- */
+const MoonChime = (function(){
+  const audio = new Audio();
+  audio.preload = 'auto';
+  audio.volume = 0.7;
+
+  if(audio.canPlayType('audio/mpeg')){
+    audio.src = './img/chime.mp3';
+  } else if(audio.canPlayType('audio/mp4')){
+    audio.src = './img/chime.m4a';
+  } else {
+    audio.src = './img/chime.mp3';
+  }
+
+  function tryPlay(){
+    audio.currentTime = 0;
+    const p = audio.play();
+    // If the browser blocks it (autoplay policy with no prior gesture),
+    // just fail silently. Do NOT queue a retry — that caused the chime
+    // to fire on later, unrelated user clicks.
+    if(p && p.catch) p.catch(()=>{});
+  }
+
+  return { tryPlay };
+})();
+
+/* ---------- Handwriting reveal animation (wipe rect inside SVG mask) ----------
+   When the writing completes AND the reader is still entirely on the home page
+   (hasn't scrolled away), play the chime exactly once — this is the only
+   moment the sound is allowed to fire. */
+(function(){
+  const wipe = document.getElementById('wipeRect');
+  if(!wipe) return;
+  const startDelay = 600;
+  const duration = 3400;
+  let t0, chimed = false;
+  function tick(t){
+    if(!t0) t0 = t;
+    const elapsed = t - t0;
+    if(elapsed < startDelay){ requestAnimationFrame(tick); return; }
+    const p = Math.min(1, (elapsed - startDelay) / duration);
+    let e = 1 - Math.pow(1-p, 3);
+    if(p < .32) e *= (0.96 + 0.04*Math.sin(p*40));
+    __wipeProgress = e;
+    wipe.setAttribute('width', __heroW * e);
+    if(p >= 1 && !chimed){
+      chimed = true;
+      // Only play if the reader is still entirely on the home page
+      if(scrollY < 30){
+        MoonChime.tryPlay();
+      }
+    }
+    if(p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
+
+/* ---------- Realistic water droplets with refraction lensing
+   • Dense static droplets clung to the glass (never move, cached to an offscreen canvas)
+   • Sliding droplets appear OCCASIONALLY like shooting stars — every ~6–18 seconds
+---------- */
+(function(){
+  const hero = document.getElementById('hero');
+  if(!hero) return;
+  const cnv = document.createElement('canvas');
+  // The same SVG frostMask wipes both the fog AND the water droplets on the glass —
+  // wherever the title is written, the droplets vanish together with the fog.
+  cnv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;z-index:7;pointer-events:none;-webkit-mask:url(#frostMask);mask:url(#frostMask)';
+  hero.appendChild(cnv);
+  const cx = cnv.getContext('2d');
+  const DPR = Math.min(devicePixelRatio || 1, 2);
+  let CW = 0, CH = 0;
+
+  // Offscreen canvas — caches the static layer so we don't re-render hundreds of drops each frame
+  const oCnv = document.createElement('canvas');
+  const oCtx = oCnv.getContext('2d');
+
+  // Background image (refraction source). No crossOrigin — same-origin local file.
+  const bg = new Image();
+  let bgLoaded = false;
+  function onBgLoad(){
+    if(bgLoaded) return;
+    bgLoaded = true;
+    calcBgCover();
+    renderStatic();
+  }
+  bg.onload = onBgLoad;
+  bg.onerror = ()=>{ console.warn('bg image failed; using fallback droplets'); renderStatic(); };
+  bg.src = './img/hero-bg.jpg';
+  if(bg.complete && bg.naturalWidth) onBgLoad();
+
+  let bgDW=0, bgDH=0, bgDX=0, bgDY=0;
+  function calcBgCover(){
+    if(!bgLoaded || !CW || !CH) return;
+    const ir = bg.width/bg.height, cr = CW/CH;
+    if(ir > cr){ bgDH = CH; bgDW = bgDH*ir; } else { bgDW = CW; bgDH = bgDW/ir; }
+    bgDX = (CW-bgDW)/2; bgDY = (CH-bgDH)/2;
+  }
+
+  const rand = (a,b)=> a + Math.random()*(b-a);
+
+  /* ----- 10 droplet silhouettes inspired by real condensation ----- */
+  /* Each returns a Path2D centered on (x,y) sized by r and aspect ar */
+  const SHAPES = [
+    // 0 · clean round (the default for most beads)
+    (x,y,r,ar)=>{ const p=new Path2D(); p.ellipse(x,y,r*ar,r,0,0,Math.PI*2); return p; },
+    // 1 · tall oval — slightly stretched vertically
+    (x,y,r,ar)=>{ const p=new Path2D(); p.ellipse(x,y,r*ar*0.80,r*1.18,0,0,Math.PI*2); return p; },
+    // 2 · wide oval — squashed by surface tension
+    (x,y,r,ar)=>{ const p=new Path2D(); p.ellipse(x,y,r*ar*1.28,r*0.76,0,0,Math.PI*2); return p; },
+    // 3 · teardrop — pointed top, rounded bottom (about to fall)
+    (x,y,r,ar)=>{
+      const p=new Path2D();
+      p.moveTo(x, y - r*1.22);
+      p.bezierCurveTo(x + r*ar*1.05, y - r*0.55, x + r*ar*1.00, y + r*0.35, x + r*ar*0.50, y + r*1.05);
+      p.bezierCurveTo(x + r*ar*0.22, y + r*1.20, x - r*ar*0.22, y + r*1.20, x - r*ar*0.50, y + r*1.05);
+      p.bezierCurveTo(x - r*ar*1.00, y + r*0.35, x - r*ar*1.05, y - r*0.55, x, y - r*1.22);
+      p.closePath(); return p;
+    },
+    // 4 · flat-bottomed meniscus — dome on top, flat where it meets glass
+    (x,y,r,ar)=>{
+      const p=new Path2D();
+      p.moveTo(x - r*ar, y + r*0.25);
+      p.bezierCurveTo(x - r*ar*1.05, y - r*0.45, x - r*ar*0.70, y - r*0.95, x, y - r);
+      p.bezierCurveTo(x + r*ar*0.70, y - r*0.95, x + r*ar*1.05, y - r*0.45, x + r*ar, y + r*0.25);
+      p.bezierCurveTo(x + r*ar*0.55, y + r*0.38, x - r*ar*0.55, y + r*0.38, x - r*ar, y + r*0.25);
+      p.closePath(); return p;
+    },
+    // 5 · lopsided — heavier on one side (drift)
+    (x,y,r,ar)=>{
+      const p=new Path2D();
+      p.moveTo(x + r*ar*1.12, y - r*0.25);
+      p.bezierCurveTo(x + r*ar*1.18, y + r*0.55, x + r*ar*0.55, y + r*1.05, x - r*ar*0.40, y + r*0.85);
+      p.bezierCurveTo(x - r*ar*1.05, y + r*0.50, x - r*ar*1.00, y - r*0.40, x - r*ar*0.35, y - r*0.85);
+      p.bezierCurveTo(x + r*ar*0.45, y - r*1.00, x + r*ar*1.05, y - r*0.70, x + r*ar*1.12, y - r*0.25);
+      p.closePath(); return p;
+    },
+    // 6 · pear — narrow top, wide bottom (gravity load)
+    (x,y,r,ar)=>{
+      const p=new Path2D();
+      p.moveTo(x, y - r*0.95);
+      p.bezierCurveTo(x + r*ar*0.55, y - r*0.85, x + r*ar*1.05, y + r*0.20, x + r*ar*0.90, y + r*1.00);
+      p.bezierCurveTo(x + r*ar*0.35, y + r*1.22, x - r*ar*0.35, y + r*1.22, x - r*ar*0.90, y + r*1.00);
+      p.bezierCurveTo(x - r*ar*1.05, y + r*0.20, x - r*ar*0.55, y - r*0.85, x, y - r*0.95);
+      p.closePath(); return p;
+    },
+    // 7 · merged twins — two beads just fused
+    (x,y,r,ar)=>{
+      const p=new Path2D();
+      p.ellipse(x - r*ar*0.50, y + r*0.10, r*ar*0.78, r*0.78, 0, 0, Math.PI*2);
+      p.ellipse(x + r*ar*0.48, y - r*0.18, r*ar*0.66, r*0.66, 0, 0, Math.PI*2);
+      return p;
+    },
+    // 8 · wobbly blob — irregular edges
+    (x,y,r,ar)=>{
+      const p=new Path2D();
+      const N=10, seed=((x*31+y*17)|0);
+      for(let i=0;i<N;i++){
+        const a=(i/N)*Math.PI*2;
+        const w=0.82+0.20*((Math.sin(seed+i*7.3)+1)*0.5);
+        const px=x+Math.cos(a)*r*ar*w;
+        const py=y+Math.sin(a)*r*w;
+        if(i===0) p.moveTo(px,py); else p.lineTo(px,py);
+      }
+      p.closePath(); return p;
+    },
+    // 9 · flat bead — barely beaded up, very wide and short
+    (x,y,r,ar)=>{ const p=new Path2D(); p.ellipse(x,y,r*ar*1.40,r*0.48,0,0,Math.PI*2); return p; }
+  ];
+
+  // Weighted picker — keeps mostly natural beads, a few outliers
+  function pickShape(){
+    const v = Math.random();
+    if(v < 0.35) return 0;                  // 35% round
+    if(v < 0.50) return 1;                  // 15% tall oval
+    if(v < 0.60) return 2;                  // 10% wide oval
+    if(v < 0.72) return 8;                  // 12% wobbly blob
+    if(v < 0.80) return 3;                  // 8%  teardrop
+    if(v < 0.87) return 5;                  // 7%  lopsided
+    if(v < 0.92) return 6;                  // 5%  pear
+    if(v < 0.96) return 4;                  // 4%  flat bottom
+    if(v < 0.99) return 9;                  // 3%  flat bead
+    return 7;                               // 1%  merged twins
+  }
+
+  let staticDrops = [];   // attached, never move
+  let specks = [];        // tiny condensation
+  const sliders = [];     // occasional shooting-star drops
+
+  function makeStaticDrop(){
+    const cls = Math.random();
+    let r;
+    if(cls < 0.55)      r = rand(2.5, 4.5);
+    else if(cls < 0.90) r = rand(4.5, 8);
+    else                r = rand(8, 14);
+    return {
+      x: Math.random()*CW,
+      y: Math.random()*CH,
+      r: r * DPR,
+      ar: 0.95 + Math.random()*0.07,
+      shape: pickShape()
+    };
+  }
+
+  function makeSlider(){
+    const cls = Math.random();
+    const r = cls < 0.5 ? rand(4, 7) : rand(7, 12);
+    // Sliders are mostly teardrops/pears (gravity-elongated) or round
+    const sv = Math.random();
+    const shape = sv < 0.45 ? 3 : (sv < 0.75 ? 6 : (sv < 0.92 ? 0 : 1));
+    return {
+      x: Math.random()*CW,
+      y: rand(-30, -5)*DPR,
+      r: r * DPR,
+      ar: 0.93,
+      shape,
+      vy: rand(0.4, 0.9) * DPR,
+      phase: rand(0, Math.PI*2),
+      trail: []
+    };
+  }
+
+  function seed(){
+    staticDrops = [];
+    specks = [];
+    // Denser attached droplets
+    const count = Math.floor((CW*CH) / (2400*DPR*DPR));
+    for(let i=0;i<count;i++) staticDrops.push(makeStaticDrop());
+    // Tiny condensation specks
+    const speckCount = Math.floor((CW*CH) / (320*DPR*DPR));
+    for(let i=0;i<speckCount;i++){
+      specks.push({
+        x: Math.random()*CW,
+        y: Math.random()*CH,
+        r: rand(0.4, 1.4)*DPR,
+        a: rand(0.10, 0.35)
+      });
+    }
+  }
+
+  function size(){
+    CW = cnv.width  = hero.offsetWidth  * DPR;
+    CH = cnv.height = hero.offsetHeight * DPR;
+    oCnv.width = CW; oCnv.height = CH;
+    calcBgCover();
+    seed();
+    renderStatic();
+  }
+
+  function drawSpeck(ctx, x, y, r, a){
+    const g = ctx.createRadialGradient(x-r*0.3, y-r*0.3, 0, x, y, r);
+    g.addColorStop(0, `rgba(255,255,255,${(a*0.85).toFixed(2)})`);
+    g.addColorStop(0.5, `rgba(220,235,255,${(a*0.35).toFixed(2)})`);
+    g.addColorStop(1, 'rgba(140,170,220,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  function drawDroplet(ctx, drop, alpha){
+    const x = drop.x, y = drop.y, r = drop.r;
+    const ar = drop.ar != null ? drop.ar : 1;
+    const shapeIdx = drop.shape != null ? drop.shape : 0;
+    const path = SHAPES[shapeIdx](x, y, r, ar);
+    const a = (alpha != null ? alpha : 1);
+
+    // 1. Refracted background, clipped to the droplet's path
+    if(bgLoaded){
+      ctx.save();
+      ctx.clip(path);
+      ctx.translate(x, y);
+      ctx.rotate(Math.PI);
+      ctx.scale(1.15, 1.15);
+      ctx.translate(-x, -y);
+      ctx.globalAlpha = a;
+      ctx.drawImage(bg, bgDX, bgDY, bgDW, bgDH);
+      ctx.restore();
+    } else {
+      ctx.fillStyle = `rgba(40,55,90,${a*0.45})`;
+      ctx.fill(path);
+    }
+
+    // 2. Dark rim around the shape (refraction at the edge)
+    ctx.lineWidth = Math.max(0.5, r*0.10);
+    ctx.strokeStyle = `rgba(5,8,22,${(a*0.55).toFixed(2)})`;
+    ctx.stroke(path);
+
+    // 3. Inner shadow (lower edge darker) — clipped to the same path
+    if(r > 2*DPR){
+      ctx.save();
+      ctx.clip(path);
+      const sg = ctx.createRadialGradient(x, y+r*0.2, r*0.3, x, y, r);
+      sg.addColorStop(0, 'rgba(0,0,0,0)');
+      sg.addColorStop(1, `rgba(0,0,0,${(a*0.25).toFixed(2)})`);
+      ctx.fillStyle = sg;
+      ctx.fill(path);
+      ctx.restore();
+    }
+
+    // 4. Primary specular highlight (upper-left)
+    if(r > 1.8*DPR){
+      const hx = x - r*ar*0.32, hy = y - r*0.45;
+      const hr = r*0.55;
+      const hg = ctx.createRadialGradient(hx, hy, 0, hx, hy, hr);
+      hg.addColorStop(0,   `rgba(255,255,255,${(a*0.95).toFixed(2)})`);
+      hg.addColorStop(0.4, `rgba(255,255,255,${(a*0.40).toFixed(2)})`);
+      hg.addColorStop(1,   'rgba(255,255,255,0)');
+      ctx.fillStyle = hg;
+      ctx.beginPath();
+      ctx.arc(hx, hy, hr, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // 5. Secondary tiny highlight (lower-right backlight)
+    if(r > 3.5*DPR){
+      const hx = x + r*ar*0.30, hy = y + r*0.32;
+      ctx.beginPath();
+      ctx.arc(hx, hy, r*0.10, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,255,255,${(a*0.50).toFixed(2)})`;
+      ctx.fill();
+    }
+
+    // 6. Contact shadow under big drops
+    if(r > 5*DPR){
+      ctx.beginPath();
+      ctx.ellipse(x, y+r*0.85, r*ar*0.6, r*0.15, 0, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(0,0,0,${(a*0.22).toFixed(2)})`;
+      ctx.fill();
+    }
+  }
+
+  // Render the static layer once into the offscreen canvas.
+  // drawDroplet has its own bgLoaded fallback so drops show either way.
+  function renderStatic(){
+    if(!CW || !CH) return;
+    oCtx.clearRect(0,0,CW,CH);
+    for(const s of specks) drawSpeck(oCtx, s.x, s.y, s.r, s.a);
+    for(const d of staticDrops) drawDroplet(oCtx, d, 1);
+  }
+
+  // Schedule sporadic sliding droplets — like shooting stars
+  function scheduleSlider(){
+    const delay = 6000 + Math.random()*12000;   // 6–18 seconds between each
+    setTimeout(()=>{
+      sliders.push(makeSlider());
+      // small chance of a quick pair
+      if(Math.random() < 0.18){
+        setTimeout(()=> sliders.push(makeSlider()), 600 + Math.random()*900);
+      }
+      scheduleSlider();
+    }, delay);
+  }
+
+  function draw(){
+    cx.clearRect(0,0,CW,CH);
+    // Static layer (cached)
+    if(oCnv.width) cx.drawImage(oCnv, 0, 0);
+
+    // Live sliders
+    for(let i=sliders.length-1; i>=0; i--){
+      const d = sliders[i];
+      d.trail.push({x:d.x, y:d.y, r:d.r*0.78});
+      if(d.trail.length > 70) d.trail.shift();
+      d.x += Math.sin(d.y*0.02 + d.phase) * 0.25 * DPR;
+      d.y += d.vy;
+      d.vy += 0.006 * DPR;
+      d.r *= 0.9994;
+
+      for(let j=0;j<d.trail.length;j++){
+        const t = d.trail[j];
+        const a = (j/d.trail.length) * 0.5;
+        drawDroplet(cx, {x:t.x, y:t.y, r:t.r*0.6, ar:d.ar, shape:0}, a*0.45);
+      }
+      drawDroplet(cx, d, 1);
+
+      if(d.y - d.r > CH || d.r < 1.2*DPR){
+        sliders.splice(i, 1);
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+
+  size();
+  addEventListener('resize', size);
+  requestAnimationFrame(draw);
+  scheduleSlider();
+})();
+
+/* ---------- Tilt cards ---------- */
+document.querySelectorAll('.card').forEach(card=>{
+  // Static cards inside the design chapter — no tilt, no glow, no lightbox.
+  if(card.classList.contains('static-card')) return;
+  const frame = card.querySelector('.frame');
+  card.addEventListener('mousemove', e=>{
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX-r.left)/r.width;
+    const y = (e.clientY-r.top)/r.height;
+    const rx = (y-.5)*-10;
+    const ry = (x-.5)*12;
+    frame.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
+    card.style.setProperty('--mx', (x*100).toFixed(1)+'%');
+    card.style.setProperty('--my', (y*100).toFixed(1)+'%');
+  });
+  card.addEventListener('mouseleave', ()=>{
+    frame.style.transform = 'rotateX(0deg) rotateY(0deg)';
+  });
+  card.addEventListener('click', ()=> openLbImage(card.dataset.img));
+});
+
+// Lightbox trigger for transparent character portraits (no tilt — they float)
+document.querySelectorAll('.character-portrait').forEach(p=>{
+  p.addEventListener('click', ()=> openLbImage(p.dataset.img));
+});
+
+/* ---------- Lightbox (images + videos) ---------- */
+const lb = document.getElementById('lb');
+const lbImg = document.getElementById('lbImg');
+const lbVid = document.getElementById('lbVid');
+
+function openLbImage(src){
+  if(!src) return;
+  lbVid.pause(); lbVid.removeAttribute('src'); lbVid.load();
+  lbVid.style.display = 'none';
+  lbImg.style.display = '';
+  lbImg.src = src;
+  lb.classList.add('open');
+}
+function openLbVideo(src){
+  if(!src) return;
+  lbImg.style.display = 'none';
+  lbImg.src = '';
+  lbVid.style.display = '';
+  lbVid.src = src;
+  lb.classList.add('open');
+  const p = lbVid.play();
+  if(p && p.catch) p.catch(()=>{});
+}
+function closeLb(){
+  lb.classList.remove('open');
+  lbImg.src = '';
+  lbVid.pause(); lbVid.removeAttribute('src'); lbVid.load();
+}
+document.getElementById('lbClose').addEventListener('click', closeLb);
+lb.addEventListener('click', e=>{ if(e.target===lb) closeLb(); });
+addEventListener('keydown', e=>{ if(e.key==='Escape' && lb.classList.contains('open')) closeLb(); });
+
+// Click on any video-card opens its video in the lightbox
+document.querySelectorAll('.video-card').forEach(v=>{
+  v.addEventListener('click', ()=> openLbVideo(v.dataset.video));
+});
+
+/* ---------- Scroll progress + nav dots + top nav ---------- */
+const progress = document.getElementById('progress');
+const dotLinks = [...document.querySelectorAll('nav.dots a')];
+const topNav = document.getElementById('topNav');
+const topNavLinks = topNav ? [...topNav.querySelectorAll('.top-nav-links a')] : [];
+
+function onScroll(){
+  const max = document.documentElement.scrollHeight - innerHeight;
+  const pct = max>0 ? (scrollY/max*100) : 0;
+  progress.style.width = pct+'%';
+
+  // Top nav background transitions to blurred panel after a short scroll
+  if(topNav){
+    topNav.classList.toggle('scrolled', scrollY > 60);
+  }
+
+  // Active section index — shared between side dots and top nav links
+  let activeIdx = 0;
+  for(let i=0; i<dotLinks.length; i++){
+    const sec = document.getElementById(dotLinks[i].dataset.target);
+    if(!sec) continue;
+    const top = sec.getBoundingClientRect().top;
+    if(top < innerHeight*0.45) activeIdx = i;
+  }
+  dotLinks.forEach((a,i)=> a.classList.toggle('active', i===activeIdx));
+  topNavLinks.forEach((a,i)=> a.classList.toggle('active', i===activeIdx));
+}
+addEventListener('scroll', onScroll);
+onScroll();
+
+/* Smooth scroll for both nav systems */
+function bindSmoothScroll(link){
+  link.addEventListener('click', e=>{
+    e.preventDefault();
+    const id = link.dataset.target || (link.getAttribute('href') || '').replace('#','');
+    const t = document.getElementById(id);
+    if(t) t.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+}
+dotLinks.forEach(bindSmoothScroll);
+topNavLinks.forEach(bindSmoothScroll);
+// Brand logo also scrolls to top
+if(topNav){
+  const brand = topNav.querySelector('.top-brand');
+  if(brand) bindSmoothScroll(brand);
+}
+
+/* ---------- Reveal on scroll ---------- */
+const io = new IntersectionObserver(entries=>{
+  for(const en of entries) if(en.isIntersecting) en.target.classList.add('in');
+}, {threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+
+/* ---------- Finale lamp page · flicker, extinguish, reveal -----------
+   Initially: lamp lit + warm glow + illustration hidden + scroll locked
+   Click lamp:
+     1) Flicker for ~0.65s (power blinking before outage)
+     2) Sudden extinguish + brief blackout (0.3s)
+     3) Illustration fades in, scroll unlocks
+   If reader tries to scroll past before clicking → lamp swings like a
+   pendulum (damped). */
+(function(){
+  const finale  = document.getElementById('finale');
+  const lamp    = document.getElementById('lampImg');
+  const rig     = document.getElementById('lampRig');
+  const blackout= document.getElementById('blackout');
+  if(!finale || !lamp || !rig) return;
+
+  let lampOff = false;          // true after the user clicks the lamp
+  let swingTimer = null;
+
+  function swingLamp(){
+    if(lampOff) return;
+    rig.classList.remove('is-swinging');
+    void rig.offsetWidth;       // restart animation
+    rig.classList.add('is-swinging');
+    clearTimeout(swingTimer);
+    swingTimer = setTimeout(()=> rig.classList.remove('is-swinging'), 2500);
+  }
+
+  // —— Click → flicker → extinguish → reveal —— //
+  lamp.addEventListener('click', ()=>{
+    if(lampOff) return;
+    lampOff = true;
+
+    // Phase 1: flicker
+    finale.classList.add('is-flickering');
+
+    // Phase 2: at the end of the flicker, lamp dies + brief blackout
+    setTimeout(()=>{
+      finale.classList.remove('is-flickering');
+      blackout.classList.add('on');
+    }, 600);
+
+    // Phase 3: switch state and lift the blackout, letting the illustration appear
+    setTimeout(()=>{
+      finale.classList.add('is-lit-off');
+      blackout.classList.remove('on');
+    }, 900);
+  });
+
+  // —— Scroll gate — locked until the lamp is clicked —— //
+  function isPastFinaleBottom(){
+    const r = finale.getBoundingClientRect();
+    return r.bottom <= innerHeight + 2;
+  }
+  function clampScroll(){
+    if(lampOff) return;
+    const r = finale.getBoundingClientRect();
+    if(r.bottom < innerHeight){
+      window.scrollBy(0, -(innerHeight - r.bottom));
+      swingLamp();
+    }
+  }
+  addEventListener('wheel', (e)=>{
+    if(lampOff) return;
+    if(e.deltaY <= 0) return;
+    if(isPastFinaleBottom()){
+      e.preventDefault();
+      swingLamp();
+    }
+  }, { passive:false });
+  let touchStartY = null;
+  addEventListener('touchstart', (e)=>{
+    if(lampOff) return;
+    touchStartY = e.touches[0].clientY;
+  }, { passive:true });
+  addEventListener('touchmove', (e)=>{
+    if(lampOff || touchStartY == null) return;
+    const dy = touchStartY - e.touches[0].clientY;
+    if(dy <= 0) return;
+    if(isPastFinaleBottom()){
+      e.preventDefault();
+      swingLamp();
+    }
+  }, { passive:false });
+  addEventListener('keydown', (e)=>{
+    if(lampOff) return;
+    if(!['ArrowDown','PageDown','End',' ','Spacebar'].includes(e.key)) return;
+    if(isPastFinaleBottom()){
+      e.preventDefault();
+      swingLamp();
+    }
+  });
+  addEventListener('scroll', clampScroll, { passive:true });
+})();
+
+/* ---------- Marquee speed boost on hover ---------- */
+const marquee = document.querySelector('.marquee .track');
+document.querySelector('.marquee').addEventListener('mouseenter', ()=>marquee.style.animationPlayState='paused');
+document.querySelector('.marquee').addEventListener('mouseleave', ()=>marquee.style.animationPlayState='running');
+
+/* ---------- Swatch click - subtle shake ---------- */
+document.querySelectorAll('.swatch').forEach(s=>{
+  s.addEventListener('click', ()=>{
+    s.animate([{transform:'scale(1.04)'},{transform:'scale(.96) rotate(-2deg)'},{transform:'scale(1.04)'},{transform:'scale(1)'}], {duration:600, easing:'cubic-bezier(.2,.7,.3,1)'});
+  });
+});
+</script>
+</body>
+</html>

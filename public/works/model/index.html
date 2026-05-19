@@ -1,0 +1,2632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dream Horizon — Amber Xu</title>
+<link href="https://fonts.googleapis.com/css2?family=Antonio:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Noto+Serif+JP:wght@400;500;600&family=Noto+Serif+KR:wght@400;500;600&family=Noto+Serif+SC:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #0a0612;
+    --bg-purple: #1a0f2a;
+    --accent-violet: #6b3fa0;
+    --accent-glow: #b388ff;
+    --neon-pink: #ff4fa3;
+    --neon-cyan: #4fe5ff;
+    --text-soft: #e8e0f0;
+    --text-mute: #a094b3;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg-deep);
+    color: var(--text-soft);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+  img { display: block; max-width: 100%; height: auto; }
+
+  /* ─────────── TOP NAVIGATION (fixed, bilingual, editorial) ─────────── */
+  .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2.5vw;
+    background: linear-gradient(180deg, rgba(8, 4, 18, 0.78) 0%, rgba(8, 4, 18, 0.55) 70%, rgba(8, 4, 18, 0) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .topbar .mark {
+    font-family: 'Antonio', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.45em;
+    color: rgba(255, 255, 255, 0.92);
+    text-transform: uppercase;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .topbar .mark::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-glow);
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+  .topbar nav {
+    display: flex;
+    gap: 2.4rem;
+  }
+  .topbar nav a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.32em;
+    color: rgba(255, 255, 255, 0.65);
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color 0.35s ease;
+    position: relative;
+    padding: 0.3rem 0;
+  }
+  .topbar nav a .cn {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.85em;
+    letter-spacing: 0.25em;
+    margin-left: 0.35em;
+    opacity: 0.7;
+  }
+  .topbar nav a::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -3px;
+    width: 0;
+    height: 1px;
+    background: var(--accent-glow);
+    transition: width 0.35s ease, left 0.35s ease;
+    box-shadow: 0 0 8px var(--accent-glow);
+  }
+  .topbar nav a:hover {
+    color: #fff;
+  }
+  .topbar nav a:hover::after {
+    width: 80%;
+    left: 10%;
+  }
+  @media (max-width: 900px) {
+    .topbar nav { gap: 1rem; }
+    .topbar nav a { font-size: 0.6rem; letter-spacing: 0.2em; }
+    .topbar nav a .cn { display: none; }
+  }
+
+  /* ─────────── COVER MARQUEES (city noise / ticker — two stacked rows) ─────────── */
+  .marquee-stack {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;         /* breathing room between the two ribbons (was 8px) */
+    flex-shrink: 0;
+    width: 100%;
+  }
+  /* Both stacks pulled 10px closer to the title */
+  .marquee-stack--top    { margin: 0 0 calc(8vh - 10px); }
+  .marquee-stack--bottom { margin: calc(8vh - 80px) 0 0; }
+
+  /* Offset the bottom stack so it never mirrors the top — each row starts
+     roughly mid-cycle by using a large negative animation-delay */
+  .marquee-stack--bottom .marquee:nth-child(1) .marquee-track { animation-delay: -55s; }
+  .marquee-stack--bottom .marquee:nth-child(2) .marquee-track { animation-delay: -47s; }
+  .marquee-stack--bottom .marquee:nth-child(3) .marquee-track { animation-delay: -72s; }
+  .marquee {
+    position: relative;
+    overflow: hidden;
+    padding: 0.32rem 0;       /* tighter vertical padding — slimmer ribbon */
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    background: linear-gradient(180deg, rgba(8, 4, 18, 0.55), rgba(8, 4, 18, 0.4));
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 6%, black 94%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, black 6%, black 94%, transparent 100%);
+  }
+  .marquee-track {
+    display: inline-flex;
+    white-space: nowrap;
+    animation: marquee-scroll 110s linear infinite;
+    will-change: transform;
+  }
+  .marquee-track > div {
+    display: inline-flex;
+    align-items: center;
+  }
+  .marquee-track .item {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.74rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.68);
+    padding: 0 1.6rem;
+  }
+  .marquee-track .item--cn {
+    font-family: 'Noto Serif SC', serif;
+    letter-spacing: 0.3em;
+    text-transform: none;
+    color: rgba(212, 197, 255, 0.78);
+  }
+  .marquee-track .item--accent {
+    color: var(--accent-glow);
+    text-shadow: 0 0 12px rgba(179, 136, 255, 0.5);
+  }
+  .marquee-track .sep {
+    display: inline-block;
+    color: rgba(255, 255, 255, 0.22);
+    padding: 0 0.4rem;
+  }
+  .marquee-track .sep--dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent-glow);
+    margin: 0 1.4rem;
+    box-shadow: 0 0 8px var(--accent-glow);
+    align-self: center;
+  }
+  @keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  /* Reverse direction for row 2 (opposite stream) */
+  .marquee--reverse .marquee-track {
+    animation: marquee-scroll-rev 95s linear infinite;
+  }
+  /* Row 3 — slower, same direction as row 1 */
+  .marquee--slow .marquee-track {
+    animation-duration: 145s;
+  }
+  /* Citation styling — quote source, small italic */
+  .marquee-track .item--cite {
+    font-style: italic;
+    font-size: 0.85em;
+    letter-spacing: 0.2em;
+    color: rgba(212, 197, 255, 0.55);
+    text-transform: none;
+  }
+  /* Japanese / Korean script fonts for original-language quotes */
+  .marquee-track .item--jp {
+    font-family: 'Noto Serif JP', 'Hiragino Mincho ProN', serif;
+    letter-spacing: 0.16em;
+    text-transform: none;
+  }
+  .marquee-track .item--kr {
+    font-family: 'Noto Serif KR', 'Apple SD Gothic Neo', serif;
+    letter-spacing: 0.18em;
+    text-transform: none;
+  }
+  /* European Latin scripts (German, French, Italian) — small italic for accents */
+  .marquee-track .item--eu {
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0.18em;
+  }
+  @keyframes marquee-scroll-rev {
+    from { transform: translateX(-50%); }
+    to   { transform: translateX(0); }
+  }
+  /* Pause animation on hover so people can actually read */
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+  /* Row 2 colour chips — each name glows in its own colour */
+  .color-chip {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 0 1.4rem;
+    color: currentColor;
+    text-shadow: 0 0 12px currentColor, 0 0 2px rgba(255, 255, 255, 0.15);
+  }
+  .color-chip--cn {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.25em;
+    text-transform: none;
+  }
+
+  /* ─────────── SECTION COMMON ─────────── */
+  section {
+    min-height: 100vh;
+    padding: 8vh 6vw;
+    position: relative;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-bottom: 0.4em;
+  }
+  .section-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--text-mute);
+    letter-spacing: 0.06em;
+  }
+
+  /* ─────────── SLIDE 1: COVER (curtain-up effect) ─────────── */
+  .cover {
+    height: 100vh;
+    width: 100%;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;     /* let marquees stretch full width */
+    z-index: 100;
+    will-change: transform, -webkit-mask-image, mask-image;
+    /* Initial mask: fully opaque (no fade). JS updates this on scroll so
+       the cover dissolves from the bottom up while it lifts. */
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 100%);
+            mask-image: linear-gradient(to bottom, black 0%, black 100%);
+  }
+  .cover.curtain-gone {
+    visibility: hidden;
+  }
+  /* Reveal-stage: holds the Concept section, pins it to the viewport
+     top while the curtain (cover) lifts above it. Height = concept
+     height (75vh) + pin distance (100vh) so the sticky pin lasts
+     exactly as long as the curtain takes to lift away.
+     The concept content is bilingual but compact — 75vh fits comfortably
+     and the shorter "exit scroll" makes the Concept → Origins handoff snappier. */
+  .reveal-stage {
+    height: 175vh;
+    position: relative;
+    z-index: 1;
+    /* Amsterdam painting fixed background — covers the whole stage so the
+       area below Concept (where it has scrolled past) still shows the painting */
+    background-image:
+      linear-gradient(180deg, rgba(10, 6, 18, 0.82), rgba(20, 8, 40, 0.88)),
+      url('./images/process-1.jpg');
+    background-size: cover, cover;
+    background-position: center center, center 30%;
+    background-attachment: fixed, fixed;
+    background-repeat: no-repeat;
+  }
+  .reveal-stage > .concept {
+    position: sticky;
+    top: 0;
+    height: 75vh;
+    min-height: 75vh;
+  }
+  .cover-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url('./images/cover-bg.jpg');
+    background-size: cover;
+    background-position: center center;
+    /* Less overall darkening + higher saturation so the neon glow at the
+       edges actually reads */
+    filter: brightness(0.78) saturate(1.35);
+    transform: scale(1.05);
+  }
+  .cover-overlay {
+    position: absolute;
+    inset: 0;
+    /* Inverted radial: a small, concentrated dark spotlight in the centre
+       (where the title sits) that fades out by ~60% of the radius, letting
+       the neon corners breathe in full colour */
+    background: radial-gradient(
+      ellipse 60% 60% at center,
+      rgba(10, 6, 18, 0.92) 0%,
+      rgba(10, 6, 18, 0.78) 30%,
+      rgba(10, 6, 18, 0.35) 65%,
+      rgba(10, 6, 18, 0) 100%
+    );
+  }
+  .cover-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 3rem 4rem;
+    will-change: transform, opacity;
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;     /* centre horizontally inside the flex column */
+    flex-shrink: 0;
+  }
+  /* Editorial meta strip above the title — issue number / mark */
+  .cover-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(0.65rem, 0.78vw, 0.78rem);
+    letter-spacing: 0.45em;
+    color: rgba(255, 255, 255, 0.55);
+    text-transform: uppercase;
+    margin-bottom: 3vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+  }
+  .cover-meta .dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent-glow);
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+  .cover-meta .line {
+    display: inline-block;
+    width: 40px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.35);
+  }
+  /* Massive condensed title — Antonio, all caps */
+  .cover-title {
+    font-family: 'Antonio', sans-serif;
+    font-weight: 600;
+    font-size: clamp(4.5rem, 14vw, 14rem);
+    line-height: 0.86;
+    letter-spacing: 0.005em;
+    color: #fff;
+    text-transform: uppercase;
+    text-shadow:
+      0 0 32px rgba(179, 136, 255, 0.45),
+      0 0 80px rgba(107, 63, 160, 0.32);
+  }
+  .cover-title .line-1 {
+    display: block;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.92);
+    /* Subtle violet glow so the range matches HORIZON, slightly smaller */
+    text-shadow:
+      0 0 26px rgba(212, 197, 255, 0.45),
+      0 0 70px rgba(179, 136, 255, 0.35),
+      0 0 150px rgba(179, 136, 255, 0.22);
+    animation: neon-breathe-soft 3.4s ease-in-out infinite;
+  }
+  .cover-title .line-2 {
+    display: block;
+    font-weight: 700;
+    color: #fff;
+    text-shadow:
+      0 0 36px rgba(212, 197, 255, 0.65),
+      0 0 90px rgba(179, 136, 255, 0.55),
+      0 0 200px rgba(179, 136, 255, 0.38);
+    /* Faster, wider swaying glow */
+    animation: neon-sway 4.0s ease-in-out infinite;
+  }
+  /* Opacity + soft glow breathing for the lighter top line */
+  @keyframes neon-breathe-soft {
+    0%, 100% {
+      opacity: 0.92;
+      text-shadow:
+        0 0 26px rgba(212, 197, 255, 0.45),
+        0 0 70px rgba(179, 136, 255, 0.35),
+        0 0 150px rgba(179, 136, 255, 0.22);
+    }
+    30% {
+      opacity: 1;
+      text-shadow:
+        0 0 36px rgba(212, 197, 255, 0.60),
+        0 0 95px rgba(179, 136, 255, 0.48),
+        0 0 190px rgba(179, 136, 255, 0.32);
+    }
+    55% {
+      opacity: 0.84;
+      text-shadow:
+        0 0 18px rgba(212, 197, 255, 0.34),
+        0 0 56px rgba(179, 136, 255, 0.26),
+        0 0 120px rgba(179, 136, 255, 0.15);
+    }
+    80% {
+      opacity: 0.97;
+      text-shadow:
+        0 0 32px rgba(212, 197, 255, 0.55),
+        0 0 85px rgba(179, 136, 255, 0.44),
+        0 0 175px rgba(179, 136, 255, 0.28);
+    }
+  }
+  /* Wider, faster swaying glow for the bold bottom line */
+  @keyframes neon-sway {
+    0%, 100% {
+      text-shadow:
+        0 0 36px rgba(212, 197, 255, 0.65),
+        0 0 90px rgba(179, 136, 255, 0.55),
+        0 0 200px rgba(179, 136, 255, 0.38);
+      opacity: 1;
+    }
+    18% {
+      text-shadow:
+        0 0 48px rgba(212, 197, 255, 0.85),
+        0 0 120px rgba(179, 136, 255, 0.72),
+        0 0 250px rgba(179, 136, 255, 0.50);
+      opacity: 1;
+    }
+    35% {
+      text-shadow:
+        0 0 28px rgba(212, 197, 255, 0.50),
+        0 0 70px rgba(179, 136, 255, 0.40),
+        0 0 160px rgba(179, 136, 255, 0.25);
+      opacity: 0.9;
+    }
+    50% {
+      text-shadow:
+        0 0 42px rgba(212, 197, 255, 0.75),
+        0 0 105px rgba(179, 136, 255, 0.62),
+        0 0 220px rgba(179, 136, 255, 0.42);
+      opacity: 1;
+    }
+    68% {
+      text-shadow:
+        0 0 22px rgba(212, 197, 255, 0.42),
+        0 0 60px rgba(179, 136, 255, 0.34),
+        0 0 140px rgba(179, 136, 255, 0.20);
+      opacity: 0.82;
+    }
+    85% {
+      text-shadow:
+        0 0 44px rgba(212, 197, 255, 0.78),
+        0 0 110px rgba(179, 136, 255, 0.66),
+        0 0 230px rgba(179, 136, 255, 0.46);
+      opacity: 1;
+    }
+  }
+  /* Bilingual subtitle in mono — technical, calm */
+  .cover-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(0.75rem, 0.92vw, 0.95rem);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 4vh;
+    line-height: 1.9;
+  }
+  .cover-sub .cn {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.85em;
+    letter-spacing: 0.5em;
+    text-transform: none;
+    color: rgba(255, 255, 255, 0.55);
+    display: block;
+    margin-top: 0.6rem;
+  }
+  /* Thin separator rules around the subtitle */
+  .cover-sub::before,
+  .cover-sub::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.3);
+    margin: 1.5rem auto;
+  }
+  .scroll-hint {
+    position: absolute;
+    bottom: 4vh;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.55);
+    opacity: 0.7;
+    z-index: 2;
+  }
+  .scroll-hint::after {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 40px;
+    background: var(--text-soft);
+    margin: 0.8rem auto 0;
+    animation: scroll-pulse 2s ease-in-out infinite;
+  }
+  @keyframes scroll-pulse {
+    0%, 100% { transform: scaleY(0.4); opacity: 0.3; }
+    50% { transform: scaleY(1); opacity: 0.9; }
+  }
+
+  /* ─────────── SLIDE 2: CONCEPT ─────────── */
+  .concept {
+    /* No own background — the reveal-stage container behind it paints the
+       Amsterdam painting consistently across the whole 175vh stage */
+    background: transparent;
+    display: flex;
+    align-items: center;
+    padding: 12vh 8vw;
+  }
+  .concept-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(220px, 320px) 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+  .concept-left h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(2.2rem, 3.8vw, 3.4rem);
+    line-height: 1.15;
+    color: var(--accent-glow);
+    letter-spacing: 0.02em;
+  }
+  .concept-left h2 small {
+    display: block;
+    font-style: normal;
+    font-size: 0.55em;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--text-mute);
+    margin-bottom: 1rem;
+  }
+  .concept-left .pill {
+    display: inline-block;
+    margin-top: 2rem;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--accent-violet);
+    border-radius: 50px;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent-glow);
+  }
+  .concept-text p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.05rem, 1.35vw, 1.25rem);
+    line-height: 1.85;
+    color: var(--text-soft);
+    margin-bottom: 1.6rem;
+    text-align: justify;
+  }
+  .concept-text p:first-child::first-letter {
+    font-size: 3.4em;
+    float: left;
+    line-height: 0.85;
+    margin: 0.1em 0.15em 0 0;
+    font-family: 'Playfair Display', serif;
+    color: var(--accent-glow);
+  }
+  .concept-text em {
+    color: var(--accent-glow);
+    font-style: italic;
+  }
+
+  /* ─── Bilingual Design Concept ─── */
+  .concept {
+    flex-direction: column;
+    justify-content: center;
+    padding: 8vh 6vw;
+  }
+  .concept-header {
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto 5vh;
+  }
+  .concept-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(2.4rem, 4.2vw, 3.6rem);
+    line-height: 1.1;
+    color: var(--accent-glow);
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+  .concept-header h2 small {
+    display: block;
+    font-style: normal;
+    font-size: 0.32em;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--text-mute);
+    margin-bottom: 0.7rem;
+    font-weight: 400;
+  }
+  .concept-header .cn-title {
+    display: block;
+    font-family: 'Noto Serif SC', 'PingFang SC', serif;
+    font-size: clamp(0.95rem, 1.05vw, 1.15rem);
+    letter-spacing: 0.45em;
+    color: var(--text-mute);
+    font-weight: 300;
+    margin-top: 1.2rem;
+    padding-left: 0.45em; /* compensate for letter-spacing visual center */
+  }
+  .concept-header .pill {
+    display: inline-block;
+    margin-top: 1.8rem;
+    padding: 0.35rem 1.1rem;
+    border: 1px solid var(--accent-violet);
+    border-radius: 50px;
+    font-size: 0.68rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent-glow);
+  }
+  .concept-bilingual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+    align-items: start;
+  }
+  .lang-col {
+    min-width: 0;
+  }
+  .lang-col p {
+    margin-bottom: 1.3rem;
+    text-align: justify;
+  }
+  .lang-en p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(0.95rem, 1.05vw, 1.12rem);
+    line-height: 1.75;
+    color: var(--text-soft);
+  }
+  .lang-en p:first-child::first-letter {
+    font-size: 3em;
+    float: left;
+    line-height: 0.85;
+    margin: 0.08em 0.12em 0 0;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--accent-glow);
+  }
+  .lang-en em {
+    font-style: italic;
+    color: var(--accent-glow);
+  }
+  .lang-cn p {
+    font-family: 'Noto Serif SC', 'PingFang SC', 'Songti SC', serif;
+    font-size: clamp(0.86rem, 0.95vw, 1rem);
+    line-height: 2;
+    color: var(--text-soft);
+    letter-spacing: 0.03em;
+  }
+  .lang-cn em {
+    font-style: normal;
+    color: var(--accent-glow);
+  }
+
+  /* ─────────── SECTION INTRO ─────────── */
+  .section-intro {
+    max-width: 760px;
+    margin: 0 auto 6vh;
+    text-align: center;
+    position: relative;
+  }
+  .section-intro .num {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--accent-glow);
+    letter-spacing: 0.3em;
+    opacity: 0.7;
+  }
+  .section-intro .num::before,
+  .section-intro .num::after {
+    content: '';
+    display: inline-block;
+    width: 40px;
+    height: 1px;
+    background: var(--accent-glow);
+    vertical-align: middle;
+    margin: 0 1rem;
+    opacity: 0.5;
+  }
+  .section-intro h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+    letter-spacing: 0.04em;
+    color: #fff;
+    margin: 1rem 0 0.6rem;
+  }
+  .section-intro h2 em {
+    font-style: italic;
+    color: var(--accent-glow);
+    font-weight: 300;
+  }
+  .section-intro .lead {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--text-mute);
+    letter-spacing: 0.04em;
+    margin-top: 0.6rem;
+  }
+
+  /* ─────────── COMBINED: DAY ↔ NIGHT INTERACTIVE SECTION ─────────── */
+  .day-night {
+    position: relative;
+    padding: 14vh 6vw;
+    overflow: hidden;
+    /* default = day */
+    background: linear-gradient(180deg, #f4eef7 0%, #e6dcec 50%, #d9cce0 100%);
+    transition: background 1.4s ease;
+    /* Display order: title first, toggle second, images last
+       (HTML keeps toggle before title; CSS reorders visually for cleaner UX) */
+    display: flex;
+    flex-direction: column;
+  }
+  .day-night > .stars        { order: 0; }
+  .day-night > .dn-intro     { order: 1; }
+  .day-night > .dn-toggle-wrap { order: 2; margin-top: 0; }
+  .day-night > .dn-stage     { order: 3; }
+  .day-night.is-night {
+    background: linear-gradient(180deg, #1a0f2a 0%, #0c0820 50%, #050208 100%);
+  }
+  /* Soft sky glow that lives behind everything and fades between sun/moon */
+  .day-night::before,
+  .day-night::after {
+    content: '';
+    position: absolute;
+    top: -20%;
+    width: 70vw;
+    height: 70vw;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0;
+    transition: opacity 1.4s ease;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .day-night::before {
+    /* sun halo */
+    left: -10%;
+    background: radial-gradient(circle, rgba(255,200,140,0.55) 0%, transparent 60%);
+    opacity: 0.9;
+  }
+  .day-night::after {
+    /* moon halo */
+    right: -10%;
+    background: radial-gradient(circle, rgba(140,120,220,0.55) 0%, transparent 60%);
+  }
+  .day-night.is-night::before { opacity: 0; }
+  .day-night.is-night::after { opacity: 1; }
+
+  /* The sun ↔ moon toggle — slider design with proximity hover + breathing hint */
+
+  /* Outer wrap: invisible proximity hot-zone + houses the hint text */
+  .dn-toggle-wrap {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: fit-content;
+    margin: 0 auto 4vh;
+    padding: 1.6rem 2.6rem;
+    cursor: pointer;
+  }
+
+  /* The pill-shaped slider track — wider, more obvious slider proportions */
+  .dn-toggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 28px;            /* visible travel distance between the two ends */
+    border-radius: 100px;
+    padding: 6px;
+    transition:
+      transform 0.55s cubic-bezier(.22,.61,.36,1),
+      background 0.8s ease,
+      box-shadow 0.8s ease,
+      border-color 0.8s ease;
+    border: 1px solid transparent;
+  }
+  .day-night:not(.is-night) .dn-toggle {
+    background: rgba(255, 255, 255, 0.55);
+    border-color: rgba(120, 80, 160, 0.18);
+    box-shadow: inset 0 1px 2px rgba(80, 50, 120, 0.06), 0 4px 18px rgba(120, 80, 160, 0.12);
+  }
+  .day-night.is-night .dn-toggle {
+    background: rgba(20, 12, 40, 0.55);
+    border-color: rgba(212, 197, 255, 0.18);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45), 0 4px 22px rgba(120, 80, 200, 0.18);
+  }
+
+  /* Proximity hover — the whole toggle enlarges when the cursor enters
+     the surrounding 30-ish px hot-zone (the wrap padding) */
+  .dn-toggle-wrap:hover .dn-toggle {
+    transform: scale(1.12);
+  }
+
+  /* Buttons inside the pill — no individual borders, share the track */
+  .dn-toggle button {
+    background: transparent;
+    border: none;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    position: relative;
+    z-index: 2;
+    transition: color 0.5s ease;
+    color: currentColor;
+  }
+  .dn-toggle button svg {
+    width: 28px; height: 28px;
+  }
+  /* Active icon is bright; inactive is dimmed */
+  .day-night:not(.is-night) .sun-btn  { color: #fff; }
+  .day-night:not(.is-night) .moon-btn { color: rgba(80, 50, 110, 0.45); }
+  .day-night.is-night        .sun-btn  { color: rgba(220, 200, 255, 0.32); }
+  .day-night.is-night        .moon-btn { color: #fff; }
+
+  /* The sliding knob — sits behind the active icon, slides to the other side */
+  .dn-knob {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    z-index: 1;
+    pointer-events: none;
+    transition:
+      transform 0.65s cubic-bezier(.22,.61,.36,1),
+      background 0.8s ease,
+      box-shadow 0.8s ease;
+  }
+  /* Sun knob — soft peach / dawn (option C) */
+  .day-night:not(.is-night) .dn-knob {
+    background: radial-gradient(circle at 35% 30%, #ffdcc8, #e89a7a 72%);
+    box-shadow: 0 0 22px rgba(232, 154, 122, 0.5), 0 4px 12px rgba(190, 110, 80, 0.22);
+  }
+  /* Moon knob — soft lavender */
+  .day-night.is-night .dn-knob {
+    background: radial-gradient(circle at 35% 30%, #e2d4ff, #8a6ee0 72%);
+    box-shadow: 0 0 28px rgba(170, 130, 255, 0.55), 0 4px 12px rgba(100, 70, 200, 0.3);
+    /* travel = sun-btn (54px) + gap (28px) = 82px */
+    transform: translateX(82px);
+  }
+
+  /* Breathing glow on the INACTIVE side — invites the click */
+  .day-night:not(.is-night) .moon-btn {
+    animation: dn-breathe-moon 2.6s ease-in-out infinite;
+  }
+  .day-night.is-night .sun-btn {
+    animation: dn-breathe-sun 2.6s ease-in-out infinite;
+  }
+  @keyframes dn-breathe-moon {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(140, 110, 230, 0); }
+    50%      { box-shadow: 0 0 22px 3px rgba(140, 110, 230, 0.55); }
+  }
+  @keyframes dn-breathe-sun {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 200, 140, 0); }
+    50%      { box-shadow: 0 0 22px 3px rgba(255, 200, 140, 0.5); }
+  }
+  /* Once user has clicked, halt the breathing — they've found it */
+  .dn-toggle-wrap.has-interacted .moon-btn,
+  .dn-toggle-wrap.has-interacted .sun-btn {
+    animation: none;
+  }
+
+  /* The micro action hint beneath the toggle */
+  .dn-hint {
+    margin: 1rem 0 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-align: center;
+    pointer-events: none;
+    transition: opacity 0.6s ease, color 1.2s ease;
+  }
+  .day-night:not(.is-night) .dn-hint { color: #4a3360; opacity: 0.6; }
+  .day-night.is-night        .dn-hint { color: var(--text-mute); opacity: 0.55; }
+  .dn-toggle-wrap:hover .dn-hint { opacity: 0.95; }
+  .dn-toggle-wrap.has-interacted .dn-hint {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  .dn-hint .arr {
+    display: inline-block;
+    margin-right: 0.35em;
+    animation: hint-bob 1.8s ease-in-out infinite;
+  }
+  .dn-hint .sep { opacity: 0.5; margin: 0 0.5em; }
+  @keyframes hint-bob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-3px); }
+  }
+
+  /* Day-night title (changes per state) */
+  .dn-intro {
+    position: relative;
+    z-index: 2;
+    max-width: 760px;
+    margin: 0 auto 6vh;
+    text-align: center;
+    transition: color 1.2s ease;
+  }
+  .day-night:not(.is-night) .dn-intro { color: #2a1a3a; }
+  .day-night.is-night .dn-intro { color: var(--text-soft); }
+  .dn-intro .num {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    letter-spacing: 0.3em;
+    opacity: 0.75;
+    transition: color 1.2s ease;
+  }
+  .day-night:not(.is-night) .dn-intro .num { color: #6b3fa0; }
+  .day-night.is-night .dn-intro .num { color: var(--accent-glow); }
+  .dn-intro .num::before,
+  .dn-intro .num::after {
+    content: '';
+    display: inline-block;
+    width: 40px;
+    height: 1px;
+    background: currentColor;
+    vertical-align: middle;
+    margin: 0 1rem;
+    opacity: 0.55;
+  }
+  .dn-intro h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: clamp(2.6rem, 4.8vw, 4.2rem);
+    letter-spacing: 0.04em;
+    margin: 1rem 0 0.4rem;
+    position: relative;
+    min-height: 1.2em;
+  }
+  .dn-intro h2 em {
+    font-style: italic;
+    font-weight: 300;
+  }
+  .day-night:not(.is-night) .dn-intro h2 em { color: #6b3fa0; }
+  .day-night.is-night .dn-intro h2 em { color: var(--accent-glow); }
+  .dn-intro .title-state {
+    display: inline-block;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .dn-intro .title-day,
+  .dn-intro .title-night {
+    position: relative;
+  }
+  .day-night.is-night .dn-intro .title-day,
+  .day-night:not(.is-night) .dn-intro .title-night {
+    opacity: 0;
+    position: absolute;
+    left: 0; right: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+  }
+  .dn-intro .lead {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+    letter-spacing: 0.04em;
+    margin-top: 0.4rem;
+    opacity: 0.75;
+    position: relative;
+  }
+  .dn-intro .lead .lead-day,
+  .dn-intro .lead .lead-night {
+    transition: opacity 0.8s ease;
+  }
+  .day-night.is-night .lead-day,
+  .day-night:not(.is-night) .lead-night {
+    opacity: 0;
+    position: absolute;
+    left: 0; right: 0;
+  }
+
+  /* Stage holds day + night grids overlapping in the same grid cell so
+     they crossfade in place. Whichever grid is taller defines the
+     stage height; the shorter one centers vertically inside it. */
+  .dn-stage {
+    position: relative;
+    z-index: 1;
+    max-width: 1500px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-areas: "stage";
+    width: 100%;
+  }
+  .dn-grid {
+    grid-area: stage;
+    transition: opacity 1.4s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4vh;
+    align-items: center;
+    width: 100%;
+    justify-self: center;
+  }
+  .dn-grid--night {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .day-night.is-night .dn-grid--day {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .day-night.is-night .dn-grid--night {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  /* Rows: editorial vertical stack with varied widths */
+  .dn-grid .row {
+    display: flex;
+    gap: 1.5rem;
+    width: 100%;
+    justify-content: center;
+    align-items: stretch;
+  }
+  .dn-grid .row--hero        { max-width: 78%; }
+  .dn-grid .row--hero-tall   { max-width: 46%; }
+  .dn-grid .row--pair        { max-width: 92%; }
+  .dn-grid .row--triplet     { max-width: 98%; }
+  .dn-grid .row--full        { max-width: 100%; }
+  .dn-grid .row > .gi {
+    flex: 1;
+    overflow: hidden;
+    border-radius: 6px;
+    position: relative;
+    box-shadow: 0 25px 55px rgba(0,0,0,0.35);
+    transition: transform 0.7s cubic-bezier(.22,.61,.36,1), box-shadow 0.7s;
+  }
+  .dn-grid .row > .gi:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 38px 80px rgba(0,0,0,0.45);
+  }
+  .dn-grid .row > .gi img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 1.2s ease;
+  }
+  .dn-grid .row > .gi:hover img { transform: scale(1.04); }
+  /* Night-state shadow is deeper (and slightly violet-tinted) */
+  .day-night.is-night .dn-grid .row > .gi {
+    box-shadow: 0 0 0 1px rgba(179,136,255,0.06), 0 30px 70px rgba(0,0,0,0.6);
+  }
+  .day-night.is-night .dn-grid .row > .gi:hover {
+    box-shadow: 0 0 0 1px rgba(255,79,163,0.18), 0 40px 90px rgba(255,79,163,0.12);
+  }
+
+  /* ─── Standalone editorial chapter sections ─── */
+  .chapter {
+    padding: 10vh 6vw;     /* tightened from 18vh to shorten transitions */
+    position: relative;
+  }
+  .chapter--process {
+    /* Same Amsterdam painting fixed background as the Concept section,
+       so the two sections share one continuous backdrop */
+    background-image:
+      linear-gradient(180deg, rgba(10, 6, 18, 0.82), rgba(20, 8, 40, 0.88)),
+      url('./images/process-1.jpg');
+    background-size: cover, cover;
+    background-position: center center, center 30%;
+    background-attachment: fixed, fixed;
+    background-repeat: no-repeat;
+  }
+  /* Mobile fallback — Safari iOS doesn't support background-attachment: fixed reliably */
+  @media (max-width: 900px) {
+    .reveal-stage,
+    .chapter--process {
+      background-attachment: scroll, scroll;
+    }
+  }
+  .chapter--neon {
+    background: linear-gradient(180deg, #050208 0%, #1a0220 35%, #2a0228 70%, #14082a 100%);
+  }
+  .chapter-intro {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 8vh;    /* tightened from 14vh */
+  }
+  .chapter-intro .num {
+    display: inline-block;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1rem;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--accent-glow);
+    opacity: 0.7;
+    margin-bottom: 1.6rem;
+  }
+  .chapter-intro .num::before,
+  .chapter-intro .num::after {
+    content: '';
+    display: inline-block;
+    width: 40px; height: 1px;
+    background: var(--accent-glow);
+    vertical-align: middle;
+    margin: 0 1rem;
+    opacity: 0.55;
+  }
+  .chapter-intro h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: clamp(2.6rem, 5vw, 4.2rem);
+    letter-spacing: 0.04em;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 1.2rem;
+  }
+  .chapter-intro h2 em {
+    font-style: italic;
+    color: var(--accent-glow);
+    font-weight: 300;
+  }
+  .chapter-intro .lead {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem;
+    font-style: italic;
+    color: var(--text-mute);
+    letter-spacing: 0.04em;
+    line-height: 1.6;
+  }
+
+  /* Editorial figure: single image w/ caption, centered, comfortable spacing */
+  .chapter-figures {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7vh;
+  }
+  .figure {
+    margin: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .figure-narrow { max-width: 58%; }
+  .figure-mid    { max-width: 72%; }
+  .figure-wide   { max-width: 90%; }
+
+  /* Paired figures — two figures side by side, near full-width so each
+     pair member is as close to a solo's visual weight as a pair can get */
+  .figure-pair {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .figure-pair .figure {
+    margin: 0;
+    width: auto;
+    max-width: none;
+  }
+  @media (max-width: 900px) {
+    .figure-pair {
+      flex-direction: column;
+      gap: 6vh;
+    }
+    .figure-pair .figure {
+      flex: 1 !important;
+    }
+  }
+  .figure img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 6px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+  }
+  .figure figcaption {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--text-mute);
+    text-align: center;
+    margin-top: 1.4rem;
+    letter-spacing: 0.04em;
+    max-width: 600px;
+    line-height: 1.5;
+  }
+
+  /* ─── Inhabitants — flip cards: image on front, story on the back ─── */
+  .dn-grid .row { align-items: flex-start; }
+  .dn-grid .row > .gi {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Override the row hover lift on flip cards — we move that to the inner
+     .card-3d so it combines smoothly with the rotation */
+  .gi--flip {
+    perspective: 1400px;
+    cursor: pointer;
+    overflow: visible !important;
+    box-shadow: none;
+    background: transparent;
+  }
+  .gi--flip:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .card-3d {
+    position: relative;
+    width: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.85s cubic-bezier(.22,.61,.36,1);
+    border-radius: 6px;
+  }
+  /* Hover tilt — suggests the card wants to flip */
+  .gi--flip:hover:not(.is-flipped) .card-3d {
+    transform: rotateY(8deg) rotateX(-2deg) translateY(-4px);
+  }
+  .gi--flip.is-flipped .card-3d {
+    transform: rotateY(180deg);
+  }
+  .gi--flip.is-flipped:hover .card-3d {
+    transform: rotateY(180deg) translateY(-4px);
+  }
+
+  .card-face {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    width: 100%;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .card-face--front { position: relative; display: block; }
+  .card-face--front img { width: 100%; height: auto; display: block; }
+  .card-face--back {
+    position: absolute;
+    inset: 0;
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 1.8rem 1.6rem;
+    transition: background 1.2s ease, color 1.2s ease;
+  }
+  /* Back face colours follow the toggle state */
+  .day-night:not(.is-night) .card-face--back {
+    background: linear-gradient(165deg, #f6efe8 0%, #e8ddd4 100%);
+    color: #2a1a3a;
+    box-shadow: inset 0 0 0 1px rgba(120, 80, 160, 0.1);
+  }
+  .day-night.is-night .card-face--back {
+    background: linear-gradient(165deg, #1f1338 0%, #0a0612 100%);
+    color: var(--text-soft);
+    box-shadow: inset 0 0 0 1px rgba(212, 197, 255, 0.08);
+  }
+  .card-face--back figcaption {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(0.92rem, 1.05vw, 1.08rem);
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+    max-width: 92%;
+    margin: 0;
+    padding: 0;
+  }
+  .card-face--back .name {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(0.7rem, 0.82vw, 0.85rem);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    opacity: 0.95;
+  }
+  .card-face--back figcaption.atm {
+    opacity: 0.78;
+  }
+  .card-face--back figcaption.atm .name { display: none; }
+
+  /* Bilingual day-card body: English block + Chinese block w/ thin divider */
+  .card-face--back .card-en {
+    margin: 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    line-height: 1.55;
+  }
+  .card-face--back .card-cn {
+    margin: 0.85em 0 0;
+    padding-top: 0.85em;
+    border-top: 1px solid currentColor;
+    border-top-color: rgba(255, 255, 255, 0.18);
+    font-family: 'Noto Serif SC', 'Songti SC', serif;
+    font-style: normal;
+    font-size: 0.88em;
+    line-height: 1.7;
+    letter-spacing: 0.02em;
+    opacity: 0.86;
+  }
+  /* Light-card scheme (day cards on pale backgrounds) — darker divider */
+  .day-night:not(.is-night) .card-face--back .card-cn {
+    border-top-color: rgba(40, 25, 60, 0.18);
+  }
+
+  /* "Try flipping" tip under the Inhabitants section title */
+  .dn-tip {
+    margin: 0.6rem 0 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    letter-spacing: 0.04em;
+    text-align: center;
+    opacity: 0.65;
+    transition: color 1.2s ease;
+  }
+  .day-night:not(.is-night) .dn-tip { color: #4a3360; }
+  .day-night.is-night        .dn-tip { color: var(--text-mute); }
+  .dn-tip .arr {
+    display: inline-block;
+    margin-right: 0.4em;
+    transform: scale(1.1);
+  }
+  .dn-tip .sep { opacity: 0.5; margin: 0 0.45em; }
+
+  /* ─── Colophon — technical detail block inside the Origins chapter ─── */
+  .colophon-inner {
+    margin: 8vh auto 0;
+    display: flex;
+    justify-content: center;       /* centre the pair as one unit on the page axis */
+    align-items: start;
+    gap: 6vw;
+    flex-wrap: wrap;
+    padding: 0 4vw;
+  }
+  .colophon-inner > .reveal:first-child {
+    transform: translateX(-40px);  /* nudge Dimensions block left (cumulative) */
+  }
+  .colophon-inner > .reveal:last-child {
+    max-width: 52ch;               /* let the Materials paragraph wrap to ~2 balanced rows */
+    transform: translateX(48px);   /* nudge Materials block right (cumulative) */
+  }
+  .colophon-inner h3 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.56rem;        /* 2x */
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--accent-glow);
+    opacity: 0.78;
+    margin-bottom: 1.6rem;
+  }
+  .colophon-inner dl {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;          /* body trimmed to 2/3 of previous 2.1rem */
+    color: var(--text-mute);
+    line-height: 1.7;
+    margin: 0;
+  }
+  .colophon-inner dl dt {
+    display: inline;
+    color: var(--text-soft);
+    font-style: italic;
+  }
+  .colophon-inner dl dt::after { content: ' \2014 '; opacity: 0.5; }
+  .colophon-inner dl dd {
+    display: inline;
+    margin: 0;
+  }
+  .colophon-inner dl dd::after { content: '\A'; white-space: pre; }
+  .colophon-inner p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.4rem;          /* 2/3 of 2.1rem to match dl */
+    color: var(--text-mute);
+    line-height: 1.6;
+    text-wrap: balance;         /* split into two visually-balanced rows */
+  }
+
+  /* Neon-language gallery rows — same idea as dn-grid rows but standalone */
+  .neon-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 7vh;
+    max-width: 1500px;
+    margin: 0 auto;
+  }
+  .neon-rows .row {
+    display: flex;
+    gap: 1.5rem;
+    width: 100%;
+    justify-content: center;
+  }
+  .neon-rows .row--full    { max-width: 92%; margin: 0 auto; }
+  .neon-rows .row--pair    { max-width: 100%; }
+  .neon-rows .row--triplet { max-width: 100%; }
+  .neon-rows .row > .gi {
+    flex: 1;
+    overflow: hidden;
+    border-radius: 6px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.6), 0 0 0 1px rgba(179,136,255,0.07);
+    transition: transform 0.7s cubic-bezier(.22,.61,.36,1), box-shadow 0.7s;
+  }
+  .neon-rows .row > .gi:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 38px 80px rgba(255,79,163,0.18), 0 0 0 1px rgba(255,79,163,0.2);
+  }
+  .neon-rows .row > .gi img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 1.2s ease;
+  }
+  .neon-rows .row > .gi:hover img { transform: scale(1.04); }
+
+  /* tiny twinkling stars when night */
+  .stars {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.6s ease;
+    z-index: 0;
+  }
+  .day-night.is-night .stars { opacity: 0.7; }
+  .stars span {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(255,255,255,0.8);
+    animation: twinkle 3s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+  }
+
+  /* ─────────── FOOTER ─────────── */
+  footer {
+    text-align: center;
+    padding: 6vh 6vw;
+    background: #050208;
+    border-top: 1px solid rgba(179,136,255,0.1);
+  }
+  footer .sig-mark {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.6rem;
+    color: var(--accent-glow);
+    letter-spacing: 0.05em;
+  }
+  footer .mute {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--text-mute);
+    margin-top: 0.6rem;
+    letter-spacing: 0.15em;
+    font-size: 0.85rem;
+  }
+
+  /* ─────────── ANIMATIONS ─────────── */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 1s ease, transform 1s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ─────────── RESPONSIVE ─────────── */
+  @media (max-width: 900px) {
+    .concept-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .concept-bilingual { grid-template-columns: 1fr; gap: 2.5rem; }
+
+    /* Rows collapse to single column on mobile */
+    .dn-grid .row--hero,
+    .dn-grid .row--hero-tall,
+    .dn-grid .row--pair,
+    .dn-grid .row--triplet,
+    .dn-grid .row--full { max-width: 100%; }
+    .dn-grid .row--pair,
+    .dn-grid .row--triplet {
+      flex-direction: column;
+    }
+
+    .neon-rows .row--full,
+    .neon-rows .row--pair,
+    .neon-rows .row--triplet { max-width: 100%; flex-direction: column; }
+
+    .figure-narrow,
+    .figure-mid,
+    .figure-wide { max-width: 100%; }
+
+    .cast-grid { grid-template-columns: 1fr; }
+    .colophon-inner { grid-template-columns: 1fr; }
+    .toc { display: none; }
+  }
+
+  /* ═══════════ SIDEBAR TABLE OF CONTENTS — NEON × ADAPTIVE ═══════════ */
+  /* Neon palette (pure magenta) with mix-blend-mode: difference, so
+     it shifts to neon cyan on light backgrounds — flat colour, no
+     glow. Visible everywhere, never overwhelming. */
+  .toc {
+    position: fixed;
+    right: clamp(1rem, 2.2vw, 2.4rem);
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 80;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-end;
+    font-family: 'Space Mono', 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    pointer-events: auto;
+    mix-blend-mode: difference;   /* white on dark → black on light (adaptive B&W) */
+    color: #ffffff;                /* pure white base — inverts to black on white bg */
+  }
+  .toc a {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    text-decoration: none;
+    line-height: 1;
+    color: #ffffff;
+    opacity: 0.45;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .toc a .toc-num {
+    font-variant-numeric: tabular-nums;
+  }
+  .toc a .toc-label {
+    opacity: 0;
+    transform: translateX(6px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    order: -1;     /* label sits to the LEFT of the bar/number */
+  }
+  .toc a .toc-bar {
+    display: inline-block;
+    width: 18px;
+    height: 1.5px;
+    background: currentColor;
+    border-radius: 1px;
+    transition: width 0.4s ease, height 0.4s ease;
+  }
+  .toc a:hover {
+    opacity: 0.85;
+  }
+  .toc a:hover .toc-label {
+    opacity: 0.9;
+    transform: translateX(0);
+  }
+  .toc a:hover .toc-bar { width: 28px; }
+
+  /* Active section — fully lit, longer/thicker bar (no glow) */
+  .toc a.is-active {
+    opacity: 1;
+  }
+  .toc a.is-active .toc-label {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .toc a.is-active .toc-bar {
+    width: 42px;
+    height: 2.5px;
+  }
+</style>
+</head>
+<body><a href="/work" style="position:fixed;top:1.25rem;left:1.25rem;z-index:9999;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#d9a574;text-decoration:none;padding:0.5rem 0.85rem;border:1px solid rgba(217,165,116,0.4);border-radius:999px;background:rgba(10,8,7,0.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">← Universe</a>
+
+<!-- ═══════════ TOP NAVIGATION ═══════════ -->
+<header class="topbar">
+  <a class="mark" href="#cover">AMBER&nbsp;XU</a>
+  <nav>
+    <a href="#concept">Concept<span class="cn">陈述</span></a>
+    <a href="#process">Origins<span class="cn">过程</span></a>
+    <a href="#day-night">Building<span class="cn">建筑</span></a>
+    <a href="#day-night-2">Inhabitants<span class="cn">居民</span></a>
+    <a href="#day-night-3">Neon<span class="cn">霓虹</span></a>
+  </nav>
+</header>
+
+<!-- ═══════════ SLIDE 1: COVER (curtain) ═══════════ -->
+<section class="cover" id="cover">
+  <div class="cover-bg"></div>
+  <div class="cover-overlay"></div>
+
+  <!-- Two stacked marquees ABOVE the title — Row 1 = quotes/concepts, Row 2 = colour stream -->
+  <div class="marquee-stack marquee-stack--top" aria-hidden="true">
+
+  <!-- Row 1 — the artist's own readings of her work, first-person, in her voice.
+       JS auto-duplicates the inner <div> for the seamless loop. -->
+  <div class="marquee">
+    <div class="marquee-track">
+      <div>
+        <span class="item item--cn">我以一个陌生人的身份 看着另一群陌生人</span>
+        <span class="sep">/</span>
+        <span class="item">I built this as a stranger watching strangers</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--cn">我把日常定格 让颜色说出无法言说的情绪</span>
+        <span class="sep">/</span>
+        <span class="item">I freeze ordinary moments &mdash; colour speaks what words cannot</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--cn">每一个小人 都是这栋楼的光下 另一个想象的自己</span>
+        <span class="sep">/</span>
+        <span class="item">Every figure is another self I imagined under the building&rsquo;s light</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--cn">颜色不是标签 是我的解读</span>
+        <span class="sep">/</span>
+        <span class="item">Colour, here, is not a label &mdash; it is my reading</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--cn">建筑是身份的躯体 光是情绪的语言</span>
+        <span class="sep">/</span>
+        <span class="item">Architecture is the body of identity &mdash; light, the language of emotion</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--cn">我画成的烦躁 在你眼里也许是渴望 是燥热 或是恋爱</span>
+        <span class="sep">/</span>
+        <span class="item">What I sensed as restlessness, you may read as longing, fever, or love</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--cn">这件作品不打算给出唯一的答案</span>
+        <span class="sep">/</span>
+        <span class="item">This work does not insist on a single answer</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--cn">它只是记录了一个旁观者一刻的内心转译</span>
+        <span class="sep">/</span>
+        <span class="item">It records one observer&rsquo;s moment of inner translation</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--cn">剩下的部分 留给每一个看它的人</span>
+        <span class="sep">/</span>
+        <span class="item">The rest, I leave to every viewer</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--cn">我把看他们时自己产生的情绪 用颜色还给了他们</span>
+        <span class="sep">/</span>
+        <span class="item">I gave them the colours I felt while watching them</span>
+        <span class="sep--dot"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2 — pure colour stream, every name glows in its own hue,
+       scrolls the opposite direction so the two ribbons cross-flow -->
+  <div class="marquee marquee--reverse">
+    <div class="marquee-track">
+      <div>
+        <span class="color-chip" style="color:#7a1d2a">Wine&#8209;Red</span>
+        <span class="color-chip color-chip--cn" style="color:#9d2933">胭脂</span>
+        <span class="color-chip" style="color:#d2222d">Crimson</span>
+        <span class="color-chip" style="color:#ff4d40">Vermilion</span>
+        <span class="color-chip color-chip--cn" style="color:#ff4d40">朱红</span>
+        <span class="color-chip" style="color:#f08a3e">Orange</span>
+        <span class="color-chip" style="color:#ff8c00">Tangerine</span>
+        <span class="color-chip" style="color:#fbceb1">Apricot</span>
+        <span class="color-chip" style="color:#cc7722">Ochre</span>
+        <span class="color-chip color-chip--cn" style="color:#f7c046">杏黄</span>
+        <span class="color-chip" style="color:#ffbf00">Amber</span>
+        <span class="color-chip" style="color:#f4c430">Saffron</span>
+        <span class="color-chip" style="color:#ffdb58">Mustard</span>
+        <span class="color-chip" style="color:#d4a82d">Yellow</span>
+        <span class="color-chip color-chip--cn" style="color:#fff143">鹅黄</span>
+        <span class="color-chip" style="color:#8b6240">Brown</span>
+        <span class="color-chip" style="color:#b7410e">Rust</span>
+        <span class="color-chip" style="color:#7fff00">Chartreuse</span>
+        <span class="color-chip color-chip--cn" style="color:#afd87a">柳绿</span>
+        <span class="color-chip" style="color:#50c878">Emerald</span>
+        <span class="color-chip" style="color:#8a9a5b">Moss</span>
+        <span class="color-chip" style="color:#1abc9c">Teal</span>
+        <span class="color-chip" style="color:#98d8c8">Mint</span>
+        <span class="color-chip" style="color:#40e0d0">Turquoise</span>
+        <span class="color-chip" style="color:#4dd0e1">Cyan</span>
+        <span class="color-chip" style="color:#6cbfe0">Sky Blue</span>
+        <span class="color-chip color-chip--cn" style="color:#1a6d8e">靛青</span>
+        <span class="color-chip" style="color:#007ba7">Cerulean</span>
+        <span class="color-chip" style="color:#4682b4">Steel</span>
+        <span class="color-chip" style="color:#3b4a8c">Deep Blue</span>
+        <span class="color-chip" style="color:#0f52ba">Sapphire</span>
+        <span class="color-chip color-chip--cn" style="color:#3e497a">黛蓝</span>
+        <span class="color-chip" style="color:#7e54b8">Violet</span>
+        <span class="color-chip" style="color:#c5a8ff">Lavender</span>
+        <span class="color-chip" style="color:#ccccff">Periwinkle</span>
+        <span class="color-chip" style="color:#e0b0ff">Mauve</span>
+        <span class="color-chip" style="color:#c098c0">Lilac</span>
+        <span class="color-chip" style="color:#8e4585">Plum</span>
+        <span class="color-chip color-chip--cn" style="color:#7a6293">黛紫</span>
+        <span class="color-chip" style="color:#d63384">Magenta</span>
+        <span class="color-chip" style="color:#ff66cc">Fuchsia</span>
+        <span class="color-chip" style="color:#e89aae">Pink</span>
+        <span class="color-chip color-chip--cn" style="color:#edd1d8">藕色</span>
+        <span class="color-chip" style="color:#ff7f50">Coral</span>
+        <span class="color-chip" style="color:#fa8072">Salmon</span>
+        <span class="color-chip" style="color:#9d2424">Red</span>
+        <span class="color-chip" style="color:#9aa0a8">Grey</span>
+        <span class="color-chip color-chip--cn" style="color:#cfd6d8">月白</span>
+        <span class="color-chip" style="color:#b2beb5">Ash</span>
+        <span class="color-chip" style="color:#708090">Slate</span>
+        <span class="color-chip" style="color:#f7e7ce">Champagne</span>
+      </div>
+      <!-- Duplicate for seamless loop -->
+      <div>
+        <span class="color-chip" style="color:#7a1d2a">Wine&#8209;Red</span>
+        <span class="color-chip color-chip--cn" style="color:#9d2933">胭脂</span>
+        <span class="color-chip" style="color:#d2222d">Crimson</span>
+        <span class="color-chip" style="color:#ff4d40">Vermilion</span>
+        <span class="color-chip color-chip--cn" style="color:#ff4d40">朱红</span>
+        <span class="color-chip" style="color:#f08a3e">Orange</span>
+        <span class="color-chip" style="color:#ff8c00">Tangerine</span>
+        <span class="color-chip" style="color:#fbceb1">Apricot</span>
+        <span class="color-chip" style="color:#cc7722">Ochre</span>
+        <span class="color-chip color-chip--cn" style="color:#f7c046">杏黄</span>
+        <span class="color-chip" style="color:#ffbf00">Amber</span>
+        <span class="color-chip" style="color:#f4c430">Saffron</span>
+        <span class="color-chip" style="color:#ffdb58">Mustard</span>
+        <span class="color-chip" style="color:#d4a82d">Yellow</span>
+        <span class="color-chip color-chip--cn" style="color:#fff143">鹅黄</span>
+        <span class="color-chip" style="color:#8b6240">Brown</span>
+        <span class="color-chip" style="color:#b7410e">Rust</span>
+        <span class="color-chip" style="color:#7fff00">Chartreuse</span>
+        <span class="color-chip color-chip--cn" style="color:#afd87a">柳绿</span>
+        <span class="color-chip" style="color:#50c878">Emerald</span>
+        <span class="color-chip" style="color:#8a9a5b">Moss</span>
+        <span class="color-chip" style="color:#1abc9c">Teal</span>
+        <span class="color-chip" style="color:#98d8c8">Mint</span>
+        <span class="color-chip" style="color:#40e0d0">Turquoise</span>
+        <span class="color-chip" style="color:#4dd0e1">Cyan</span>
+        <span class="color-chip" style="color:#6cbfe0">Sky Blue</span>
+        <span class="color-chip color-chip--cn" style="color:#1a6d8e">靛青</span>
+        <span class="color-chip" style="color:#007ba7">Cerulean</span>
+        <span class="color-chip" style="color:#4682b4">Steel</span>
+        <span class="color-chip" style="color:#3b4a8c">Deep Blue</span>
+        <span class="color-chip" style="color:#0f52ba">Sapphire</span>
+        <span class="color-chip color-chip--cn" style="color:#3e497a">黛蓝</span>
+        <span class="color-chip" style="color:#7e54b8">Violet</span>
+        <span class="color-chip" style="color:#c5a8ff">Lavender</span>
+        <span class="color-chip" style="color:#ccccff">Periwinkle</span>
+        <span class="color-chip" style="color:#e0b0ff">Mauve</span>
+        <span class="color-chip" style="color:#c098c0">Lilac</span>
+        <span class="color-chip" style="color:#8e4585">Plum</span>
+        <span class="color-chip color-chip--cn" style="color:#7a6293">黛紫</span>
+        <span class="color-chip" style="color:#d63384">Magenta</span>
+        <span class="color-chip" style="color:#ff66cc">Fuchsia</span>
+        <span class="color-chip" style="color:#e89aae">Pink</span>
+        <span class="color-chip color-chip--cn" style="color:#edd1d8">藕色</span>
+        <span class="color-chip" style="color:#ff7f50">Coral</span>
+        <span class="color-chip" style="color:#fa8072">Salmon</span>
+        <span class="color-chip" style="color:#9d2424">Red</span>
+        <span class="color-chip" style="color:#9aa0a8">Grey</span>
+        <span class="color-chip color-chip--cn" style="color:#cfd6d8">月白</span>
+        <span class="color-chip" style="color:#b2beb5">Ash</span>
+        <span class="color-chip" style="color:#708090">Slate</span>
+        <span class="color-chip" style="color:#f7e7ce">Champagne</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3 — 20 quotes from international TV / film / literature in their
+       original language. Slow left scroll. -->
+  <div class="marquee marquee--slow">
+    <div class="marquee-track" id="marquee-row-3-track">
+      <div>
+        <span class="item">Make it simple, but significant.</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">Mad Men &middot; Don Draper</span>
+        <span class="sep--dot"></span>
+
+        <span class="item">I&rsquo;m looking for love. Real love. Ridiculous, inconvenient, consuming, can&rsquo;t-live-without-each-other love.</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">Sex and the City &middot; Carrie Bradshaw</span>
+        <span class="sep--dot"></span>
+
+        <span class="item">Time is a flat circle.</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">True Detective &middot; Rust Cohle</span>
+        <span class="sep--dot"></span>
+
+        <span class="item">You are not serious people.</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">Succession &middot; Logan Roy</span>
+        <span class="sep--dot"></span>
+
+        <span class="item">Either everyone feels like this a little bit and they&rsquo;re just not talking about it, or I&rsquo;m completely alone.</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">Fleabag</span>
+        <span class="sep--dot"></span>
+
+        <span class="item">Hello, friend. Hello, friend? That&rsquo;s lame. Maybe I should give you a name.</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">Mr. Robot &middot; Elliot Alderson</span>
+        <span class="sep--dot"></span>
+
+        <span class="item">So we beat on, boats against the current, borne back ceaselessly into the past.</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">The Great Gatsby &middot; F. Scott Fitzgerald</span>
+        <span class="sep--dot"></span>
+
+        <span class="item">The more you know who you are, and what you want, the less you let things upset you.</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">Lost in Translation &middot; Bob Harris</span>
+        <span class="sep--dot"></span>
+
+        <span class="item">He adored New York City. He idolized it all out of proportion.</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">Manhattan &middot; Woody Allen</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--cn">不知道从什么时候开始 在每个东西上都有一个日子</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">重庆森林 &middot; 王家卫</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--cn">我看见过一种鸟没有脚的 它的一生只能在天上飞</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">阿飞正传 &middot; 王家卫</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--cn">如果有多一张船票 你会不会跟我一起走</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">花样年华 &middot; 王家卫</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--jp">新しい一日が始まる。私の店は、終わりだ。</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">深夜食堂</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--jp">死は生の対極ではなく、その一部として存在している。</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">ノルウェイの森 &middot; 村上春樹</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--kr">회사는 전쟁터지만, 회사 밖은 지옥이다.</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">미생 &middot; 오상식</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--kr">추앙해요. 사랑으론 안 돼. 추앙해야 돼.</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">나의 해방일지 &middot; 염미정</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--eu">Als das Kind Kind war, wu&szlig;te es nicht, dass es Kind war.</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">Der Himmel &uuml;ber Berlin &middot; Wim Wenders</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--eu">Les temps sont durs pour les r&ecirc;veurs.</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">Am&eacute;lie &middot; Jean-Pierre Jeunet</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--eu">Jusqu&rsquo;ici tout va bien.</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">La Haine &middot; Mathieu Kassovitz</span>
+        <span class="sep--dot"></span>
+
+        <span class="item item--eu">La vita non &egrave; come l&rsquo;hai vista al cinema. La vita &egrave; molto pi&ugrave; difficile.</span>
+        <span class="sep">—</span>
+        <span class="item item--cite">Nuovo Cinema Paradiso &middot; Alfredo</span>
+        <span class="sep--dot"></span>
+      </div>
+      <!-- Duplicate for seamless loop — cloned by JS at runtime -->
+    </div>
+  </div>
+
+  </div><!-- /.marquee-stack -->
+
+  <div class="cover-content">
+    <div class="cover-meta">
+      <span>A&nbsp;Mixed&#8209;Media&nbsp;Installation</span>
+      <span class="line"></span>
+      <span>2018</span>
+      <span class="dot"></span>
+      <span>By&nbsp;Amber&nbsp;Xu</span>
+    </div>
+    <h1 class="cover-title">
+      <span class="line-1">L&rsquo;HEURE</span>
+      <span class="line-2">VIOLETTE</span>
+    </h1>
+    <div class="cover-sub">
+      A&nbsp;Miniature&nbsp;Inner&nbsp;Cosmos
+      <span class="cn">一座微缩的内心宇宙</span>
+    </div>
+  </div>
+
+  <!-- Bottom marquee-stack — populated by JS with the same content as the top one -->
+  <div class="marquee-stack marquee-stack--bottom" aria-hidden="true"></div>
+
+  <div class="scroll-hint">scroll ↓</div>
+</section>
+<!-- Reveal stage: Concept lives here, pinned at top while the cover (above)
+     lifts away. The cover above it overlays it from scroll 0; pulling it
+     up directly exposes the Concept behind. -->
+<div class="reveal-stage">
+  <!-- ═══════════ SLIDE 2: DESIGN CONCEPT (bilingual) ═══════════ -->
+  <section class="concept" id="concept">
+    <header class="concept-header reveal">
+      <h2>
+        <small>Design</small>
+        Concept.
+        <span class="cn-title">设 计 陈 述</span>
+      </h2>
+      <span class="pill">Statement &middot; 陈述</span>
+    </header>
+    <div class="concept-bilingual">
+      <div class="lang-col lang-en reveal">
+        <p>This streetscape is a corner of the city at dusk&mdash;the hour when people stop containing what they feel and let the night carry it. I built it as an <em>observer</em>: a stranger watching strangers, making no claim to know who they are. The purple building stays still, a quiet witness, while faceless figures drift through ordinary acts: resting under a lamp, taking out trash, smoking in a doorway, arguing after a crash, dancing on a balcony.</p>
+        <p>By daylight, the violet fa&ccedil;ade wears the readable surface of identity, and the inward-looking windows hold a quiet spectrum of emotion. When night arrives, the patterned motifs ignite into neon and the interior glows outward&mdash;the city sheds its social shell and lets emotion speak in saturated color. <em>Architecture</em> becomes the body of identity; <em>light</em> becomes the language of emotion.</p>
+        <p>I did not know any of these people. I gave them the colors I felt while watching them. Color, here, is not a label but a <em>reading</em>&mdash;mine. It is also visibility: some figures are loud and vivid, asking to be seen; others fade into the darker end of the spectrum and almost disappear into the night. To wear a color is to choose how much of yourself the city is allowed to read.</p>
+        <p>The viewer may read differently. What I sensed as restlessness might appear, to someone else, as longing, or fever, or love. This work does not insist on a single answer&mdash;it records one observer&rsquo;s moment of inner translation, and leaves room for every other.</p>
+      </div>
+      <div class="lang-col lang-cn reveal">
+        <p>这是黄昏时分城市的一处街角。夜色漫上来，人们松开白天紧攥着的情绪，把它们交给夜晚去承接。我以一个<em>旁观者</em>的身份做了这件作品：一个陌生人，看着另一群陌生人，并不声称自己理解他们。紫色的楼安静地立在那里，像一个沉默的见证者；几个没有面孔的人物在它周围做着最普通的动作——倚在路灯下、倒垃圾、在门口抽烟、为一起车祸对骂、在阳台上跳舞。</p>
+        <p>白天，紫色的立面是这栋楼给路人看的那张脸，朝内的窗户里收着一片更安静的情绪；夜色一来，墙上的图案点亮成霓虹，建筑开始从内部向外发光——城市卸下它的社交外壳，让情绪用饱和的颜色说话。<em>建筑</em>成为身份的躯体，<em>光</em>成为情绪的语言。</p>
+        <p>我并不认识这些人中的任何一个。我把看他们时自己产生的情绪——用颜色——还给了他们。颜色在这里不是一个标签，而是一个<em>解读</em>，属于我的解读。它同时也是一种"可见度"：有人鲜亮张扬，希望被看见；另一些人则用深色把自己折进夜里，几乎隐形。给自己穿上一种颜色，也就是在决定：愿意让这座城市读出多少自己。</p>
+        <p>观众未必和我读到同一个答案。我画成烦躁的人，在别人眼里也许是渴望，是燥热，或是恋爱。我并不打算给出唯一的答案——这件作品只是记录了一个旁观者一刻的内心转译，剩下的部分，留给每一个看它的人。</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════ CHAPTER: ORIGINS (process) ═══════════ -->
+<section class="chapter chapter--process" id="process">
+  <div class="chapter-intro reveal">
+    <span class="num">Origins</span>
+    <h2>How it <em>Began</em></h2>
+    <p class="lead">Before the model, there were a painting, a notebook, and a stack of sheets &mdash; a slow gathering of cities, lights, and figures that would later live inside.</p>
+  </div>
+  <div class="chapter-figures">
+    <!-- Row 1: #1 — initial inspiration, the painting keeps its own intimate size -->
+    <figure class="figure figure-narrow reveal">
+      <img src="./images/process-1.jpg" alt="The initial inspiration — a sunset painting of canal-side houses">
+      <figcaption>The first spark &mdash; a sunset painting, windows already speaking in colour.</figcaption>
+    </figure>
+
+    <!-- Row 2: #2 — architecture & bar refs (solo) -->
+    <figure class="figure figure-mid reveal">
+      <img src="./images/process-2.jpg" alt="Architecture and bar references">
+      <figcaption>Reference &mdash; storefronts and living quarters, sized and listed.</figcaption>
+    </figure>
+
+    <!-- Row 3: #3 + #5 — two portrait reference / sketch sheets paired
+         Exact flex ratio = ratio3 / ratio5 = 0.7107 / 0.7553 = 0.941
+         so process-3 takes 48.5% and process-5 takes 51.5% — gives equal image heights. -->
+    <div class="figure-pair reveal" style="align-items: flex-start;">
+      <figure class="figure" style="flex: 941">
+        <img src="./images/process-3.jpg" alt="Neon light references">
+        <figcaption>Reference &mdash; lantern, alley, ironwork, and a small colour experiment.</figcaption>
+      </figure>
+      <figure class="figure" style="flex: 1000">
+        <img src="./images/process-5.jpg" alt="Architectural concept sketches">
+        <figcaption>Architectural concept sketches &mdash; three storefronts translating reference into form.</figcaption>
+      </figure>
+    </div>
+
+    <!-- Row 4: #4 — neon & colour study (solo) -->
+    <figure class="figure figure-mid reveal">
+      <img src="./images/process-4.jpg" alt="Neon and colour reference study">
+      <figcaption>Reference &mdash; the city after dark, in its full saturated palette.</figcaption>
+    </figure>
+
+    <!-- Row 5: #6 — ground-floor bar details (solo) -->
+    <figure class="figure figure-mid reveal">
+      <img src="./images/process-6.jpg" alt="Ground-floor bar details, interior elevation">
+      <figcaption>Ground-floor bar details &mdash; where the figures inside would meet.</figcaption>
+    </figure>
+  </div>
+
+  <!-- Colophon (dimensions + materials) — sits inside Origins as a closing
+       technical block, sharing the same Amsterdam painting background -->
+  <div class="colophon-inner">
+    <div class="reveal">
+      <h3>Dimensions</h3>
+      <dl>
+        <dt>Total</dt><dd>60 &times; 45&nbsp;cm</dd>
+        <dt>Building</dt><dd>40 &times; 20 &times; 50&nbsp;cm</dd>
+      </dl>
+    </div>
+    <div class="reveal">
+      <h3>Materials</h3>
+      <p>PVC foam board, paper clay, sulfuric-acid paper, iron wire, miniature lightbulbs, U-glue, 502 adhesive, and PVC film.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ DAY ↔ NIGHT TOGGLE I: BUILDING ═══════════ -->
+<section class="day-night" id="day-night" aria-label="Building day and night view">
+  <div class="stars" aria-hidden="true"></div>
+
+  <div class="dn-toggle-wrap reveal">
+    <div class="dn-toggle" role="group" aria-label="Toggle day or night view">
+      <button class="sun-btn" type="button" aria-label="Show daytime view" aria-pressed="true">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="24" r="8.5"/>
+          <path d="M24 5.5v4.5M24 38v4.5M5.5 24h4.5M38 24h4.5M10.8 10.8l3.2 3.2M34 34l3.2 3.2M37.2 10.8l-3.2 3.2M14 34l-3.2 3.2"/>
+        </svg>
+      </button>
+      <span class="dn-knob" aria-hidden="true"></span>
+      <button class="moon-btn" type="button" aria-label="Show nighttime view" aria-pressed="false">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M34 29a13 13 0 1 1-15-19.2A10.5 10.5 0 0 0 34 29z"/>
+          <circle cx="36" cy="14" r="0.9" fill="currentColor"/>
+          <circle cx="40" cy="22" r="0.7" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+    <p class="dn-hint" aria-hidden="true"><span class="arr">↑</span>Tap to switch<span class="sep">·</span>点击切换昼夜</p>
+  </div>
+
+  <div class="dn-intro reveal">
+    <div class="num"><span class="title-day title-state">I</span><span class="title-night title-state">II</span></div>
+    <h2>
+      <span class="title-day title-state">The <em>Building</em> &middot; By Day</span>
+      <span class="title-night title-state">The <em>Building</em> &middot; By Night</span>
+    </h2>
+    <p class="lead">
+      <span class="lead-day">A purple corner, calm and visible &mdash; identity worn on the outside.</span>
+      <span class="lead-night">When dark falls, the inner light steps out as neon and colour.</span>
+    </p>
+  </div>
+
+  <div class="dn-stage reveal">
+    <!-- DAY: 5 curated photos from 白天建筑 folder -->
+    <div class="dn-grid dn-grid--day">
+      <div class="row row--hero">
+        <div class="gi"><img src="./images/day-2.jpg" alt="Building, daytime, head-on view of the neon-symbol wall"></div>
+      </div>
+      <div class="row row--pair">
+        <div class="gi" style="flex: 55"><img src="./images/day-1.jpg" alt="Building, daytime, 3/4 angle showing both faces"></div>
+        <div class="gi" style="flex: 45"><img src="./images/day-5.jpg" alt="Building, daytime, 3/4 angle with trees and figures"></div>
+      </div>
+      <div class="row row--pair">
+        <div class="gi" style="flex: 38"><img src="./images/day-3.jpg" alt="Building, daytime, tall vertical view"></div>
+        <div class="gi" style="flex: 62"><img src="./images/day-4.jpg" alt="Building, daytime, head-on rainbow window side"></div>
+      </div>
+    </div>
+    <!-- NIGHT: 4 curated shots from 夜晚建筑 folder -->
+    <div class="dn-grid dn-grid--night">
+      <div class="row row--hero">
+        <div class="gi"><img src="./images/night-1.jpg" alt="Building at night, close 3/4 with the neon side lit"></div>
+      </div>
+      <div class="row row--pair">
+        <div class="gi" style="flex: 55"><img src="./images/night-2.jpg" alt="Building at night, wider 3/4 with figures around the base"></div>
+        <div class="gi" style="flex: 45"><img src="./images/night-3.jpg" alt="Building at night, side view with lit windows"></div>
+      </div>
+      <div class="row row--hero">
+        <div class="gi"><img src="./images/night-4.jpg" alt="Building at night, head-on view of the rainbow facade"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ DAY ↔ NIGHT TOGGLE II: INHABITANTS ═══════════ -->
+<section class="day-night" id="day-night-2" aria-label="Inhabitants day and night view">
+  <div class="stars" aria-hidden="true"></div>
+
+  <div class="dn-toggle-wrap reveal">
+    <div class="dn-toggle" role="group" aria-label="Toggle day or night details">
+      <button class="sun-btn" type="button" aria-label="Show daytime details" aria-pressed="true">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="24" r="8.5"/>
+          <path d="M24 5.5v4.5M24 38v4.5M5.5 24h4.5M38 24h4.5M10.8 10.8l3.2 3.2M34 34l3.2 3.2M37.2 10.8l-3.2 3.2M14 34l-3.2 3.2"/>
+        </svg>
+      </button>
+      <span class="dn-knob" aria-hidden="true"></span>
+      <button class="moon-btn" type="button" aria-label="Show nighttime details" aria-pressed="false">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M34 29a13 13 0 1 1-15-19.2A10.5 10.5 0 0 0 34 29z"/>
+          <circle cx="36" cy="14" r="0.9" fill="currentColor"/>
+          <circle cx="40" cy="22" r="0.7" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+    <p class="dn-hint" aria-hidden="true"><span class="arr">↑</span>Tap to switch<span class="sep">·</span>点击切换昼夜</p>
+  </div>
+
+  <div class="dn-intro reveal">
+    <div class="num"><span class="title-day title-state">III</span><span class="title-night title-state">IV</span></div>
+    <h2>
+      <span class="title-day title-state">Inhabitants &middot; <em>By Day</em></span>
+      <span class="title-night title-state">Inhabitants &middot; <em>By Night</em></span>
+    </h2>
+    <p class="lead">
+      <span class="lead-day">Each figure is a frozen confession &mdash; posture, hue, an interior state.</span>
+      <span class="lead-night">When the lamps come on, the figures answer with their own light.</span>
+    </p>
+    <p class="dn-tip"><span class="arr">↻</span>Tap a card &mdash; do we read the same Hamlet?<span class="sep">·</span>点击卡片，看看我们是否读到了同样的哈姆雷特</p>
+  </div>
+
+  <div class="dn-stage reveal">
+    <!-- DAY: 7 character close-ups from 人白 folder — hero + 3 pair rows -->
+    <div class="dn-grid dn-grid--day">
+      <!-- Hero: Sky Blue kid with cats, mice, and the trash box -->
+      <div class="row row--hero">
+        <figure class="gi gi--flip">
+          <div class="card-3d">
+            <div class="card-face card-face--front"><img src="./images/inhab-day-6.jpg" alt="Sky-blue child taking out the trash with cats and mice nearby"></div>
+            <div class="card-face card-face--back"><figcaption>
+              <span class="name" style="color:#6cbfe0">Sky Blue</span>
+              <p class="card-en">Today: drained past feeling. A little longer and I&rsquo;m off the clock &mdash; head empty, chest strangely calm. Today&rsquo;s wishlist: no socialising, no thinking, no overtime. Just let me melt into the wall &mdash; no one calling my name, no small talk, not seen by anyone.</p>
+              <p class="card-cn">今天累到麻木，再过一会儿就下班——脑子是空空的，内心异常平静。许愿今天无社交，无动脑，无加班。只想跟墙融到一起，不被任何人喊住，不用搭话，也不用被看见。</p>
+            </figcaption></div>
+          </div>
+        </figure>
+      </div>
+
+      <!-- Row 2: solitary characters (Wine-Red + Deep Blue) -->
+      <div class="row row--pair">
+        <figure class="gi gi--flip">
+          <div class="card-3d">
+            <div class="card-face card-face--front"><img src="./images/inhab-day-2.jpg" alt="Wine-red figure leaning against the wall, alone"></div>
+            <div class="card-face card-face--back"><figcaption>
+              <span class="name" style="color:#7a1d2a">Wine&#8209;Red</span>
+              <p class="card-en">His head is staging a full-scale world war &mdash; thoughts he can&rsquo;t stop, an irritation that won&rsquo;t sit. He desperately wants somewhere to vent, wants to scream without caring who hears, wants to smash everything in reach. Instead, he just keeps smoking &mdash; one after another &mdash; pressing the whole storm back down inside.</p>
+              <p class="card-cn">他现在思绪非常杂乱，脑子里像是在上演世界大战，简直快要炸掉了。无法停止的思绪，以及烦躁的情绪，让他迫切地想要寻求一个地方发泄，想要不顾一切的大吼，想要破坏一切，然而他只能拼命抽烟，压抑自己。</p>
+            </figcaption></div>
+          </div>
+        </figure>
+        <figure class="gi gi--flip">
+          <div class="card-3d">
+            <div class="card-face card-face--front"><img src="./images/inhab-day-3.jpg" alt="Deep blue figure on the iron fire stairs"></div>
+            <div class="card-face card-face--back"><figcaption>
+              <span class="name" style="color:#3b4a8c">Deep Blue</span>
+              <p class="card-en">He probably can&rsquo;t sync up with the roomful of people behind that door. So he slips out to the balcony alone, tucks himself behind the iron rails &mdash; the louder it gets inside, the quieter he gets out here. Better if no one opens that door. Better if his friends forget he stepped out, and don&rsquo;t drag him back into that loud-and-boring world.</p>
+              <p class="card-cn">他或许跟门里那一屋子的人对不上拍。一个人溜到阳台上、躲在铁架后面——里面越闹，他越静。最好谁也别推开那扇门，最好他的朋友别想起他在外面，别把他拽回那个又喧哗又无聊的世界。</p>
+            </figcaption></div>
+          </div>
+        </figure>
+      </div>
+
+      <!-- Row 3: movement & stillness (Orange entering + Grey crouched) -->
+      <div class="row row--pair">
+        <figure class="gi gi--flip">
+          <div class="card-3d">
+            <div class="card-face card-face--front"><img src="./images/inhab-day-4.jpg" alt="Orange figure stepping toward the bar"></div>
+            <div class="card-face card-face--back"><figcaption>
+              <span class="name" style="color:#f08a3e">Orange</span>
+              <p class="card-en">Hahahaha &mdash; however unhinged drunk-me gets, however hard sober-me is gonna regret it, <em>step aside</em> &mdash; the happiest moment is right before the first drink. Door open, lights up, in the room &mdash; <em>&ldquo;Tonight, I&rsquo;m the prettiest motherfucker in this bar.&rdquo;</em></p>
+              <p class="card-cn">哈哈哈哈，不管喝醉了有多癫，酒醒了有多后悔，通通闪开——反正去喝酒之前是最开心的。门一开、灯一亮、人到位——"我就是今晚这个酒吧最靓的仔。"</p>
+            </figcaption></div>
+          </div>
+        </figure>
+        <figure class="gi gi--flip">
+          <div class="card-3d">
+            <div class="card-face card-face--front"><img src="./images/inhab-day-5.jpg" alt="Grey drunk slumped beside the streetlamp"></div>
+            <div class="card-face card-face--back"><figcaption>
+              <span class="name" style="color:#9aa0a8">Grey</span>
+              <p class="card-en">He&rsquo;s probably thinking: <em>&ldquo;Damn this world, let it end. Tomorrow I&rsquo;ll go blow up the office. AAARGH I don&rsquo;t want to work. Can the world just disappear? At least &mdash; can I disappear from this world? AAARGH, just let me crawl off alone, all twisted up in the dark.&rdquo;</em> The streetlamp says nothing. Tch &mdash; what a cold piece of metal.</p>
+              <p class="card-cn">他大概在想："操蛋的世界毁灭吧。明天就去炸公司。啊啊啊不想上班。这个世界能不能消失？至少——我能不能从这个世界消失？啊啊啊，就让我一个人阴暗扭曲地爬行吧。" 路灯没说话，呵，这玩意儿可真冷漠！</p>
+            </figcaption></div>
+          </div>
+        </figure>
+      </div>
+
+      <!-- Row 4: companions — lovers & friends (Pink × 2 + Yellow × 2) -->
+      <div class="row row--pair">
+        <figure class="gi gi--flip">
+          <div class="card-3d">
+            <div class="card-face card-face--front"><img src="./images/inhab-day-1.jpg" alt="Two pink figures together on a daytime balcony"></div>
+            <div class="card-face card-face--back"><figcaption>
+              <span class="name" style="color:#e89aae">Pink &times; 2</span>
+              <p class="card-en">Two people, leaking pink bubbles from every pore &mdash; the kind of love you can&rsquo;t quite hold in. They&rsquo;ve planted themselves in the loudest, busiest spot on purpose &mdash; they want the whole street to witness it.</p>
+              <p class="card-cn">两个人浑身冒着粉红色的泡泡，那种藏不住、一直往外溢的喜欢。他们偏要站在最人声鼎沸的地方——让所有人见证他们的爱情。</p>
+            </figcaption></div>
+          </div>
+        </figure>
+        <figure class="gi gi--flip">
+          <div class="card-3d">
+            <div class="card-face card-face--front"><img src="./images/inhab-day-7.jpg" alt="Two yellow friends drinking, fresh from the bar"></div>
+            <div class="card-face card-face--back"><figcaption>
+              <span class="name"><span style="color:#d4a82d">Yellow</span> <span style="opacity:0.6">&amp;</span> <span style="color:#9aa0a8">Grey</span></span>
+              <p class="card-en">Some leave the bar in pairs, some leave alone. In all the traffic and shimmer of a night like this, you can always spot a tiny version of yourself somewhere in the crowd.</p>
+              <p class="card-cn">有人出双入对，有人形单影只，在这车水马龙的繁华夜景中总能找到自己的缩影。</p>
+            </figcaption></div>
+          </div>
+        </figure>
+      </div>
+    </div>
+    <!-- NIGHT: 8 character close-ups from 人夜 folder, 4 rows of 2 -->
+    <div class="dn-grid dn-grid--night">
+      <!-- Row 1: solitary figures (Wine-Red portrait + Deep Blue landscape, 32:68 for height match) -->
+      <div class="row row--pair">
+        <figure class="gi gi--flip" style="flex: 32">
+          <div class="card-3d">
+            <div class="card-face card-face--front"><img src="./images/inhab-night-1.jpg" alt="A shadowy figure peering into a dimly lit window at night"></div>
+            <div class="card-face card-face--back"><figcaption>
+              <span class="name" style="color:#f08a3e">Orange</span>
+              <p class="card-en">Bleurgh&hellip; damn it, threw another whole meal back up! Bleurgh&hellip; if I just melt into the dark like this, no one can see me, right? Bleurgh&hellip; bleurgh&hellip; Huh? You&rsquo;re asking what I&rsquo;m thinking? Me?&hellip; bleurgh&hellip; is there even a brain left in here to think with?</p>
+              <p class="card-cn">呕。。。可恶，今天又白吃了一顿！呕。。。我与黑暗融为一体，应该没人能看见我吧？呕。。。呕。。。 啊？你问我在想啥？我。。。呕。。。还有那脑子想吗？</p>
+            </figcaption></div>
+          </div>
+        </figure>
+        <figure class="gi gi--flip" style="flex: 68">
+          <div class="card-3d">
+            <div class="card-face card-face--front"><img src="./images/inhab-night-2.jpg" alt="Deep blue figure hidden on the iron stairs at night"></div>
+            <div class="card-face card-face--back"><figcaption>
+              <span class="name" style="color:#3b4a8c">Deep Blue</span>
+              <p class="card-en">He probably can&rsquo;t sync up with the roomful of people behind that door. So he slips out to the balcony alone, tucks himself behind the iron rails &mdash; the louder it gets inside, the quieter he gets out here. Better if no one opens that door. Better if his friends forget he stepped out, and don&rsquo;t drag him back into that loud-and-boring world.</p>
+              <p class="card-cn">他或许跟门里那一屋子的人对不上拍。一个人溜到阳台上、躲在铁架后面——里面越闹，他越静。最好谁也别推开那扇门，最好他的朋友别想起他在外面，别把他拽回那个又喧哗又无聊的世界。</p>
+            </figcaption></div>
+          </div>
+        </figure>
+      </div>
+
+      <!-- Row 2: lovers on the balcony + orange figure entering the bar (54:46 for height match) -->
+      <div class="row row--pair">
+        <figure class="gi gi--flip" style="flex: 54">
+          <div class="card-3d">
+            <div class="card-face card-face--front"><img src="./images/inhab-night-4.jpg" alt="Two pink lovers silhouetted on a lit balcony"></div>
+            <div class="card-face card-face--back"><figcaption>
+              <span class="name" style="color:#e89aae">Pink &times; 2</span>
+              <p class="card-en">Two people, leaking pink bubbles from every pore &mdash; the kind of love you can&rsquo;t quite hold in. They&rsquo;ve planted themselves in the loudest, busiest spot on purpose &mdash; they want the whole street to witness it.</p>
+              <p class="card-cn">两个人浑身冒着粉红色的泡泡，那种藏不住、一直往外溢的喜欢。他们偏要站在最人声鼎沸的地方——让所有人见证他们的爱情。</p>
+            </figcaption></div>
+          </div>
+        </figure>
+        <figure class="gi gi--flip" style="flex: 46">
+          <div class="card-3d">
+            <div class="card-face card-face--front"><img src="./images/inhab-night-5.jpg" alt="Wine-red figure standing at a lit doorway, hand to face"></div>
+            <div class="card-face card-face--back"><figcaption>
+              <span class="name" style="color:#7a1d2a">Wine&#8209;Red</span>
+              <p class="card-en">His head is staging a full-scale world war &mdash; thoughts he can&rsquo;t stop, an irritation that won&rsquo;t sit. He desperately wants somewhere to vent, wants to scream without caring who hears, wants to smash everything in reach. Instead, he just keeps smoking &mdash; one after another &mdash; pressing the whole storm back down inside.</p>
+              <p class="card-cn">他现在思绪非常杂乱，脑子里像是在上演世界大战，简直快要炸掉了。无法停止的思绪，以及烦躁的情绪，让他迫切地想要寻求一个地方发泄，想要不顾一切的大吼，想要破坏一切，然而他只能拼命抽烟，压抑自己。</p>
+            </figcaption></div>
+          </div>
+        </figure>
+      </div>
+
+      <!-- Row 3: kid with cats + drunk friends (50:50) -->
+      <div class="row row--pair">
+        <figure class="gi gi--flip">
+          <div class="card-3d">
+            <div class="card-face card-face--front"><img src="./images/inhab-night-6.jpg" alt="Sky blue child with cats at night"></div>
+            <div class="card-face card-face--back"><figcaption>
+              <span class="name" style="color:#6cbfe0">Sky Blue</span>
+              <p class="card-en">Today: drained past feeling. A little longer and I&rsquo;m off the clock &mdash; head empty, chest strangely calm. Today&rsquo;s wishlist: no socialising, no thinking, no overtime. Just let me melt into the wall &mdash; no one calling my name, no small talk, not seen by anyone.</p>
+              <p class="card-cn">今天累到麻木，再过一会儿就下班——脑子是空空的，内心异常平静。许愿今天无社交，无动脑，无加班。只想跟墙融到一起，不被任何人喊住，不用搭话，也不用被看见。</p>
+            </figcaption></div>
+          </div>
+        </figure>
+        <figure class="gi gi--flip">
+          <div class="card-3d">
+            <div class="card-face card-face--front"><img src="./images/inhab-night-7.jpg" alt="Two yellow friends with bottles, drunk after the bar"></div>
+            <div class="card-face card-face--back"><figcaption>
+              <span class="name" style="color:#d4a82d">Yellow &times; 2</span>
+              <p class="card-en"><em>&ldquo;Brothers forever! Three galloping horses! Four blessings rolling in! Five champions standing! Six-six-six!&hellip;&rdquo;</em> Hey &mdash; the two of us, best mates in the whole damn world!</p>
+              <p class="card-cn">"哥俩好啊、三匹马啊、四喜财啊、五魁首啊、六六六啊。。。"嘿！咱俩天下第一好！</p>
+            </figcaption></div>
+          </div>
+        </figure>
+      </div>
+
+      <!-- Row 4: atmospheric night street + traffic accident (50:50) -->
+      <div class="row row--pair">
+        <figure class="gi gi--flip">
+          <div class="card-3d">
+            <div class="card-face card-face--front"><img src="./images/inhab-night-3.jpg" alt="Atmospheric night street with figures and lamplight"></div>
+            <div class="card-face card-face--back"><figcaption class="atm">
+              <p class="card-en">Some leave the bar in pairs, some leave alone. In all the traffic and shimmer of a night like this, you can always spot a tiny version of yourself somewhere in the crowd.</p>
+              <p class="card-cn">有人出双入对，有人形单影只，在这车水马龙的繁华夜景中总能找到自己的缩影。</p>
+            </figcaption></div>
+          </div>
+        </figure>
+        <figure class="gi gi--flip">
+          <div class="card-3d">
+            <div class="card-face card-face--front"><img src="./images/inhab-night-8.jpg" alt="Two cars collided at night, drivers confronting"></div>
+            <div class="card-face card-face--back"><figcaption>
+              <span class="name"><span style="color:#9d2424">Red</span> <span style="opacity:0.6">&times;</span> <span style="color:#6a4ea0">Purple</span></span>
+              <p class="card-en">Driving along, minding my own business in the dead of night &mdash; and BAM, he hits me! Who am I supposed to take this up with?! I&rsquo;m going to argue him until he can&rsquo;t say a word, scream until the whole damn block comes out to weigh in!</p>
+              <p class="card-cn">这大半夜的好好开着车呢，就撞车了，我找谁说理去啊！我一定要说的他哑口无言，再吵的个天翻地覆，把周围的人都吸引过来给我评评理！</p>
+            </figcaption></div>
+          </div>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ DAY ↔ NIGHT TOGGLE III: THE NEON LANGUAGE (lights off ↔ on) ═══════════ -->
+<section class="day-night" id="day-night-3" aria-label="Neon language: lights off and on">
+  <div class="stars" aria-hidden="true"></div>
+
+  <div class="dn-toggle-wrap reveal">
+    <div class="dn-toggle" role="group" aria-label="Toggle lights off or on">
+      <button class="sun-btn" type="button" aria-label="Lights off (daytime)" aria-pressed="true">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="24" r="8.5"/>
+          <path d="M24 5.5v4.5M24 38v4.5M5.5 24h4.5M38 24h4.5M10.8 10.8l3.2 3.2M34 34l3.2 3.2M37.2 10.8l-3.2 3.2M14 34l-3.2 3.2"/>
+        </svg>
+      </button>
+      <span class="dn-knob" aria-hidden="true"></span>
+      <button class="moon-btn" type="button" aria-label="Lights on (nighttime)" aria-pressed="false">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M34 29a13 13 0 1 1-15-19.2A10.5 10.5 0 0 0 34 29z"/>
+          <circle cx="36" cy="14" r="0.9" fill="currentColor"/>
+          <circle cx="40" cy="22" r="0.7" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+    <p class="dn-hint" aria-hidden="true"><span class="arr">↑</span>Tap to switch the lights<span class="sep">·</span>点击切换灯光</p>
+  </div>
+
+  <div class="dn-intro reveal">
+    <div class="num"><span class="title-day title-state">V</span><span class="title-night title-state">VI</span></div>
+    <h2>
+      <span class="title-day title-state">The Neon Language &middot; <em>Unlit</em></span>
+      <span class="title-night title-state">The Neon Language &middot; <em>Lit</em></span>
+    </h2>
+    <p class="lead">
+      <span class="lead-day">By day, the wires are quiet pigment on a wall &mdash; the alphabet exists but hasn&rsquo;t spoken yet.</span>
+      <span class="lead-night">Switch the lights and the wall begins to talk &mdash; a private vocabulary projected outward in colour.</span>
+    </p>
+  </div>
+
+  <div class="dn-stage reveal">
+    <!-- DAY: unlit wall (lights off) — 4 photos from 细节白 folder, zoom-in arc -->
+    <div class="dn-grid dn-grid--day">
+      <div class="row row--full">
+        <div class="gi"><img src="./images/neon-day-1.jpg" alt="Full neon panel, unlit — Neon Moon Night text and full alphabet"></div>
+      </div>
+      <div class="row row--pair">
+        <div class="gi"><img src="./images/neon-day-2.jpg" alt="Section detail — heart, treble clef, cloud and beer mug, unlit"></div>
+        <div class="gi"><img src="./images/neon-day-3.jpg" alt="Section detail — sun, cactus, flame and PIZZA, unlit"></div>
+      </div>
+      <div class="row row--full">
+        <div class="gi"><img src="./images/neon-day-4.jpg" alt="PIZZA word macro close-up, unlit"></div>
+      </div>
+    </div>
+    <!-- NIGHT: lit wall (lights on) — 6 images from 细节夜, paired (3 rows × 2) -->
+    <div class="dn-grid dn-grid--night">
+      <!-- Row 1: full head-on + angled-with-figures (establishing shots) -->
+      <div class="row row--pair">
+        <div class="gi"><img src="./images/neon-night-1.jpg" alt="Full neon panel, lit, head-on"></div>
+        <div class="gi"><img src="./images/neon-night-2.jpg" alt="Angled neon side at night with figures"></div>
+      </div>
+      <!-- Row 2: top vs bottom macros (Neon Moon Night text + PIZZA section) -->
+      <div class="row row--pair">
+        <div class="gi"><img src="./images/neon-night-3.jpg" alt="Neon Moon Night text — top macro"></div>
+        <div class="gi"><img src="./images/neon-night-4.jpg" alt="PIZZA & cactus — lower macro"></div>
+      </div>
+      <!-- Row 3: closest detail + interior glow (the city seen from inside) -->
+      <div class="row row--pair">
+        <div class="gi"><img src="./images/neon-night-5.jpg" alt="Beer mug & cloud — close-up"></div>
+        <div class="gi"><img src="./images/neon-night-6.jpg" alt="Interior bar lit through the window"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SIDEBAR TABLE OF CONTENTS ═══════════ -->
+<nav class="toc" aria-label="Table of contents">
+  <a href="#cover" data-target="cover">
+    <span class="toc-label">Cover</span>
+    <span class="toc-num">00</span>
+    <span class="toc-bar" aria-hidden="true"></span>
+  </a>
+  <a href="#concept" data-target="concept">
+    <span class="toc-label">Concept</span>
+    <span class="toc-num">01</span>
+    <span class="toc-bar" aria-hidden="true"></span>
+  </a>
+  <a href="#process" data-target="process">
+    <span class="toc-label">Origins</span>
+    <span class="toc-num">02</span>
+    <span class="toc-bar" aria-hidden="true"></span>
+  </a>
+  <a href="#day-night" data-target="day-night">
+    <span class="toc-label">Building</span>
+    <span class="toc-num">03</span>
+    <span class="toc-bar" aria-hidden="true"></span>
+  </a>
+  <a href="#day-night-2" data-target="day-night-2">
+    <span class="toc-label">Inhabitants</span>
+    <span class="toc-num">04</span>
+    <span class="toc-bar" aria-hidden="true"></span>
+  </a>
+  <a href="#day-night-3" data-target="day-night-3">
+    <span class="toc-label">Neon</span>
+    <span class="toc-num">05</span>
+    <span class="toc-bar" aria-hidden="true"></span>
+  </a>
+</nav>
+
+<footer>
+  <div class="sig-mark">Amber Xu</div>
+  <div class="mute">Dream Horizon &nbsp;·&nbsp; A miniature commercial district</div>
+</footer>
+
+<script>
+  // Reveal-on-scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Curtain-up cover: cover is position:fixed, we translateY based on scroll.
+  (function () {
+    const cover = document.getElementById('cover');
+    const content = cover && cover.querySelector('.cover-content');
+    const hint = cover && cover.querySelector('.scroll-hint');
+    const bg = cover && cover.querySelector('.cover-bg');
+    if (!cover) return;
+    // Curtain pulls fully off over 1.0 viewport heights of scroll.
+    // Must match the reveal-stage pin duration (200vh stage - 100vh concept = 100vh pin).
+    const PULL_RATIO = 1.0;
+    let ticking = false;
+    function update() {
+      const y = window.scrollY || window.pageYOffset;
+      const vh = window.innerHeight;
+      const pullDistance = vh * PULL_RATIO;
+      const progress = Math.min(Math.max(y / pullDistance, 0), 1);
+      // Ease-out curve so the curtain lifts with weight at first,
+      // then accelerates as it clears the screen
+      const eased = 1 - Math.pow(1 - progress, 1.6);
+      // Curtain lift (slightly more than 100% so it fully clears any shadow)
+      cover.style.transform = `translateY(${-eased * 102}%)`;
+      // Gradient dissolve: bottom of the cover fades first, the top stays
+      // visible longest. At progress 0 the gradient sits below the cover
+      // (no fade). At progress 1 the entire cover is past the transparent
+      // stop (fully dissolved).
+      const fadeEnd   = 150 - 180 * progress;   // 150% -> -30%
+      const fadeStart = fadeEnd - 45;           // 45% soft transition
+      const mask = `linear-gradient(to bottom, black ${fadeStart}%, transparent ${fadeEnd}%)`;
+      cover.style.webkitMaskImage = mask;
+      cover.style.maskImage = mask;
+      // Subtle parallax: content lifts a touch faster than the curtain for depth
+      if (content) content.style.transform = `translateY(${-progress * 60}px)`;
+      // Background sinks slightly for reverse parallax (page-behind-glass feel)
+      if (bg) bg.style.transform = `scale(1.05) translateY(${progress * 60}px)`;
+      // Scroll-hint fades out as soon as you start pulling
+      if (hint) hint.style.opacity = String(Math.max(0, 1 - progress * 5));
+      // Lift cover out of the paint pipeline once it's fully off-screen
+      if (progress >= 1) cover.classList.add('curtain-gone');
+      else cover.classList.remove('curtain-gone');
+      ticking = false;
+    }
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(update);
+        ticking = true;
+      }
+    }, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+
+  // 1) Auto-duplicate marquee-track content for tracks that only have one
+  //    child (so the seamless loop math works on translateX(-50%)).
+  document.querySelectorAll('.marquee-stack--top .marquee-track').forEach(track => {
+    if (track.children.length === 1) {
+      const clone = track.firstElementChild.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      track.appendChild(clone);
+    }
+  });
+
+  // 2) Mirror the top marquee-stack (now with all duplicates in place) into
+  //    the empty bottom stack.
+  (function () {
+    const top = document.querySelector('.marquee-stack--top');
+    const bottom = document.querySelector('.marquee-stack--bottom');
+    if (top && bottom && !bottom.children.length) {
+      bottom.innerHTML = top.innerHTML;
+    }
+  })();
+
+  // Flip cards in the Inhabitants section
+  document.querySelectorAll('.gi--flip').forEach(card => {
+    card.addEventListener('click', () => {
+      card.classList.toggle('is-flipped');
+    });
+  });
+
+  // Day ↔ Night toggle (works for every .day-night section on the page)
+  (function () {
+    document.querySelectorAll('.day-night').forEach(section => {
+      const sunBtn = section.querySelector('.sun-btn');
+      const moonBtn = section.querySelector('.moon-btn');
+      if (!sunBtn || !moonBtn) return;
+
+      const wrap = section.querySelector('.dn-toggle-wrap');
+      function setMode(night) {
+        section.classList.toggle('is-night', night);
+        sunBtn.setAttribute('aria-pressed', String(!night));
+        moonBtn.setAttribute('aria-pressed', String(night));
+        if (wrap) wrap.classList.add('has-interacted');
+      }
+      sunBtn.addEventListener('click', () => setMode(false));
+      moonBtn.addEventListener('click', () => setMode(true));
+
+      // Sprinkle stars for the night background (one starfield per section)
+      const stars = section.querySelector('.stars');
+      if (stars && !stars.children.length) {
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < 50; i++) {
+          const s = document.createElement('span');
+          s.style.left = (Math.random() * 100) + '%';
+          s.style.top = (Math.random() * 70) + '%';
+          s.style.animationDelay = (Math.random() * 3) + 's';
+          s.style.opacity = (0.3 + Math.random() * 0.7).toFixed(2);
+          if (Math.random() > 0.7) {
+            s.style.width = '3px'; s.style.height = '3px';
+          }
+          frag.appendChild(s);
+        }
+        stars.appendChild(frag);
+      }
+    });
+  })();
+
+  // ═══════════ SIDEBAR TOC: active-section tracking + smooth scroll ═══════════
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    if (!links.length) return;
+    const items = links.map(a => ({
+      link: a,
+      target: document.getElementById(a.dataset.target)
+    })).filter(x => x.target);
+
+    function update() {
+      const viewportMark = window.scrollY + window.innerHeight * 0.35;
+      let active = items[0];
+      for (const it of items) {
+        const top = it.target.getBoundingClientRect().top + window.scrollY;
+        if (top <= viewportMark) active = it;
+      }
+      links.forEach(a => a.classList.remove('is-active'));
+      if (active) active.link.classList.add('is-active');
+    }
+
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => { update(); ticking = false; });
+        ticking = true;
+      }
+    }, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+
+    // Smooth scroll on click
+    links.forEach(a => {
+      a.addEventListener('click', (e) => {
+        const target = document.getElementById(a.dataset.target);
+        if (!target) return;
+        e.preventDefault();
+        const top = target.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top, behavior: 'smooth' });
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

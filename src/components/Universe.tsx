@@ -530,8 +530,14 @@ function SceneContent({
 }
 
 // slugs that have a published detail page in public/works/[slug]/.
-// As each work's HTML + assets are migrated we add its slug here.
-const PUBLISHED_WORKS = new Set(["nemo"]);
+// Anything NOT in this set falls through to the "still forming" modal.
+const PUBLISHED_WORKS = new Set([
+  "nemo",
+  "moonlight",
+  "model",
+  "concept",
+  "mask",
+]);
 
 export default function Universe() {
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
@@ -628,9 +634,7 @@ function PlanetModal({
           {planet.name}
         </h2>
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
-          {["game", "photography", "drawing"].includes(slug)
-            ? "This world is still forming. Come back when the dust settles."
-            : "World detail page — coming soon."}
+          This world is still forming. Come back when the dust settles.
         </p>
         <button
           onClick={onClose}
