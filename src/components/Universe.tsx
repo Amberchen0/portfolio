@@ -436,9 +436,14 @@ function SceneContent({
       <NebulaWisp position={[3, 4.5, -7]} scale={1.3} color="#e070c0" />
       <NebulaWisp position={[-6, -3, 2]} scale={1.1} color="#5a8de0" />
 
-      <AmberSun />
-
-      <PlanetSystem onPlanetClick={onPlanetClick} />
+      {/* Whole solar system shares one overall tilt — left side lower, right
+          side higher — matching the reference diagram. Each planet ALSO has
+          its own subtle deviation on top of this, so the orbital planes are
+          stacked rather than perfectly co-planar. */}
+      <group rotation={[0.12, 0, 0.30]}>
+        <AmberSun />
+        <PlanetSystem onPlanetClick={onPlanetClick} />
+      </group>
     </>
   );
 }
