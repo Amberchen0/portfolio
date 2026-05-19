@@ -529,11 +529,25 @@ function SceneContent({
   );
 }
 
+// slugs that have a published detail page in public/works/[slug]/.
+// As each work's HTML + assets are migrated we add its slug here.
+const PUBLISHED_WORKS = new Set(["nemo"]);
+
 export default function Universe() {
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
   // tracked via DOM pointer events on the fullscreen wrapper; read by
   // PlanetSystem in useFrame to gate mouse-driven rotation
   const cursorInsideRef = useRef(true);
+
+  // Click handler: published works → navigate to their static detail page;
+  // placeholder works → show the "still forming" modal as before.
+  const handlePlanetClick = (slug: string) => {
+    if (PUBLISHED_WORKS.has(slug)) {
+      window.location.href = `/works/${slug}/`;
+    } else {
+      setActiveSlug(slug);
+    }
+  };
 
   return (
     <div
@@ -562,7 +576,7 @@ export default function Universe() {
         <color attach="background" args={["#0a0807"]} />
         <fog attach="fog" args={["#0a0807", 15, 40]} />
         <SceneContent
-          onPlanetClick={setActiveSlug}
+          onPlanetClick={handlePlanetClick}
           cursorInsideRef={cursorInsideRef}
         />
       </Canvas>

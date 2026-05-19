@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NEMO — Character & World Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&family=Italiana&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+
+<!-- universe back link — injected for portfolio integration -->
+<a href="/work" style="position:fixed;top:1.25rem;left:1.25rem;z-index:9999;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#d9a574;text-decoration:none;padding:0.5rem 0.85rem;border:1px solid rgba(217,165,116,0.4);border-radius:999px;background:rgba(10,8,7,0.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:all 0.25s ease;">← Universe</a>
+
+<!-- floating ambient particles -->
+<div class="bubbles" aria-hidden="true">
+  <span></span><span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<!-- nav -->
+<header class="nav">
+  <a class="brand" href="#hero">
+    <span class="brand-mark">N</span>
+    <span class="brand-name">Nemo</span>
+  </a>
+  <nav class="nav-links">
+    <a href="#about">01 · About</a>
+    <a href="#design">02 · Design</a>
+    <a href="#style">03 · Style</a>
+    <a href="#set">04 · Set</a>
+    <a href="#story">05 · Story</a>
+  </nav>
+  <div class="nav-meta">A Character Study · 2026</div>
+</header>
+
+<!-- progress bar -->
+<div class="progress" aria-hidden="true"><div class="progress-bar"></div></div>
+
+<!-- HERO -->
+<section id="hero" class="hero">
+  <div class="hero-img-wrap" data-parallax="0.25">
+    <img src="./assets/cover.jpg" alt="Nemo cover artwork" class="hero-img" />
+    <div class="hero-vignette"></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span class="line"></span>
+      <span>A Character Study</span>
+      <span class="line"></span>
+    </div>
+    <h1 class="hero-title">
+      <span class="reveal" style="--d:0">N</span><span class="reveal" style="--d:.08s">e</span><span class="reveal" style="--d:.16s">m</span><span class="reveal" style="--d:.24s">o</span>
+    </h1>
+    <p class="hero-sub reveal-up" style="--d:.6s">
+      A gentle-looking amphibious spirit, drifting between sky and sea,
+      guarding the shimmering treasures of a sunken world.
+    </p>
+    <div class="hero-cta reveal-up" style="--d:.85s">
+      <a href="#about" class="cta">
+        <span>Discover Her Story</span>
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 4v16m0 0l-6-6m6 6l6-6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="scroll-hint" aria-hidden="true">
+    <span>scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="about">
+  <div class="about-grid">
+    <div class="about-art">
+      <div class="art-frame">
+        <img src="./assets/nemo-character.png" alt="Nemo character pose" />
+        <div class="glow-orb"></div>
+      </div>
+      <div class="floating-petal p1"></div>
+      <div class="floating-petal p2"></div>
+      <div class="floating-petal p3"></div>
+    </div>
+
+    <div class="about-text">
+      <div class="section-mark">01 — The Character</div>
+      <h2 class="section-title">She blooms by day,<br/><em>hunts by night.</em></h2>
+
+      <p class="lede">
+        Nemo is a gentle-looking amphibious spirit who can soar through the
+        sky and dive into the depths of the sea. She lives inside a sunken
+        ship resting at the bottom of the ocean, surrounded by shimmering
+        treasures.
+      </p>
+      <p>
+        Enchanted by all things that sparkle, Nemo sees herself as the
+        guardian of these long-lost relics. Every day, she busily roams with
+        her companions, searching for new treasures to fill her underwater
+        home.
+      </p>
+      <p class="caution">
+        But don't be fooled by her bright, flower-like appearance or innocent
+        charm — Nemo is, in truth, a <em>carnivore.</em>
+        The delicate blossom atop her head emits a soft, glowing light that
+        lures curious sprites close. And when they let their guard down…
+        she strikes, swallowing her prey whole.
+      </p>
+
+      <div class="stat-row">
+        <div class="stat"><div class="stat-num">∞</div><div class="stat-lbl">Sky · Sea</div></div>
+        <div class="stat"><div class="stat-num">1</div><div class="stat-lbl">Sunken Ship</div></div>
+        <div class="stat"><div class="stat-num">∞</div><div class="stat-lbl">Treasures</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DESIGN — full development spread + turnaround -->
+<section id="design" class="design">
+  <div class="section-head">
+    <div class="section-mark light">02 — Character Design</div>
+    <h2 class="section-title light">Iterations of a <em>blossom</em></h2>
+    <p class="section-desc">From the very first scribble to the final turnaround — three rounds of exploration, a moodboard of lily-of-the-valley, axolotls, jellyfish, butterflies and cat eyes.</p>
+  </div>
+
+  <!-- full development spread (1st / 2nd / 3rd iteration + moodboard) -->
+  <div class="dev-spread">
+    <div class="dev-stage">
+      <img src="./assets/dev-spread.jpg" alt="Full character development spread — three iterations plus moodboard" />
+      <button class="dev-zoom" type="button" aria-label="Zoom development spread" onclick="openLightbox('assets/dev-spread.jpg')">
+        <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M21 21l-4.5-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M11 8v6M8 11h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span>Click to zoom</span>
+      </button>
+    </div>
+    <div class="dev-legend">
+      <div class="leg"><span class="leg-num">i</span><span class="leg-txt">1st Iteration · silhouettes</span></div>
+      <div class="leg"><span class="leg-num">ii</span><span class="leg-txt">2nd Iteration · forms & references</span></div>
+      <div class="leg"><span class="leg-num">iii</span><span class="leg-txt">3rd Iteration · final pose & expression</span></div>
+    </div>
+  </div>
+
+  <div class="turnaround-band">
+    <div class="turnaround">
+      <div class="turnaround-cap">— Final Turnaround —</div>
+      <div class="turnaround-stage">
+        <img src="./assets/nemo-turnaround.png" alt="Nemo turnaround sheet" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STYLE FRAMES -->
+<section id="style" class="style">
+  <div class="section-head">
+    <div class="section-mark">03 — Style Frames</div>
+    <h2 class="section-title">Style <em>Frames</em></h2>
+    <p class="section-desc">Two moments inside the sunken ship — the cold blue silence broken only by the glow of red coral and Nemo's wide, hungry eyes.</p>
+  </div>
+
+  <div class="style-frames">
+    <figure class="frame frame-left">
+      <img src="./assets/styleframe-1.jpg" alt="Style frame — Nemo on treasure chest" loading="lazy"/>
+      <figcaption>i. The Approach</figcaption>
+    </figure>
+    <figure class="frame frame-right">
+      <img src="./assets/styleframe-2.jpg" alt="Style frame — Nemo beside red coral and chest" loading="lazy"/>
+      <figcaption>ii. The Find</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- SET DESIGN -->
+<section id="set" class="set">
+  <div class="section-head">
+    <div class="section-mark light">04 — Set Design</div>
+    <h2 class="section-title light">A <em>sunken</em> world,<br/>built by hand.</h2>
+    <p class="section-desc light">A handcrafted miniature of Nemo's resting place — the broken hull, the cliffs, the white sand, the bursts of red coral.</p>
+  </div>
+
+  <div class="set-mosaic">
+    <a class="tile tile-main" href="#" onclick="return openLightbox('assets/set-main.jpg')">
+      <img src="./assets/set-main.jpg" alt="Set design — main shot" loading="lazy"/>
+      <span class="tile-label">Main · The Wreck</span>
+    </a>
+    <a class="tile tile-a" href="#" onclick="return openLightbox('assets/set-ship-side.jpg')">
+      <img src="./assets/set-ship-side.jpg" alt="Set design — ship side" loading="lazy"/>
+      <span class="tile-label">Hull</span>
+    </a>
+    <a class="tile tile-b" href="#" onclick="return openLightbox('assets/set-detail.jpg')">
+      <img src="./assets/set-detail.jpg" alt="Set design — detail" loading="lazy"/>
+      <span class="tile-label">Detail</span>
+    </a>
+    <a class="tile tile-c" href="#" onclick="return openLightbox('assets/set-inside.jpg')">
+      <img src="./assets/set-inside.jpg" alt="Set design — interior" loading="lazy"/>
+      <span class="tile-label">Interior</span>
+    </a>
+    <a class="tile tile-d" href="#" onclick="return openLightbox('assets/set-chest.jpg')">
+      <img src="./assets/set-chest.jpg" alt="Set design — chest" loading="lazy"/>
+      <span class="tile-label">Treasure</span>
+    </a>
+  </div>
+</section>
+
+<!-- STORYBOARD -->
+<section id="story" class="story">
+  <div class="section-head">
+    <div class="section-mark">05 — Storyboard</div>
+    <h2 class="section-title">Story <em>board</em></h2>
+    <p class="section-desc">From thumbnail sketches to composited frames — following two sprites who follow a treasure map a little too far.</p>
+  </div>
+
+  <div class="story-sketch">
+    <img src="./assets/sb-sketch.jpg" alt="Storyboard sketches" loading="lazy"/>
+    <div class="story-sketch-caption">Thumbnails · pencil on paper</div>
+  </div>
+
+  <div class="story-strip">
+    <div class="strip-reel">
+      <div class="strip-track">
+        <figure class="strip-frame"><img src="./assets/sb-01.jpg" alt="Storyboard frame 1" loading="lazy"/><figcaption>01</figcaption></figure>
+        <figure class="strip-frame"><img src="./assets/sb-02.jpg" alt="Storyboard frame 2" loading="lazy"/><figcaption>02</figcaption></figure>
+        <figure class="strip-frame"><img src="./assets/sb-03.jpg" alt="Storyboard frame 3" loading="lazy"/><figcaption>03</figcaption></figure>
+        <figure class="strip-frame"><img src="./assets/sb-04.jpg" alt="Storyboard frame 4" loading="lazy"/><figcaption>04</figcaption></figure>
+        <figure class="strip-frame"><img src="./assets/sb-05.jpg" alt="Storyboard frame 5" loading="lazy"/><figcaption>05</figcaption></figure>
+        <figure class="strip-frame"><img src="./assets/sb-06.jpg" alt="Storyboard frame 6" loading="lazy"/><figcaption>06</figcaption></figure>
+        <figure class="strip-frame"><img src="./assets/sb-07.jpg" alt="Storyboard frame 7" loading="lazy"/><figcaption>07</figcaption></figure>
+        <figure class="strip-frame"><img src="./assets/sb-08.jpg" alt="Storyboard frame 8" loading="lazy"/><figcaption>08</figcaption></figure>
+        <figure class="strip-frame"><img src="./assets/sb-09.jpg" alt="Storyboard frame 9" loading="lazy"/><figcaption>09</figcaption></figure>
+        <figure class="strip-frame"><img src="./assets/sb-10.jpg" alt="Storyboard frame 10" loading="lazy"/><figcaption>10</figcaption></figure>
+        <figure class="strip-frame"><img src="./assets/sb-11.jpg" alt="Storyboard frame 11" loading="lazy"/><figcaption>11</figcaption></figure>
+      </div>
+    </div>
+    <div class="strip-overview" aria-label="storyboard overview">
+      <button class="ov-frame" type="button" data-index="0" aria-label="Jump to frame 1"><img src="./assets/sb-01.jpg" alt="" loading="lazy"/></button>
+      <button class="ov-frame" type="button" data-index="1" aria-label="Jump to frame 2"><img src="./assets/sb-02.jpg" alt="" loading="lazy"/></button>
+      <button class="ov-frame" type="button" data-index="2" aria-label="Jump to frame 3"><img src="./assets/sb-03.jpg" alt="" loading="lazy"/></button>
+      <button class="ov-frame" type="button" data-index="3" aria-label="Jump to frame 4"><img src="./assets/sb-04.jpg" alt="" loading="lazy"/></button>
+      <button class="ov-frame" type="button" data-index="4" aria-label="Jump to frame 5"><img src="./assets/sb-05.jpg" alt="" loading="lazy"/></button>
+      <button class="ov-frame" type="button" data-index="5" aria-label="Jump to frame 6"><img src="./assets/sb-06.jpg" alt="" loading="lazy"/></button>
+      <button class="ov-frame" type="button" data-index="6" aria-label="Jump to frame 7"><img src="./assets/sb-07.jpg" alt="" loading="lazy"/></button>
+      <button class="ov-frame" type="button" data-index="7" aria-label="Jump to frame 8"><img src="./assets/sb-08.jpg" alt="" loading="lazy"/></button>
+      <button class="ov-frame" type="button" data-index="8" aria-label="Jump to frame 9"><img src="./assets/sb-09.jpg" alt="" loading="lazy"/></button>
+      <button class="ov-frame" type="button" data-index="9" aria-label="Jump to frame 10"><img src="./assets/sb-10.jpg" alt="" loading="lazy"/></button>
+      <button class="ov-frame" type="button" data-index="10" aria-label="Jump to frame 11"><img src="./assets/sb-11.jpg" alt="" loading="lazy"/></button>
+    </div>
+    <div class="strip-hint">← hover edges to scroll →</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="foot">
+  <div class="foot-mark">
+    <span class="line"></span>
+    <span>Fin</span>
+    <span class="line"></span>
+  </div>
+  <p class="foot-quote">
+    "And when they let their guard down… she strikes."
+  </p>
+  <div class="foot-meta">
+    <span>Nemo — A Character & World Study</span>
+    <span>·</span>
+    <span>Chen Xu</span>
+    <span>·</span>
+    <span>2026</span>
+  </div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <img id="lightbox-img" alt="" />
+  <button class="lightbox-close" onclick="closeLightbox(event)" aria-label="Close">×</button>
+</div>
+
+<script src="./script.js"></script>
+</body>
+</html>
