@@ -107,59 +107,68 @@ function OrbitRing({
   );
 }
 
-/** 3D chromatic glass-text label — replaces flat HTML overlay.
- *  Three layered Text meshes with sub-pixel X offsets in RGB to mimic the
- *  "off-axis printing / RGB shift" glitch language. Billboard keeps them
- *  readable as the universe rotates. */
+/** 3D chromatic glass-text label that wraps around the planet's equator.
+ *  Uses troika's `curveRadius` to bend the text along a cylinder coincident
+ *  with the planet's vertical axis, so the text appears glued to the
+ *  sphere surface. Three RGB-shifted layers give the chromatic-glass feel.
+ *  Billboard keeps the wrap facing the camera regardless of orbit/spin. */
 function PlanetLabel({
   name,
-  offset,
+  planetRadius,
   hovered,
 }: {
   name: string;
-  /** distance from anchor (planet/moon center) to where label starts, screen-right */
-  offset: number;
+  /** the planet/moon's body radius — label wraps just outside this */
+  planetRadius: number;
   hovered: boolean;
 }) {
-  const shift = hovered ? 0.028 : 0.012;
-  const fontSize = hovered ? 0.22 : 0.19;
-  const fillOpacity = hovered ? 0.95 : 0.7;
+  const shift = hovered ? 0.022 : 0.010;
+  const fontSize = hovered ? 0.18 : 0.14;
+  const fillOpacity = hovered ? 0.95 : 0.78;
+  // sit just outside hover-scaled sphere (1.1x), so label never clips in
+  const distance = planetRadius * 1.15 + 0.06;
   return (
     <Billboard>
-      {/* magenta-red ghost (left of main) */}
+      {/* magenta-red ghost */}
       <Text
-        position={[offset - shift, 0, 0]}
+        position={[shift, 0, distance]}
         color="#ff2860"
         fontSize={fontSize}
-        letterSpacing={0.22}
-        anchorX="left"
+        letterSpacing={0.2}
+        anchorX="center"
         anchorY="middle"
+        // @ts-expect-error troika supports curveRadius; drei type omits it
+        curveRadius={distance}
         fillOpacity={fillOpacity * 0.7}
         raycast={() => null}
       >
         {name.toUpperCase()}
       </Text>
-      {/* cyan ghost (right of main) */}
+      {/* cyan ghost */}
       <Text
-        position={[offset + shift, 0, 0]}
+        position={[-shift, 0, distance]}
         color="#00e0ff"
         fontSize={fontSize}
-        letterSpacing={0.22}
-        anchorX="left"
+        letterSpacing={0.2}
+        anchorX="center"
         anchorY="middle"
+        // @ts-expect-error troika supports curveRadius; drei type omits it
+        curveRadius={distance}
         fillOpacity={fillOpacity * 0.7}
         raycast={() => null}
       >
         {name.toUpperCase()}
       </Text>
-      {/* warm-cream main fill, drawn last on top */}
+      {/* warm-cream main fill, drawn last on top — slightly closer to camera */}
       <Text
-        position={[offset, 0, 0.002]}
+        position={[0, 0, distance + 0.004]}
         color={hovered ? "#f0e0c5" : "#c8bca0"}
         fontSize={fontSize}
-        letterSpacing={0.22}
-        anchorX="left"
+        letterSpacing={0.2}
+        anchorX="center"
         anchorY="middle"
+        // @ts-expect-error troika supports curveRadius; drei type omits it
+        curveRadius={distance + 0.004}
         fillOpacity={fillOpacity}
         raycast={() => null}
       >
@@ -234,7 +243,7 @@ function MoonSystem({
           </mesh>
           <PlanetLabel
             name={moon.name}
-            offset={moon.size + 0.28}
+            planetRadius={moon.size}
             hovered={hovered}
           />
         </group>
@@ -313,10 +322,11 @@ function Planet({
             </mesh>
           </group>
 
-          {/* floating 3D chromatic label beside planet — outside body self-rotation */}
+          {/* curved 3D chromatic label wrapping the planet's equator — sibling
+              of body so it doesn't spin with body's self-rotation */}
           <PlanetLabel
             name={planet.name}
-            offset={planet.size + 0.35}
+            planetRadius={planet.size}
             hovered={hovered}
           />
 
