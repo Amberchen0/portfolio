@@ -338,37 +338,94 @@ function Planet({
   );
 }
 
-/** Central amber sun — aggressive verification pass.
- *  Previous pass: distort=0.22 was too subtle to read; multi-halo created
- *  banded concentric rings instead of a soft glow. This commit pushes the
- *  distortion hard (0.5) so we can confirm the material is actually
- *  responding, and drops the halo entirely. Once the bumpy body is
- *  confirmed working we'll dial it back and re-add a proper glow.
+/** Central amber sun — final composition after verification.
+ *  Confirmed MeshDistortMaterial works (distort=0.5 made the sphere a
+ *  visible blob). Now dialed back into three coordinated layers:
  *
- *  Note: drei's MeshDistortMaterial extends MeshStandardMaterial, NOT
- *  Physical — so iridescence/clearcoat are silently ignored. Removed
- *  them to keep the prop list honest. Iridescence will come back later
- *  via either a layered shell or post-processing. */
+ *  1. Sprite halo with a procedurally generated radial-gradient canvas
+ *     texture → a real soft glow that fades from center to edge,
+ *     replacing the banded multi-sphere approach.
+ *  2. Inner sun body: MeshDistortMaterial with subtle distort (0.13)
+ *     keeps the sphere recognizably round but gives the surface the
+ *     "alive, bumpy" quality from the reference. emissive at 0.7 makes
+ *     it self-luminous as a star.
+ *  3. Outer iridescent shell at 1.22 (just outside the 1.18 body):
+ *     MeshPhysicalMaterial with iridescence + clearcoat, low opacity
+ *     so the bumpy core shows through, giving the oil-film color over
+ *     the wavy surface — the "iridescent glass" the user described. */
 function AmberSun() {
   const ref = useRef<THREE.Mesh>(null!);
+
+  // canvas-generated radial gradient → soft alpha falloff, used as a
+  // sprite for the glow halo. memoized so it builds once.
+  const glowTex = useMemo<THREE.CanvasTexture | null>(() => {
+    if (typeof document === "undefined") return null;
+    const canvas = document.createElement("canvas");
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    const grad = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+    grad.addColorStop(0.0, "rgba(240,200,133,1)");
+    grad.addColorStop(0.2, "rgba(240,200,133,0.5)");
+    grad.addColorStop(0.55, "rgba(240,200,133,0.12)");
+    grad.addColorStop(1.0, "rgba(240,200,133,0)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 256, 256);
+    return new THREE.CanvasTexture(canvas);
+  }, []);
+
   useFrame((_, delta) => {
     if (ref.current) ref.current.rotation.y += delta * 0.05;
   });
 
   return (
     <Float speed={0.6} rotationIntensity={0.08} floatIntensity={0.12}>
+      {/* halo glow — billboard sprite, additive */}
+      {glowTex && (
+        <sprite scale={3.2}>
+          <spriteMaterial
+            map={glowTex}
+            transparent
+            opacity={0.85}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </sprite>
+      )}
+
+      {/* inner bumpy emissive body */}
       <mesh ref={ref}>
-        <sphereGeometry args={[1.2, 192, 192]} />
+        <sphereGeometry args={[1.18, 128, 128]} />
         <MeshDistortMaterial
           color="#d9a574"
-          emissive="#8a5a2a"
-          emissiveIntensity={0.25}
-          roughness={0.08}
-          metalness={0.55}
-          distort={0.5}
-          speed={2.0}
+          emissive="#d9a574"
+          emissiveIntensity={0.7}
+          roughness={0.18}
+          metalness={0.3}
+          distort={0.13}
+          speed={1.0}
         />
       </mesh>
+
+      {/* thin iridescent shell on top — oil-film color over the bumpy core */}
+      <mesh>
+        <sphereGeometry args={[1.22, 64, 64]} />
+        <meshPhysicalMaterial
+          color="#f0c885"
+          transparent
+          opacity={0.28}
+          roughness={0.08}
+          metalness={0}
+          iridescence={1.0}
+          iridescenceIOR={1.4}
+          iridescenceThicknessRange={[200, 800]}
+          clearcoat={1.0}
+          clearcoatRoughness={0.05}
+        />
+      </mesh>
+
       <pointLight color="#f0c885" intensity={4} distance={28} decay={1.5} />
     </Float>
   );
