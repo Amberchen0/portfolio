@@ -395,34 +395,21 @@ function AmberSun() {
         </sprite>
       )}
 
-      {/* inner bumpy emissive body */}
+      {/* bumpy emissive sun body — dropped the iridescent shell that was
+          covering the distortion. distort=0.2 is the sweet spot between
+          "too smooth to see" (0.13) and "looks like liquid" (0.5) — the
+          sphere stays clearly spherical but the surface has a visible,
+          slowly rolling bump pattern. */}
       <mesh ref={ref}>
-        <sphereGeometry args={[1.18, 128, 128]} />
+        <sphereGeometry args={[1.2, 128, 128]} />
         <MeshDistortMaterial
           color="#d9a574"
           emissive="#d9a574"
-          emissiveIntensity={0.7}
-          roughness={0.18}
-          metalness={0.3}
-          distort={0.13}
-          speed={1.0}
-        />
-      </mesh>
-
-      {/* thin iridescent shell on top — oil-film color over the bumpy core */}
-      <mesh>
-        <sphereGeometry args={[1.22, 64, 64]} />
-        <meshPhysicalMaterial
-          color="#f0c885"
-          transparent
-          opacity={0.28}
-          roughness={0.08}
-          metalness={0}
-          iridescence={1.0}
-          iridescenceIOR={1.4}
-          iridescenceThicknessRange={[200, 800]}
-          clearcoat={1.0}
-          clearcoatRoughness={0.05}
+          emissiveIntensity={0.65}
+          roughness={0.2}
+          metalness={0.4}
+          distort={0.2}
+          speed={1.2}
         />
       </mesh>
 
