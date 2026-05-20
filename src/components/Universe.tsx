@@ -338,14 +338,17 @@ function Planet({
   );
 }
 
-/** Central amber sun — a "breathing iridescent" star.
- *  The previous transmission-shell approach was invisible because there
- *  was no scene behind the sun to refract. Switched to MeshDistortMaterial,
- *  which uses perlin-noise vertex displacement on the sphere itself:
- *  the surface visibly rolls, bumps and ripples over time. Combined with
- *  iridescence and clearcoat, it reads as the "alive bumpy glass" from
- *  the reference. Outer halo is now three stacked additive spheres of
- *  decreasing opacity → a soft radial glow instead of a hard ring. */
+/** Central amber sun — aggressive verification pass.
+ *  Previous pass: distort=0.22 was too subtle to read; multi-halo created
+ *  banded concentric rings instead of a soft glow. This commit pushes the
+ *  distortion hard (0.5) so we can confirm the material is actually
+ *  responding, and drops the halo entirely. Once the bumpy body is
+ *  confirmed working we'll dial it back and re-add a proper glow.
+ *
+ *  Note: drei's MeshDistortMaterial extends MeshStandardMaterial, NOT
+ *  Physical — so iridescence/clearcoat are silently ignored. Removed
+ *  them to keep the prop list honest. Iridescence will come back later
+ *  via either a layered shell or post-processing. */
 function AmberSun() {
   const ref = useRef<THREE.Mesh>(null!);
   useFrame((_, delta) => {
@@ -354,64 +357,18 @@ function AmberSun() {
 
   return (
     <Float speed={0.6} rotationIntensity={0.08} floatIntensity={0.12}>
-      {/* Halo layer 1 — close in, denser */}
-      <mesh>
-        <sphereGeometry args={[1.35, 32, 32]} />
-        <meshBasicMaterial
-          color="#f0c885"
-          transparent
-          opacity={0.18}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          toneMapped={false}
-        />
-      </mesh>
-      {/* Halo layer 2 — medium */}
-      <mesh>
-        <sphereGeometry args={[1.7, 32, 32]} />
-        <meshBasicMaterial
-          color="#f0c885"
-          transparent
-          opacity={0.09}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          toneMapped={false}
-        />
-      </mesh>
-      {/* Halo layer 3 — far, softest */}
-      <mesh>
-        <sphereGeometry args={[2.2, 32, 32]} />
-        <meshBasicMaterial
-          color="#f0c885"
-          transparent
-          opacity={0.04}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          toneMapped={false}
-        />
-      </mesh>
-
-      {/* Sun body — perlin-noise vertex displacement gives the "凹凸不平"
-          surface from the reference. iridescence + clearcoat paints the
-          oil-film color the user wants on top of the warm amber emissive. */}
       <mesh ref={ref}>
-        <sphereGeometry args={[1.2, 128, 128]} />
+        <sphereGeometry args={[1.2, 192, 192]} />
         <MeshDistortMaterial
           color="#d9a574"
-          emissive="#a8743a"
-          emissiveIntensity={0.6}
-          roughness={0.18}
-          metalness={0.3}
-          iridescence={1.0}
-          iridescenceIOR={1.3}
-          iridescenceThicknessRange={[300, 900]}
-          clearcoat={1.0}
-          clearcoatRoughness={0.08}
-          distort={0.22}
-          speed={1.2}
+          emissive="#8a5a2a"
+          emissiveIntensity={0.25}
+          roughness={0.08}
+          metalness={0.55}
+          distort={0.5}
+          speed={2.0}
         />
       </mesh>
-
       <pointLight color="#f0c885" intensity={4} distance={28} decay={1.5} />
     </Float>
   );
