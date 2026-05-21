@@ -487,6 +487,8 @@ function AmberSun() {
           clearcoatRoughness={0.18}
           attenuationColor="#fff0d4"
           attenuationDistance={3.0}
+          transparent
+          opacity={0.75}
         />
       </mesh>
       {/* Sun pointLight removed: per spec, the sun does not illuminate
