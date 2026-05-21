@@ -624,14 +624,19 @@ function SceneContent({
 }) {
   return (
     <>
-      <Environment preset="studio" environmentIntensity={0.5} />
+      {/* Environment changed studio → warehouse. Studio HDR contains
+          photographic softboxes which glossy planets were reflecting
+          as bright star-burst specular highlights — the "plastic"
+          look the user flagged. Warehouse is a diffuse interior with
+          no obvious directional sources, so reflections become soft
+          ambient gradients. Intensity also lowered. */}
+      <Environment preset="warehouse" environmentIntensity={0.35} />
 
-      {/* Removed strong warm key light — was creating an obvious
-          directional "plastic" highlight on the iridescent planets.
-          Kept only the subtle cool fill for some shape definition.
-          Ambient bumped to compensate for total scene brightness. */}
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[-6, -2, -4]} intensity={0.25} color="#7ab0e0" />
+      {/* All directional lights removed. Their key-light specular hits
+          on the iridescent glass planets also read as "plastic." With
+          env + ambient only, every planet now picks up soft diffuse
+          lighting from all sides instead of a single hard highlight. */}
+      <ambientLight intensity={0.4} />
 
       <StarField count={1500} />
 
