@@ -456,9 +456,9 @@ function AmberSun() {
   useFrame((state, delta) => {
     if (meshRef.current) meshRef.current.rotation.y -= delta * 0.1;
     if (matRef.current) {
-      // gentle breathing pulse: 0.5..0.7, ~5s period
+      // gentle breathing pulse: 0.6..0.8, ~5s period
       const t = state.clock.elapsedTime;
-      matRef.current.emissiveIntensity = 0.6 + Math.sin(t * 1.2) * 0.1;
+      matRef.current.emissiveIntensity = 0.7 + Math.sin(t * 1.2) * 0.1;
     }
   });
 
@@ -471,7 +471,7 @@ function AmberSun() {
           map={tex}
           emissiveMap={tex}
           emissive="#ffffff"
-          emissiveIntensity={0.6}
+          emissiveIntensity={0.7}
           displacementMap={displacement}
           displacementScale={0.1} /* LOCKED */
           displacementBias={-0.05} /* LOCKED */
