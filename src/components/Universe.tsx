@@ -338,26 +338,29 @@ function Planet({
   );
 }
 
-/** Central amber sun — final art-direction approach.
- *  After many procedural iterations couldn't quite hit the "iridescent
- *  bumpy glass" the user wanted (vertex distort gave liquid blobs at
- *  high amplitude and invisible bumps at low amplitude, no way to
- *  combine with iridescence cleanly), switched to a pre-rendered image
- *  source. The user generated the desired look in an external tool and
- *  saved it to /public/sun.png. We display it as a billboard sprite
- *  with additive blending so:
- *    - Pure-black pixels in the source contribute 0 → they "disappear"
- *      against the starfield/nebula background. No visible square
- *      silhouette around the sun.
- *    - Bright sun + iridescent rim pixels add on top → visible.
- *  Kept the pointLight so the warm amber illumination on the planets
- *  is unchanged. Float keeps the gentle bob in place. */
+/** Central amber sun — pre-rendered image displayed via a rotating
+ *  billboard sprite. The image already carries the bumpy iridescent
+ *  glass look; we add motion by spinning the sprite material's
+ *  `rotation` field each frame so the violet / cyan / magenta
+ *  highlights visibly drift around the centre — that's the "颜色
+ *  flowing + sun self-rotation" the user asked for. Additive blending
+ *  keeps the pure-black source background invisible against the
+ *  starfield. */
 function AmberSun() {
   const tex = useTexture("/sun.png");
+  const matRef = useRef<THREE.SpriteMaterial>(null!);
+  // Spin the sprite material's UV rotation. SpriteMaterial.rotation
+  // rotates the bitmap around the sprite centre in 2D — visually this
+  // reads as the iridescent patches rotating across the sun's face.
+  // ~0.06 rad/s → roughly one full revolution per 100s.
+  useFrame((_, delta) => {
+    if (matRef.current) matRef.current.rotation += delta * 0.06;
+  });
   return (
     <Float speed={0.6} rotationIntensity={0.08} floatIntensity={0.12}>
       <sprite scale={[3.0, 3.0, 1]}>
         <spriteMaterial
+          ref={matRef}
           map={tex}
           transparent
           blending={THREE.AdditiveBlending}
