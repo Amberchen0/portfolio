@@ -669,10 +669,13 @@ function SceneContent({
         cursorInsideRef={cursorInsideRef}
       />
 
-      {/* Global post-processing: nudge saturation +0.2 so colours feel
-          a touch more vivid without re-tinting individual materials. */}
+      {/* Global post-processing chain — currently neutral (saturation
+          set to 0). Was introducing a visible amber-shift on the
+          orbital rings because HueSaturation operates on every final
+          pixel, including the rings. EffectComposer is kept in place
+          so we can add other effects (Bloom, etc.) later. */}
       <EffectComposer>
-        <HueSaturation hue={0} saturation={0.1} />
+        <HueSaturation hue={0} saturation={0} />
       </EffectComposer>
     </>
   );
