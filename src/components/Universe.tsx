@@ -430,19 +430,22 @@ function AmberSun() {
         <sphereGeometry args={[1.2, 256, 256]} />
         <meshPhysicalMaterial
           map={tex}
+          emissiveMap={tex}
+          emissive="#ffffff"
+          emissiveIntensity={0.45}
           displacementMap={displacement}
-          displacementScale={0.08}
-          displacementBias={-0.04}
-          transmission={0.7}
-          thickness={1.5}
+          displacementScale={0.10}
+          displacementBias={-0.05}
+          transmission={0.55}
+          thickness={1.2}
           ior={1.5}
-          roughness={0.1}
+          roughness={0.12}
           metalness={0}
           iridescence={1.0}
           iridescenceIOR={1.3}
           iridescenceThicknessRange={[300, 800]}
           clearcoat={1.0}
-          clearcoatRoughness={0.05}
+          clearcoatRoughness={0.18}
           attenuationColor="#d9a574"
           attenuationDistance={1.5}
         />
@@ -589,7 +592,7 @@ function SceneContent({
 }) {
   return (
     <>
-      <Environment preset="night" environmentIntensity={0.4} />
+      <Environment preset="studio" environmentIntensity={0.4} />
 
       <ambientLight intensity={0.15} />
       <directionalLight position={[5, 8, 5]} intensity={0.6} color="#e8d5a8" />
