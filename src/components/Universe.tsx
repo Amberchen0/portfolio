@@ -7,7 +7,6 @@ import {
   Text,
   Billboard,
   useTexture,
-  Lightformer,
 } from "@react-three/drei";
 import { useRef, useMemo, useState, useEffect } from "react";
 import * as THREE from "three";
@@ -625,25 +624,23 @@ function SceneContent({
 }) {
   return (
     <>
-      {/* All HDR presets carry their own colour tone (warehouse =
-          warm tungsten, studio = cool softbox, etc), which was tinting
-          the iridescent planets and the sun. Replaced the preset with
-          a custom 6-face white Lightformer cube — pure neutral white
-          environment from every direction, zero colour bias. Baked
-          once (frames={1}) so it's cheap. envIntensity at 0.1 per
-          user direction. */}
+      {/* Truly uniform neutral-white environment: a single inside-out
+          white sphere centred at origin. The Environment's cubemap
+          camera sees ONLY this uniform white inner surface in every
+          direction — so reflections on the planets are a smooth
+          continuous white instead of the multiple discrete hotspots
+          the 6-Lightformer setup produced. iridescence still works
+          because it depends on Fresnel angle, not env variation. */}
       <Environment
         background={false}
         frames={1}
-        resolution={128}
+        resolution={64}
         environmentIntensity={0.1}
       >
-        <Lightformer form="rect" intensity={2} color="white" position={[0, 5, 0]} scale={[15, 15, 1]} rotation={[-Math.PI / 2, 0, 0]} />
-        <Lightformer form="rect" intensity={2} color="white" position={[0, -5, 0]} scale={[15, 15, 1]} rotation={[Math.PI / 2, 0, 0]} />
-        <Lightformer form="rect" intensity={2} color="white" position={[5, 0, 0]} scale={[10, 10, 1]} rotation={[0, -Math.PI / 2, 0]} />
-        <Lightformer form="rect" intensity={2} color="white" position={[-5, 0, 0]} scale={[10, 10, 1]} rotation={[0, Math.PI / 2, 0]} />
-        <Lightformer form="rect" intensity={2} color="white" position={[0, 0, 5]} scale={[10, 10, 1]} />
-        <Lightformer form="rect" intensity={2} color="white" position={[0, 0, -5]} scale={[10, 10, 1]} rotation={[0, Math.PI, 0]} />
+        <mesh scale={50}>
+          <sphereGeometry args={[1, 16, 16]} />
+          <meshBasicMaterial color="white" side={THREE.BackSide} />
+        </mesh>
       </Environment>
 
       {/* All directional lights removed. Their key-light specular hits
