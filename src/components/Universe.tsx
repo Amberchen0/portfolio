@@ -338,36 +338,29 @@ function Planet({
   );
 }
 
-/** Central amber sun — pre-rendered image displayed via a rotating
- *  billboard sprite. The image already carries the bumpy iridescent
- *  glass look; we add motion by spinning the sprite material's
- *  `rotation` field each frame so the violet / cyan / magenta
- *  highlights visibly drift around the centre — that's the "颜色
- *  flowing + sun self-rotation" the user asked for. Additive blending
- *  keeps the pure-black source background invisible against the
- *  starfield. */
+/** Central amber sun — real 3D sphere wrapped with an equirectangular
+ *  panorama texture. Rotates around its Y axis in the negative
+ *  direction so surface features visibly move from right to left
+ *  across the visible face — the "globe rotating" feel the user
+ *  asked for (vs the previous 2D sprite-spin which read as a flat
+ *  coin spinning face-up).
+ *  Currently using /sun-pano-1.png. Swap to /sun-pano-2.png to try
+ *  the other panorama. */
 function AmberSun() {
-  const tex = useTexture("/sun.png");
-  const matRef = useRef<THREE.SpriteMaterial>(null!);
-  // Spin the sprite material's UV rotation. SpriteMaterial.rotation
-  // rotates the bitmap around the sprite centre in 2D — visually this
-  // reads as the iridescent patches rotating across the sun's face.
-  // ~0.06 rad/s → roughly one full revolution per 100s.
+  const tex = useTexture("/sun-pano-1.png");
+  const meshRef = useRef<THREE.Mesh>(null!);
+  // Negative Y rotation → in this camera setup features sweep from
+  // the right of the visible face toward the left. ~0.1 rad/s gives
+  // a full revolution every ~63s.
   useFrame((_, delta) => {
-    if (matRef.current) matRef.current.rotation += delta * 0.06;
+    if (meshRef.current) meshRef.current.rotation.y -= delta * 0.1;
   });
   return (
     <Float speed={0.6} rotationIntensity={0.08} floatIntensity={0.12}>
-      <sprite scale={[3.0, 3.0, 1]}>
-        <spriteMaterial
-          ref={matRef}
-          map={tex}
-          transparent
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-          toneMapped={false}
-        />
-      </sprite>
+      <mesh ref={meshRef}>
+        <sphereGeometry args={[1.2, 64, 64]} />
+        <meshBasicMaterial map={tex} toneMapped={false} />
+      </mesh>
       <pointLight color="#f0c885" intensity={4} distance={28} decay={1.5} />
     </Float>
   );
