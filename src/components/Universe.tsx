@@ -672,7 +672,7 @@ function SceneContent({
       {/* Global post-processing: nudge saturation +0.2 so colours feel
           a touch more vivid without re-tinting individual materials. */}
       <EffectComposer>
-        <HueSaturation hue={0} saturation={0.2} />
+        <HueSaturation hue={0} saturation={0.1} />
       </EffectComposer>
     </>
   );
