@@ -419,7 +419,7 @@ function useNoiseDisplacementMap(
  *  Transmission kept lower (0.3) so the amber colour stays
  *  saturated; iridescence handles rim shimmer. */
 function AmberSun() {
-  const tex = useTexture("/sun-pano-2.png");
+  const tex = useTexture("/sun-pano-3.png");
   const meshRef = useRef<THREE.Mesh>(null!);
   const displacement = useNoiseDisplacementMap(512, 28, 4);
 
