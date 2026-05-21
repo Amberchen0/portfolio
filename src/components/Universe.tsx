@@ -418,7 +418,7 @@ function useNoiseDisplacementMap(
 function AmberSun() {
   const tex = useTexture("/sun-pano-2.png");
   const meshRef = useRef<THREE.Mesh>(null!);
-  const displacement = useNoiseDisplacementMap(512, 14, 4);
+  const displacement = useNoiseDisplacementMap(512, 28, 4);
 
   useFrame((_, delta) => {
     if (meshRef.current) meshRef.current.rotation.y -= delta * 0.1;
