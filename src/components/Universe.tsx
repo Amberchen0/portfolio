@@ -52,7 +52,7 @@ type Planet = {
 const ORBIT_SPEED = Math.PI / 30;
 const PLANETS: Planet[] = [
   // ── real works ──
-  { slug: "model",     name: "Model",           color: "#8b4513", iridescenceColor: "#f29a4a",
+  { slug: "model",     name: "L'HEURE VIOLETTE", color: "#8b4513", iridescenceColor: "#f29a4a",
     size: 1.00, orbitRadius: 4.6, angle: Math.PI / 2,                          orbitSpeed: ORBIT_SPEED, orbitTilt: [0.22, -0.10] },
   { slug: "nemo",      name: "Nemo",            color: "#1a6b8e", iridescenceColor: "#3dd5b0",
     size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.30, 0.12] },
