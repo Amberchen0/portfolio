@@ -6,7 +6,7 @@ import {
   Float,
   Text,
   Billboard,
-  MeshDistortMaterial,
+  useTexture,
 } from "@react-three/drei";
 import { useRef, useMemo, useState, useEffect } from "react";
 import * as THREE from "three";
@@ -338,88 +338,33 @@ function Planet({
   );
 }
 
-/** Central amber sun — final composition after verification.
- *  Confirmed MeshDistortMaterial works (distort=0.5 made the sphere a
- *  visible blob). Now dialed back into three coordinated layers:
- *
- *  1. Sprite halo with a procedurally generated radial-gradient canvas
- *     texture → a real soft glow that fades from center to edge,
- *     replacing the banded multi-sphere approach.
- *  2. Inner sun body: MeshDistortMaterial with subtle distort (0.13)
- *     keeps the sphere recognizably round but gives the surface the
- *     "alive, bumpy" quality from the reference. emissive at 0.7 makes
- *     it self-luminous as a star.
- *  3. Outer iridescent shell at 1.22 (just outside the 1.18 body):
- *     MeshPhysicalMaterial with iridescence + clearcoat, low opacity
- *     so the bumpy core shows through, giving the oil-film color over
- *     the wavy surface — the "iridescent glass" the user described. */
+/** Central amber sun — final art-direction approach.
+ *  After many procedural iterations couldn't quite hit the "iridescent
+ *  bumpy glass" the user wanted (vertex distort gave liquid blobs at
+ *  high amplitude and invisible bumps at low amplitude, no way to
+ *  combine with iridescence cleanly), switched to a pre-rendered image
+ *  source. The user generated the desired look in an external tool and
+ *  saved it to /public/sun.png. We display it as a billboard sprite
+ *  with additive blending so:
+ *    - Pure-black pixels in the source contribute 0 → they "disappear"
+ *      against the starfield/nebula background. No visible square
+ *      silhouette around the sun.
+ *    - Bright sun + iridescent rim pixels add on top → visible.
+ *  Kept the pointLight so the warm amber illumination on the planets
+ *  is unchanged. Float keeps the gentle bob in place. */
 function AmberSun() {
-  const ref = useRef<THREE.Mesh>(null!);
-
-  // canvas-generated radial gradient → soft alpha falloff, used as a
-  // sprite for the glow halo. memoized so it builds once.
-  const glowTex = useMemo<THREE.CanvasTexture | null>(() => {
-    if (typeof document === "undefined") return null;
-    const canvas = document.createElement("canvas");
-    canvas.width = 256;
-    canvas.height = 256;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return null;
-    const grad = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
-    grad.addColorStop(0.0, "rgba(240,200,133,1)");
-    grad.addColorStop(0.2, "rgba(240,200,133,0.5)");
-    grad.addColorStop(0.55, "rgba(240,200,133,0.12)");
-    grad.addColorStop(1.0, "rgba(240,200,133,0)");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 256, 256);
-    return new THREE.CanvasTexture(canvas);
-  }, []);
-
-  useFrame((_, delta) => {
-    if (ref.current) ref.current.rotation.y += delta * 0.05;
-  });
-
+  const tex = useTexture("/sun.png");
   return (
     <Float speed={0.6} rotationIntensity={0.08} floatIntensity={0.12}>
-      {/* halo glow — billboard sprite, additive */}
-      {glowTex && (
-        <sprite scale={3.2}>
-          <spriteMaterial
-            map={glowTex}
-            transparent
-            opacity={0.85}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            toneMapped={false}
-          />
-        </sprite>
-      )}
-
-      {/* bumpy sun body. Two coupled tweaks vs the previous pass:
-          - distort 0.20 → 0.32, so the bumps are unmistakable instead
-            of microscopic.
-          - emissiveIntensity 0.65 → 0.35, so the surface is mostly lit
-            BY the pointLight + env rather than self-luminous. Self-
-            luminous shading washes out the geometric bumps (everything
-            gets the same brightness regardless of normal direction).
-            Lower emissive lets light-and-shadow ride the displaced
-            normals → bumps actually read as bumps.
-          - metalness 0.40 → 0.70 + roughness 0.20 → 0.12, so the
-            specular highlights track tightly over the bumps, giving
-            the visible "rolling chrome droplet of amber" look. */}
-      <mesh ref={ref}>
-        <sphereGeometry args={[1.2, 128, 128]} />
-        <MeshDistortMaterial
-          color="#d9a574"
-          emissive="#b8843f"
-          emissiveIntensity={0.35}
-          roughness={0.12}
-          metalness={0.7}
-          distort={0.32}
-          speed={1.4}
+      <sprite scale={[3.0, 3.0, 1]}>
+        <spriteMaterial
+          map={tex}
+          transparent
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          toneMapped={false}
         />
-      </mesh>
-
+      </sprite>
       <pointLight color="#f0c885" intensity={4} distance={28} decay={1.5} />
     </Float>
   );
