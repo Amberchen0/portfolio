@@ -93,11 +93,10 @@ const PLANETS: Planet[] = [
  *  Used to visualize the orbit, like in the reference solar-system diagram. */
 function OrbitRing({
   radius,
-  // default opacity lowered to compensate for the global
-  // toneMappingExposure=1.4 — the renderer brightens every pixel by
-  // 40%, so the ring at original 0.16 looked too solid. 0.11 × 1.4
-  // ≈ 0.16 in the final image, matching the original visual weight.
-  opacity = 0.11,
+  // default opacity lowered further per user — rings should be very
+  // faint, almost ghosted, not the prominent gold lines the previous
+  // setting produced.
+  opacity = 0.06,
   segments = 196,
 }: {
   radius: number;
@@ -206,7 +205,7 @@ function MoonSystem({
 
   return (
     <group rotation={[moon.orbitTilt[0], 0, moon.orbitTilt[1]]}>
-      <OrbitRing radius={moon.orbitRadius} opacity={0.085} segments={96} />
+      <OrbitRing radius={moon.orbitRadius} opacity={0.05} segments={96} />
       <group ref={orbitRef}>
         <group position={[moon.orbitRadius, 0, 0]}>
           <mesh
