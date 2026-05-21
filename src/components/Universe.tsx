@@ -408,20 +408,50 @@ function useNoiseDisplacementMap(
   }, [size, frequency, octaves]);
 }
 
-/** Central amber sun — pure PBR glass per user direction:
- *  "just do normal physical glass". Clean albedo texture only (no
- *  emissive — real glass doesn't self-glow), high transmission, real
- *  ior 1.5, full iridescence so the violet/cyan oil-film rim appears
- *  naturally from grazing-angle interference, clearcoat for the
- *  glossy outer shell. Bumpy displacement preserved so the
- *  silhouette stays crystalline. */
+/** Central sun — locked spec per user direction (DO NOT drift from this):
+ *
+ *  Identity:
+ *    A micro-sun, but artistically interpreted as a softly glowing
+ *    crystalline glass orb (the "lit gemstone"). NOT photoreal solar
+ *    plasma. Brightness is gentle — you should still clearly see the
+ *    bumpy surface; never blinding.
+ *
+ *  Center-glow:
+ *    Solved at the TEXTURE layer (the panorama paints bright/dark
+ *    facets to fake interior light). Do NOT add code-side inner
+ *    spheres or fancy "core glow" shaders — the texture is doing it.
+ *
+ *  Displacement (LOCKED — do not edit without explicit user instruction):
+ *    frequency 28, scale 0.10, bias -0.05, octaves 4. The bumpy
+ *    silhouette is at the level the user signed off on; further
+ *    tweaks are off-limits unless asked for.
+ *
+ *  Pulse:
+ *    Emissive intensity breathes ~0.35 → 0.55 with a slow rhythm
+ *    (period ~5s) so the orb feels alive.
+ *
+ *  Scene role:
+ *    Visual-only emission. Does NOT cast light on the 9 planets
+ *    (they're lit independently). The pointLight is therefore
+ *    removed from this component.
+ *
+ *  Iridescence:
+ *    Kept at 1.0 so future nebula light will naturally tint the
+ *    rim with the cosmic colour palette. */
 function AmberSun() {
   const tex = useTexture("/sun-pano-3.png");
   const meshRef = useRef<THREE.Mesh>(null!);
+  const matRef = useRef<THREE.MeshPhysicalMaterial>(null!);
+  // LOCKED — do not change these three numbers without explicit ask.
   const displacement = useNoiseDisplacementMap(512, 28, 4);
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     if (meshRef.current) meshRef.current.rotation.y -= delta * 0.1;
+    if (matRef.current) {
+      // gentle breathing pulse: 0.35..0.55, ~5s period
+      const t = state.clock.elapsedTime;
+      matRef.current.emissiveIntensity = 0.45 + Math.sin(t * 1.2) * 0.1;
+    }
   });
 
   return (
@@ -429,13 +459,14 @@ function AmberSun() {
       <mesh ref={meshRef}>
         <sphereGeometry args={[1.2, 256, 256]} />
         <meshPhysicalMaterial
+          ref={matRef}
           map={tex}
           emissiveMap={tex}
           emissive="#ffffff"
           emissiveIntensity={0.45}
           displacementMap={displacement}
-          displacementScale={0.10}
-          displacementBias={-0.05}
+          displacementScale={0.1} /* LOCKED */
+          displacementBias={-0.05} /* LOCKED */
           transmission={0.55}
           thickness={1.2}
           ior={1.5}
@@ -450,7 +481,8 @@ function AmberSun() {
           attenuationDistance={1.5}
         />
       </mesh>
-      <pointLight color="#f0c885" intensity={4} distance={28} decay={1.5} />
+      {/* Sun pointLight removed: per spec, the sun does not illuminate
+          the 9 planets. Planet lighting is independent. */}
     </Float>
   );
 }
@@ -592,11 +624,14 @@ function SceneContent({
 }) {
   return (
     <>
-      <Environment preset="studio" environmentIntensity={0.4} />
+      <Environment preset="studio" environmentIntensity={0.5} />
 
-      <ambientLight intensity={0.15} />
-      <directionalLight position={[5, 8, 5]} intensity={0.6} color="#e8d5a8" />
-      <directionalLight position={[-6, -2, -4]} intensity={0.3} color="#7ab0e0" />
+      {/* Removed strong warm key light — was creating an obvious
+          directional "plastic" highlight on the iridescent planets.
+          Kept only the subtle cool fill for some shape definition.
+          Ambient bumped to compensate for total scene brightness. */}
+      <ambientLight intensity={0.35} />
+      <directionalLight position={[-6, -2, -4]} intensity={0.25} color="#7ab0e0" />
 
       <StarField count={1500} />
 
