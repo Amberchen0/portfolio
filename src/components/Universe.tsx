@@ -237,6 +237,8 @@ function MoonSystem({
               attenuationColor={moon.iridescenceColor}
               attenuationDistance={2.0}
               envMapIntensity={1.4}
+              transparent
+              opacity={0.55}
             />
           </mesh>
           <PlanetLabel
@@ -316,6 +318,8 @@ function Planet({
                 attenuationColor={planet.iridescenceColor}
                 attenuationDistance={2.5}
                 envMapIntensity={1.4}
+                transparent
+                opacity={0.55}
               />
             </mesh>
           </group>
