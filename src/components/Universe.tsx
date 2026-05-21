@@ -7,6 +7,7 @@ import {
   Text,
   Billboard,
   useTexture,
+  Lightformer,
 } from "@react-three/drei";
 import { useRef, useMemo, useState, useEffect } from "react";
 import * as THREE from "three";
@@ -624,13 +625,26 @@ function SceneContent({
 }) {
   return (
     <>
-      {/* Environment changed studio → warehouse. Studio HDR contains
-          photographic softboxes which glossy planets were reflecting
-          as bright star-burst specular highlights — the "plastic"
-          look the user flagged. Warehouse is a diffuse interior with
-          no obvious directional sources, so reflections become soft
-          ambient gradients. Intensity also lowered. */}
-      <Environment preset="warehouse" environmentIntensity={0.2} />
+      {/* All HDR presets carry their own colour tone (warehouse =
+          warm tungsten, studio = cool softbox, etc), which was tinting
+          the iridescent planets and the sun. Replaced the preset with
+          a custom 6-face white Lightformer cube — pure neutral white
+          environment from every direction, zero colour bias. Baked
+          once (frames={1}) so it's cheap. envIntensity at 0.1 per
+          user direction. */}
+      <Environment
+        background={false}
+        frames={1}
+        resolution={128}
+        environmentIntensity={0.1}
+      >
+        <Lightformer form="rect" intensity={2} color="white" position={[0, 5, 0]} scale={[15, 15, 1]} rotation={[-Math.PI / 2, 0, 0]} />
+        <Lightformer form="rect" intensity={2} color="white" position={[0, -5, 0]} scale={[15, 15, 1]} rotation={[Math.PI / 2, 0, 0]} />
+        <Lightformer form="rect" intensity={2} color="white" position={[5, 0, 0]} scale={[10, 10, 1]} rotation={[0, -Math.PI / 2, 0]} />
+        <Lightformer form="rect" intensity={2} color="white" position={[-5, 0, 0]} scale={[10, 10, 1]} rotation={[0, Math.PI / 2, 0]} />
+        <Lightformer form="rect" intensity={2} color="white" position={[0, 0, 5]} scale={[10, 10, 1]} />
+        <Lightformer form="rect" intensity={2} color="white" position={[0, 0, -5]} scale={[10, 10, 1]} rotation={[0, Math.PI, 0]} />
+      </Environment>
 
       {/* All directional lights removed. Their key-light specular hits
           on the iridescent glass planets also read as "plastic." With
