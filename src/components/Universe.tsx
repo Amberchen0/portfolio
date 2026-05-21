@@ -233,7 +233,7 @@ function MoonSystem({
               iridescenceIOR={1.3}
               iridescenceThicknessRange={[100, 800]}
               clearcoat={1.0}
-              clearcoatRoughness={0.08}
+              clearcoatRoughness={0.3}
               attenuationColor={moon.iridescenceColor}
               attenuationDistance={2.0}
               envMapIntensity={1.4}
@@ -312,7 +312,7 @@ function Planet({
                 iridescenceIOR={1.3}
                 iridescenceThicknessRange={[100, 800]}
                 clearcoat={1.0}
-                clearcoatRoughness={0.08}
+                clearcoatRoughness={0.3}
                 attenuationColor={planet.iridescenceColor}
                 attenuationDistance={2.5}
                 envMapIntensity={1.4}
@@ -630,7 +630,7 @@ function SceneContent({
           look the user flagged. Warehouse is a diffuse interior with
           no obvious directional sources, so reflections become soft
           ambient gradients. Intensity also lowered. */}
-      <Environment preset="warehouse" environmentIntensity={0.35} />
+      <Environment preset="warehouse" environmentIntensity={0.2} />
 
       {/* All directional lights removed. Their key-light specular hits
           on the iridescent glass planets also read as "plastic." With
