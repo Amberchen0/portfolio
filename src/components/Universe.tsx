@@ -8,6 +8,7 @@ import {
   Billboard,
   useTexture,
 } from "@react-three/drei";
+import { EffectComposer, HueSaturation } from "@react-three/postprocessing";
 import { useRef, useMemo, useState, useEffect } from "react";
 import * as THREE from "three";
 
@@ -667,6 +668,12 @@ function SceneContent({
         onPlanetClick={onPlanetClick}
         cursorInsideRef={cursorInsideRef}
       />
+
+      {/* Global post-processing: nudge saturation +0.2 so colours feel
+          a touch more vivid without re-tinting individual materials. */}
+      <EffectComposer>
+        <HueSaturation hue={0} saturation={0.2} />
+      </EffectComposer>
     </>
   );
 }
@@ -723,7 +730,7 @@ export default function Universe() {
           // mesh's final colour, so it brightens the sun + all 9
           // planets + moon together without touching their individual
           // material props. Default is 1.0; 1.5 = 50% brighter overall.
-          gl.toneMappingExposure = 1.5;
+          gl.toneMappingExposure = 1.4;
         }}
       >
         <color attach="background" args={["#0a0807"]} />
