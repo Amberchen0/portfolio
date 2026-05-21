@@ -347,7 +347,7 @@ function Planet({
  *  Currently using /sun-pano-1.png. Swap to /sun-pano-2.png to try
  *  the other panorama. */
 function AmberSun() {
-  const tex = useTexture("/sun-pano-1.png");
+  const tex = useTexture("/sun-pano-2.png");
   const meshRef = useRef<THREE.Mesh>(null!);
   // Negative Y rotation → in this camera setup features sweep from
   // the right of the visible face toward the left. ~0.1 rad/s gives
