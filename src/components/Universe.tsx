@@ -475,7 +475,7 @@ function AmberSun() {
           displacementMap={displacement}
           displacementScale={0.1} /* LOCKED */
           displacementBias={-0.05} /* LOCKED */
-          transmission={0.55}
+          transmission={0.3}
           thickness={1.2}
           ior={1.5}
           roughness={0.12}
