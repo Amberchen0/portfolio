@@ -395,21 +395,28 @@ function AmberSun() {
         </sprite>
       )}
 
-      {/* bumpy emissive sun body — dropped the iridescent shell that was
-          covering the distortion. distort=0.2 is the sweet spot between
-          "too smooth to see" (0.13) and "looks like liquid" (0.5) — the
-          sphere stays clearly spherical but the surface has a visible,
-          slowly rolling bump pattern. */}
+      {/* bumpy sun body. Two coupled tweaks vs the previous pass:
+          - distort 0.20 → 0.32, so the bumps are unmistakable instead
+            of microscopic.
+          - emissiveIntensity 0.65 → 0.35, so the surface is mostly lit
+            BY the pointLight + env rather than self-luminous. Self-
+            luminous shading washes out the geometric bumps (everything
+            gets the same brightness regardless of normal direction).
+            Lower emissive lets light-and-shadow ride the displaced
+            normals → bumps actually read as bumps.
+          - metalness 0.40 → 0.70 + roughness 0.20 → 0.12, so the
+            specular highlights track tightly over the bumps, giving
+            the visible "rolling chrome droplet of amber" look. */}
       <mesh ref={ref}>
         <sphereGeometry args={[1.2, 128, 128]} />
         <MeshDistortMaterial
           color="#d9a574"
-          emissive="#d9a574"
-          emissiveIntensity={0.65}
-          roughness={0.2}
-          metalness={0.4}
-          distort={0.2}
-          speed={1.2}
+          emissive="#b8843f"
+          emissiveIntensity={0.35}
+          roughness={0.12}
+          metalness={0.7}
+          distort={0.32}
+          speed={1.4}
         />
       </mesh>
 
