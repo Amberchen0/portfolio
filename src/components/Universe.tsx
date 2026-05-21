@@ -408,16 +408,13 @@ function useNoiseDisplacementMap(
   }, [size, frequency, octaves]);
 }
 
-/** Central amber sun — single bumpy glass sphere, lit-from-within
- *  via emissiveMap. The previous "outer shell + inner emissive
- *  sphere" architecture failed because the inner sphere read as a
- *  visibly separate object floating inside, not as "glass lit from
- *  within". Reverting to a single mesh: the clean amber texture
- *  goes to BOTH `map` (surface colour) and `emissiveMap` (self-
- *  light), so the entire glass body glows like a lantern wall —
- *  warm where the amber is bright, darker where it's dim.
- *  Transmission kept lower (0.3) so the amber colour stays
- *  saturated; iridescence handles rim shimmer. */
+/** Central amber sun — pure PBR glass per user direction:
+ *  "just do normal physical glass". Clean albedo texture only (no
+ *  emissive — real glass doesn't self-glow), high transmission, real
+ *  ior 1.5, full iridescence so the violet/cyan oil-film rim appears
+ *  naturally from grazing-angle interference, clearcoat for the
+ *  glossy outer shell. Bumpy displacement preserved so the
+ *  silhouette stays crystalline. */
 function AmberSun() {
   const tex = useTexture("/sun-pano-3.png");
   const meshRef = useRef<THREE.Mesh>(null!);
@@ -433,22 +430,21 @@ function AmberSun() {
         <sphereGeometry args={[1.2, 256, 256]} />
         <meshPhysicalMaterial
           map={tex}
-          emissiveMap={tex}
-          emissive="#ffffff"
-          emissiveIntensity={1.0}
           displacementMap={displacement}
           displacementScale={0.08}
           displacementBias={-0.04}
-          transmission={0.3}
-          thickness={0.8}
+          transmission={0.7}
+          thickness={1.5}
           ior={1.5}
-          roughness={0.18}
+          roughness={0.1}
           metalness={0}
-          iridescence={0.7}
-          iridescenceIOR={1.4}
+          iridescence={1.0}
+          iridescenceIOR={1.3}
           iridescenceThicknessRange={[300, 800]}
           clearcoat={1.0}
           clearcoatRoughness={0.05}
+          attenuationColor="#d9a574"
+          attenuationDistance={1.5}
         />
       </mesh>
       <pointLight color="#f0c885" intensity={4} distance={28} decay={1.5} />
