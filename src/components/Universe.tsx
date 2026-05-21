@@ -717,8 +717,13 @@ export default function Universe() {
           powerPreference: "high-performance",
         }}
         dpr={[1, 2]}
-        onCreated={({ camera }) => {
+        onCreated={({ camera, gl }) => {
           camera.lookAt(0, 0, 0);
+          // Global brightness multiplier — applies uniformly to every
+          // mesh's final colour, so it brightens the sun + all 9
+          // planets + moon together without touching their individual
+          // material props. Default is 1.0; 1.5 = 50% brighter overall.
+          gl.toneMappingExposure = 1.5;
         }}
       >
         <color attach="background" args={["#0a0807"]} />
