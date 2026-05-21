@@ -1,7 +1,13 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, Float, Text, Billboard } from "@react-three/drei";
+import {
+  Environment,
+  Float,
+  Text,
+  Billboard,
+  useTexture,
+} from "@react-three/drei";
 import { useRef, useMemo, useState, useEffect } from "react";
 import * as THREE from "three";
 
@@ -402,62 +408,46 @@ function useNoiseDisplacementMap(
   }, [size, frequency, octaves]);
 }
 
-/** Central amber sun — three-layer "lantern" build:
- *    1. Inner emissive plasma core (~0.45r) — the actual light, sits
- *       at the centre so the glow truly radiates centre→edge.
- *    2. Outer transparent glass shell (~1.20r) with REAL geometric
- *       bumpiness via a procedural grayscale noise displacement map.
- *       Because vertices are physically displaced, the silhouette is
- *       also irregular (not a perfect circle) — fixing the "perfect
- *       outline" problem.
- *       Material: meshPhysicalMaterial with transmission (true glass
- *       see-through), iridescence (oil-film rim colours computed
- *       in real time from incident light, not baked into a texture),
- *       clearcoat (glossy outer surface).
- *    3. Outer halo sprite is dropped — the inner core + transmission
- *       gives enough "lit lantern" feel on its own.
- *  Rotates -Y so the bumps drift right→left. */
+/** Central amber sun — single bumpy glass sphere wrapping the GPT
+ *  amber pano texture. The texture goes into BOTH `map` (surface
+ *  colour) AND `emissiveMap` (self-light) so the iridescent bright
+ *  spots in the source image actually glow rather than getting
+ *  bleached out by the transmission. transmission gives the
+ *  see-through glass feel, displacement gives the bumpy silhouette,
+ *  iridescence adds extra rim shimmer on top. */
 function AmberSun() {
-  const shellRef = useRef<THREE.Mesh>(null!);
+  const tex = useTexture("/sun-pano-2.png");
+  const meshRef = useRef<THREE.Mesh>(null!);
   const displacement = useNoiseDisplacementMap(512, 8, 4);
 
   useFrame((_, delta) => {
-    if (shellRef.current) shellRef.current.rotation.y -= delta * 0.1;
+    if (meshRef.current) meshRef.current.rotation.y -= delta * 0.1;
   });
 
   return (
     <Float speed={0.6} rotationIntensity={0.08} floatIntensity={0.12}>
-      {/* 1 — bright emissive core */}
-      <mesh>
-        <sphereGeometry args={[0.45, 32, 32]} />
-        <meshBasicMaterial color="#fff4cc" toneMapped={false} />
-      </mesh>
-
-      {/* 2 — bumpy transparent glass shell */}
-      <mesh ref={shellRef}>
+      <mesh ref={meshRef}>
         <sphereGeometry args={[1.2, 256, 256]} />
         <meshPhysicalMaterial
-          color="#d9a574"
-          transmission={0.9}
-          thickness={1.6}
-          ior={1.5}
-          roughness={0.12}
-          metalness={0}
-          iridescence={1.0}
-          iridescenceIOR={1.4}
-          iridescenceThicknessRange={[200, 800]}
-          clearcoat={1.0}
-          clearcoatRoughness={0.05}
-          attenuationColor="#f0c885"
-          attenuationDistance={2.0}
-          emissive="#b8843f"
-          emissiveIntensity={0.15}
+          map={tex}
+          emissiveMap={tex}
+          emissive="#ffffff"
+          emissiveIntensity={1.0}
           displacementMap={displacement}
           displacementScale={0.16}
           displacementBias={-0.08}
+          transmission={0.45}
+          thickness={1.0}
+          ior={1.5}
+          roughness={0.15}
+          metalness={0}
+          iridescence={0.6}
+          iridescenceIOR={1.4}
+          iridescenceThicknessRange={[300, 800]}
+          clearcoat={1.0}
+          clearcoatRoughness={0.05}
         />
       </mesh>
-
       <pointLight color="#f0c885" intensity={4} distance={28} decay={1.5} />
     </Float>
   );
