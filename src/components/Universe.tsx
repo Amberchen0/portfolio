@@ -408,13 +408,12 @@ function useNoiseDisplacementMap(
   }, [size, frequency, octaves]);
 }
 
-/** Central amber sun — single bumpy glass sphere wrapping the GPT
- *  amber pano texture. The texture goes into BOTH `map` (surface
- *  colour) AND `emissiveMap` (self-light) so the iridescent bright
- *  spots in the source image actually glow rather than getting
- *  bleached out by the transmission. transmission gives the
- *  see-through glass feel, displacement gives the bumpy silhouette,
- *  iridescence adds extra rim shimmer on top. */
+/** Central amber sun — final architecture: a clean amber texture
+ *  (no baked lighting) wraps an outer bumpy GLASS shell; a small
+ *  bright EMISSIVE core sits inside the shell so the glass appears
+ *  lit from its centre. Now that the texture is just albedo, all
+ *  lighting effects come from real material properties + the inner
+ *  core, not from painted-in highlights. */
 function AmberSun() {
   const tex = useTexture("/sun-pano-2.png");
   const meshRef = useRef<THREE.Mesh>(null!);
@@ -426,28 +425,45 @@ function AmberSun() {
 
   return (
     <Float speed={0.6} rotationIntensity={0.08} floatIntensity={0.12}>
+      {/* Inner light source — small bright emissive sphere at the
+          sun's centre, visible through the (partially transparent)
+          outer glass shell. This is what gives "lit from within". */}
+      <mesh>
+        <sphereGeometry args={[0.42, 48, 48]} />
+        <meshBasicMaterial color="#fff5d6" toneMapped={false} />
+      </mesh>
+
+      {/* Outer bumpy glass shell — clean albedo texture + glass
+          material props. Transmission high enough that the inner
+          core shows through; iridescence and clearcoat compute the
+          rim colour from scene lighting (not baked into the image). */}
       <mesh ref={meshRef}>
         <sphereGeometry args={[1.2, 256, 256]} />
         <meshPhysicalMaterial
           map={tex}
-          emissiveMap={tex}
-          emissive="#ffffff"
-          emissiveIntensity={1.0}
           displacementMap={displacement}
           displacementScale={0.08}
           displacementBias={-0.04}
-          transmission={0.45}
+          transmission={0.65}
           thickness={1.0}
           ior={1.5}
           roughness={0.15}
           metalness={0}
-          iridescence={0.6}
+          iridescence={0.8}
           iridescenceIOR={1.4}
           iridescenceThicknessRange={[300, 800]}
           clearcoat={1.0}
           clearcoatRoughness={0.05}
+          attenuationColor="#d9a574"
+          attenuationDistance={2.0}
         />
       </mesh>
+
+      {/* Strong inner point light so the glass shell itself shows
+          a luminous core; range limited so it doesn't over-illuminate
+          the planets (those are still lit by the outer warm
+          pointLight below). */}
+      <pointLight color="#fff5d6" intensity={3} distance={2.5} decay={1.5} />
       <pointLight color="#f0c885" intensity={4} distance={28} decay={1.5} />
     </Float>
   );
