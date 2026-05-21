@@ -1,13 +1,7 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import {
-  Environment,
-  Float,
-  Text,
-  Billboard,
-  useTexture,
-} from "@react-three/drei";
+import { Environment, Float, Text, Billboard } from "@react-three/drei";
 import { useRef, useMemo, useState, useEffect } from "react";
 import * as THREE from "three";
 
@@ -338,29 +332,132 @@ function Planet({
   );
 }
 
-/** Central amber sun — real 3D sphere wrapped with an equirectangular
- *  panorama texture. Rotates around its Y axis in the negative
- *  direction so surface features visibly move from right to left
- *  across the visible face — the "globe rotating" feel the user
- *  asked for (vs the previous 2D sprite-spin which read as a flat
- *  coin spinning face-up).
- *  Currently using /sun-pano-1.png. Swap to /sun-pano-2.png to try
- *  the other panorama. */
+/** Procedural grayscale value-noise texture, used as a displacement
+ *  map. Sums multiple octaves of hash-noise on a canvas, normalises
+ *  to 0..255, returns a CanvasTexture. Cached via useMemo so it
+ *  builds once per mount. */
+function useNoiseDisplacementMap(
+  size = 512,
+  frequency = 6,
+  octaves = 4
+): THREE.CanvasTexture | null {
+  return useMemo(() => {
+    if (typeof document === "undefined") return null;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    const img = ctx.createImageData(size, size);
+
+    // Tiny seeded hash for repeatable noise across reloads.
+    const hash = (x: number, y: number) => {
+      const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+      return n - Math.floor(n);
+    };
+    const smooth = (t: number) => t * t * (3 - 2 * t);
+    const valueNoise = (x: number, y: number) => {
+      const xi = Math.floor(x);
+      const yi = Math.floor(y);
+      const xf = x - xi;
+      const yf = y - yi;
+      const u = smooth(xf);
+      const v = smooth(yf);
+      const a = hash(xi, yi);
+      const b = hash(xi + 1, yi);
+      const c = hash(xi, yi + 1);
+      const d = hash(xi + 1, yi + 1);
+      return (
+        a * (1 - u) * (1 - v) +
+        b * u * (1 - v) +
+        c * (1 - u) * v +
+        d * u * v
+      );
+    };
+
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const u = (x / size) * frequency;
+        const v = (y / size) * frequency;
+        let amp = 0.5;
+        let freq = 1;
+        let total = 0;
+        for (let o = 0; o < octaves; o++) {
+          total += valueNoise(u * freq, v * freq) * amp;
+          freq *= 2;
+          amp *= 0.5;
+        }
+        const g = Math.max(0, Math.min(255, Math.floor(total * 255)));
+        const idx = (y * size + x) * 4;
+        img.data[idx] = g;
+        img.data[idx + 1] = g;
+        img.data[idx + 2] = g;
+        img.data[idx + 3] = 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    const t = new THREE.CanvasTexture(canvas);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    return t;
+  }, [size, frequency, octaves]);
+}
+
+/** Central amber sun — three-layer "lantern" build:
+ *    1. Inner emissive plasma core (~0.45r) — the actual light, sits
+ *       at the centre so the glow truly radiates centre→edge.
+ *    2. Outer transparent glass shell (~1.20r) with REAL geometric
+ *       bumpiness via a procedural grayscale noise displacement map.
+ *       Because vertices are physically displaced, the silhouette is
+ *       also irregular (not a perfect circle) — fixing the "perfect
+ *       outline" problem.
+ *       Material: meshPhysicalMaterial with transmission (true glass
+ *       see-through), iridescence (oil-film rim colours computed
+ *       in real time from incident light, not baked into a texture),
+ *       clearcoat (glossy outer surface).
+ *    3. Outer halo sprite is dropped — the inner core + transmission
+ *       gives enough "lit lantern" feel on its own.
+ *  Rotates -Y so the bumps drift right→left. */
 function AmberSun() {
-  const tex = useTexture("/sun-pano-2.png");
-  const meshRef = useRef<THREE.Mesh>(null!);
-  // Negative Y rotation → in this camera setup features sweep from
-  // the right of the visible face toward the left. ~0.1 rad/s gives
-  // a full revolution every ~63s.
+  const shellRef = useRef<THREE.Mesh>(null!);
+  const displacement = useNoiseDisplacementMap(512, 8, 4);
+
   useFrame((_, delta) => {
-    if (meshRef.current) meshRef.current.rotation.y -= delta * 0.1;
+    if (shellRef.current) shellRef.current.rotation.y -= delta * 0.1;
   });
+
   return (
     <Float speed={0.6} rotationIntensity={0.08} floatIntensity={0.12}>
-      <mesh ref={meshRef}>
-        <sphereGeometry args={[1.2, 64, 64]} />
-        <meshBasicMaterial map={tex} toneMapped={false} />
+      {/* 1 — bright emissive core */}
+      <mesh>
+        <sphereGeometry args={[0.45, 32, 32]} />
+        <meshBasicMaterial color="#fff4cc" toneMapped={false} />
       </mesh>
+
+      {/* 2 — bumpy transparent glass shell */}
+      <mesh ref={shellRef}>
+        <sphereGeometry args={[1.2, 256, 256]} />
+        <meshPhysicalMaterial
+          color="#d9a574"
+          transmission={0.9}
+          thickness={1.6}
+          ior={1.5}
+          roughness={0.12}
+          metalness={0}
+          iridescence={1.0}
+          iridescenceIOR={1.4}
+          iridescenceThicknessRange={[200, 800]}
+          clearcoat={1.0}
+          clearcoatRoughness={0.05}
+          attenuationColor="#f0c885"
+          attenuationDistance={2.0}
+          emissive="#b8843f"
+          emissiveIntensity={0.15}
+          displacementMap={displacement}
+          displacementScale={0.16}
+          displacementBias={-0.08}
+        />
+      </mesh>
+
       <pointLight color="#f0c885" intensity={4} distance={28} decay={1.5} />
     </Float>
   );
