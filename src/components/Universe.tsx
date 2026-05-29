@@ -2703,6 +2703,14 @@ function SceneContent({
    *  dpr is handled at the Canvas level, not here. */
   lowQuality?: boolean;
 }) {
+  // Keep tone-mapping exposure in sync with viewport size — onCreated
+  // only fires once, so a phone rotation (mobile↔landscape changing the
+  // matchMedia result) wouldn't update the brightness without this.
+  const { gl } = useThree();
+  useEffect(() => {
+    gl.toneMappingExposure = lowQuality ? 1.0 : 1.4;
+  }, [lowQuality, gl]);
+
   return (
     <>
       {/* Truly uniform neutral-white environment: a single inside-out
@@ -4167,29 +4175,28 @@ function SceneContent({
             cores bleed into a halo; darker matte stuff stays matte. Tune
             `intensity` if too soft / too hot. mipmapBlur gives a higher
             quality wide blur at moderate cost. */}
-      {/* Post-processing chain — only on desktop. Bloom + mipmapBlur is
-          one of the most expensive passes on mobile GPUs, and the scene
-          still reads as "the cosmic universe" without the soft halos
-          around the sun and HYSTON. Skip it entirely on small viewports. */}
-      {!lowQuality && (
-        <EffectComposer>
-          <HueSaturation hue={0} saturation={0} />
-          <Bloom
-            intensity={0.6}
-            luminanceThreshold={0.7}
-            luminanceSmoothing={0.3}
-            mipmapBlur
-            // levels controls how many mip steps the bloom walks down before
-            // compositing — each step roughly doubles the kernel radius.
-            // Default 8 → halo bleeds ~100px past silhouette. Cut to 3 → halo
-            // hugs the silhouette (~25-30px out), which reads as "internal
-            // glow that just kisses the edge" rather than a wide aura around
-            // the sun and HYSTON. Other planets' halos shrink too but they
-            // were already faint so the change is mostly invisible there.
-            levels={3}
-          />
-        </EffectComposer>
-      )}
+      {/* Post-processing chain — kept on mobile but at a much lighter
+          setting. Without ANY bloom on mobile, the planets read as flat
+          stickers pasted on pure black; with the full desktop bloom they
+          shred the GPU. Sweet spot for mobile: intensity 0.35 (was 0.6)
+          and only 2 mip levels (was 3) — keeps the atmospheric softening
+          that bridges sun/HYSTON into the background while keeping the
+          pass cheap.
+          levels controls how many mip steps the bloom walks down before
+          compositing — each step roughly doubles the kernel radius.
+          Default 8 → halo bleeds ~100px past silhouette. Cut to 3 → halo
+          hugs the silhouette (~25-30px out), which reads as "internal
+          glow that just kisses the edge". Mobile goes one tighter still. */}
+      <EffectComposer>
+        <HueSaturation hue={0} saturation={0} />
+        <Bloom
+          intensity={lowQuality ? 0.35 : 0.6}
+          luminanceThreshold={0.7}
+          luminanceSmoothing={0.3}
+          mipmapBlur
+          levels={lowQuality ? 2 : 3}
+        />
+      </EffectComposer>
     </>
   );
 }
@@ -4256,7 +4263,13 @@ export default function Universe() {
           // mesh's final colour, so it brightens the sun + all 9
           // planets + moon together without touching their individual
           // material props. Default is 1.0; 1.5 = 50% brighter overall.
-          gl.toneMappingExposure = 1.4;
+          // Mobile gets a calmer 1.0 so the planets don't pop too hard
+          // against the pure-black backdrop (Bloom is also lighter on
+          // mobile, so without dropping exposure the scene reads as
+          // "neon stickers on black"). The matching `useEffect` inside
+          // SceneContent keeps this in sync if the viewport changes
+          // (e.g. user rotates the phone) without remounting the canvas.
+          gl.toneMappingExposure = isMobile ? 1.0 : 1.4;
         }}
       >
         {/* scene background removed so LiquidEther layer behind canvas
