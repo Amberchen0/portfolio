@@ -4,9 +4,28 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Moonlight — A Dream Demon · Amber Xu</title>
+<meta name="description" content="A dream demon in seven acts. Crystal chimes for wings, masks that breathe peril, tears for feast — a visual story by Amber Xu.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://amberxu.vercel.app/works/moonlight/">
+<meta property="og:title" content="Moonlight — A Dream Demon · Amber Xu">
+<meta property="og:description" content="A dream demon in seven acts. Crystal chimes for wings, masks that breathe peril, tears for feast — a visual story by Amber Xu.">
+<meta property="og:image" content="https://amberxu.vercel.app/works/moonlight/img/hero-bg.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Moonlight — A Dream Demon · Amber Xu">
+<meta name="twitter:description" content="A dream demon in seven acts. Crystal chimes for wings, masks that breathe peril, tears for feast.">
+<meta name="twitter:image" content="https://amberxu.vercel.app/works/moonlight/img/hero-bg.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Caveat:wght@500;700&family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@600&family=Sacramento&display=swap" rel="stylesheet">
+
+<!-- Three.js as ES module (needed for the FluidGlass refractive lens on the hero) -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
 <style>
   :root{
     --bg-0:#05060e;
@@ -232,6 +251,17 @@
 
   /* Mask SVG positioned to cover the hero — only its <mask> is used via id */
   .mask-svg{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0}
+  /* FluidGlass refractive lens — sits above droplets (z:7) but below text (z:8),
+     transparent everywhere except where the glass orb is rendered. */
+  .fluid-glass-canvas{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:8;               /* above droplets (z:7), text still renders on top via DOM order */
+    pointer-events:none;     /* lets clicks fall through */
+    background:transparent;
+  }
 
   .scroll-cue{
     position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:9;
@@ -704,7 +734,7 @@
   @media (hover:none){.cursor-dot,.cursor-ring{display:none}html,body,*{cursor:auto!important}}
 </style>
 </head>
-<body><a href="/work" style="position:fixed;top:1.25rem;left:1.25rem;z-index:9999;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#d9a574;text-decoration:none;padding:0.5rem 0.85rem;border:1px solid rgba(217,165,116,0.4);border-radius:999px;background:rgba(10,8,7,0.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">← Universe</a>
+<body><a href="/work" style="position:fixed;top:1.25rem;left:1.25rem;z-index:9999;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.75);text-decoration:none;padding:0.5rem 0.85rem;border:1px solid rgba(255,255,255,0.25);border-radius:999px;background:rgba(10,8,7,0.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">← Universe</a>
 
 <div class="progress" id="progress"></div>
 
@@ -746,6 +776,10 @@
     <div class="frost-tint"></div>
   </div>
   <div class="frost-vignette"></div>
+
+  <!-- FluidGlass · refractive glass orb following the cursor (ports React-Bits
+       FluidGlass to vanilla Three.js — see module script at the bottom). -->
+  <canvas id="fluidGlass" class="fluid-glass-canvas"></canvas>
 
   <!-- Layer 4 · printed text that sits on the glass -->
   <div class="hero-text">
@@ -1646,5 +1680,394 @@ document.querySelectorAll('.swatch').forEach(s=>{
   });
 });
 </script>
+
+<!-- ============================================================
+     FluidGlass — refractive glass lens following the cursor
+     Ported from the React-Bits / @react-three/drei MeshTransmissionMaterial
+     to vanilla Three.js. No 3D model needed: uses IcosahedronGeometry.
+     Renders the hero background to an off-screen FBO, then samples that
+     buffer through a custom refraction shader with chromatic aberration.
+
+     TODO (before final deployment):
+       Make the lens refract the HTML text too (currently only refracts
+       hero-bg.jpg). Two options when content is finalized:
+       (A) html2canvas snapshot of #hero → lens refracts everything.
+           Caveat: snapshot is static; dynamic droplets/frost won't update.
+       (B) Replicate the text in Three.js (canvas-rendered textures on
+           planes in the buffer scene). Live but requires duplicate
+           maintenance whenever HTML text changes.
+============================================================ -->
+<!-- html2canvas — used by the FluidGlass module below to snapshot the
+     hero's HTML/CSS layer into the lens buffer, so the lens refracts
+     text & UI (not just hero-bg.jpg). Loaded synchronously here so it's
+     ready when the deferred ES module fires. -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script type="module">
+import * as THREE from 'three';
+
+(function(){
+  const hero   = document.getElementById('hero');
+  const canvas = document.getElementById('fluidGlass');
+  if(!hero || !canvas) return;
+
+  const W = () => hero.offsetWidth;
+  const H = () => hero.offsetHeight;
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+  // ── Renderer + cameras + scenes ─────────────────────────────────
+  const renderer = new THREE.WebGLRenderer({
+    canvas, alpha:true, antialias:true, premultipliedAlpha:false
+  });
+  renderer.setPixelRatio(DPR);
+  renderer.setSize(W(), H(), false);
+  renderer.setClearColor(0x000000, 0);
+
+  // Perspective camera for the lens
+  const camera = new THREE.PerspectiveCamera(15, W()/H(), 0.1, 100);
+  camera.position.set(0, 0, 20);
+  camera.lookAt(0, 0, 0);
+
+  // Orthographic camera + fullscreen quad for the buffer pass
+  const bufferCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+  // Two scenes — buffer (the bg that gets refracted) + main (the lens)
+  const bufferScene = new THREE.Scene();
+  const mainScene   = new THREE.Scene();
+
+  console.log('[FluidGlass] module script started, document URL:', document.URL);
+
+  // ── Buffer scene: hero-bg.jpg painted on a fullscreen quad ─────
+  // Try paths in order. The first one that loads is used; whole material
+  // gets replaced (more reliable than swapping image inside a Texture).
+  const bgQuad = new THREE.Mesh(
+    new THREE.PlaneGeometry(2, 2),
+    // Start with an obviously-magenta material so we can SEE if loading fails
+    new THREE.MeshBasicMaterial({ color: 0xff00ff })
+  );
+  bufferScene.add(bgQuad);
+
+  const bgCandidates = [
+    './img/hero-bg.jpg',
+    '/moonlight/img/hero-bg.jpg',
+    './moonlight/img/hero-bg.jpg',
+    '.././img/hero-bg.jpg',
+    'moonlight/img/hero-bg.jpg'
+  ];
+
+  function tryLoad(idx){
+    if(idx >= bgCandidates.length){
+      console.error('[FluidGlass] all bg paths failed — see Network tab for which URLs 404\'d');
+      return;
+    }
+    const url = bgCandidates[idx];
+    const loader = new THREE.TextureLoader();
+    loader.crossOrigin = '';   // http://localhost is same-origin so this is fine
+    console.log('[FluidGlass] trying →', url, '(resolved:', new URL(url, document.URL).href + ')');
+    loader.load(
+      url,
+      tex => {
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.minFilter = THREE.LinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+        tex.needsUpdate = true;
+        const newMat = new THREE.MeshBasicMaterial({ map: tex });
+        bgQuad.material.dispose();
+        bgQuad.material = newMat;
+        console.log('[FluidGlass] ✓ LOADED', url, '—', tex.image.width+'×'+tex.image.height);
+      },
+      undefined,
+      err => {
+        console.warn('[FluidGlass] ✗ failed:', url, err && err.message);
+        tryLoad(idx + 1);
+      }
+    );
+  }
+  tryLoad(0);
+
+  // ── HTML → buffer texture (so the lens refracts text & UI too) ───
+  // Strategy A from the TODO above the script: html2canvas the #hero
+  // element after the handwriting reveal finishes + fonts are ready,
+  // then swap bgQuad's material to use that snapshot as a texture.
+  //
+  // ignoreElements skips every <canvas> in hero — that covers both:
+  //   • #fluidGlass (the lens canvas itself; capturing it would create
+  //     a feedback loop — refract the already-refracted output)
+  //   • the droplets canvas (created dynamically by the droplets IIFE
+  //     and appended to #hero with no id; it's a rendering layer too,
+  //     and html2canvas can't snapshot a 2D-canvas's painted content
+  //     reliably anyway).
+  //
+  // Caveats baked in (acceptable per user spec):
+  //   • backdrop-filter:blur on .frost-stack is silently ignored by
+  //     html2canvas — the captured frost area will look "less frosted"
+  //     than the live page. Impact: lens samples a slightly clearer
+  //     version of the background where frost overlaps. Low impact
+  //     visually because the lens itself adds chromatic refraction.
+  //   • The SVG-mask handwritten MOONLIGHT title may render imperfectly
+  //     (feDisplacementMap on a clip-path) — outline geometry mostly
+  //     captures, but the rough-edge filter often degrades. Acceptable.
+  //   • Snapshot is STATIC: the droplets/frost living "breathing" effect
+  //     is frozen inside the lens. Sliding droplets outside the lens
+  //     remain live. To re-capture, call captureHero() again.
+  async function captureHero(){
+    if(typeof html2canvas !== 'function'){
+      console.warn('[FluidGlass] html2canvas missing → lens refracts hero-bg.jpg only.');
+      return;
+    }
+    // Wait for webfonts so .hero-text renders in the correct face,
+    // not a fallback that would be replaced post-snapshot.
+    if(document.fonts && document.fonts.ready){
+      try { await document.fonts.ready; } catch(_){}
+    }
+    // Wait for the handwriting reveal: startDelay 600ms + duration 3400ms
+    // → wipe completes at ~4000ms. Add a small paint-settle buffer.
+    await new Promise(r => setTimeout(r, 4200));
+
+    console.log('[FluidGlass] capturing #hero → buffer texture…');
+    try {
+      const snap = await html2canvas(hero, {
+        ignoreElements: (el) => el.tagName === 'CANVAS',
+        backgroundColor: null,
+        scale: DPR,
+        useCORS: true,
+        allowTaint: false,
+        logging: false
+      });
+      const tex = new THREE.CanvasTexture(snap);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.minFilter = THREE.LinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+      tex.needsUpdate = true;
+      const newMat = new THREE.MeshBasicMaterial({ map: tex });
+      bgQuad.material.dispose();
+      bgQuad.material = newMat;
+      console.log('[FluidGlass] ✓ buffer now using snapshot', snap.width + '×' + snap.height);
+    } catch(e){
+      console.error('[FluidGlass] html2canvas failed:', e);
+    }
+  }
+  captureHero();
+
+  // FBO that receives the buffer pass
+  const buffer = new THREE.WebGLRenderTarget(W()*DPR, H()*DPR, {
+    minFilter: THREE.LinearFilter,
+    magFilter: THREE.LinearFilter,
+    type: THREE.UnsignedByteType,
+    colorSpace: THREE.SRGBColorSpace
+  });
+
+  // ── Lens material: physically-based glass refraction shader ────
+  // Implements proper TWO-stage refraction (entry + exit through sphere),
+  // wavelength-dependent dispersion, Fresnel reflection, and a sharp
+  // specular highlight band — matching MeshTransmissionMaterial visually.
+  const lensMat = new THREE.ShaderMaterial({
+    transparent:true,
+    uniforms:{
+      bufferTex:          { value: buffer.texture },
+      resolution:         { value: new THREE.Vector2(W()*DPR, H()*DPR) },
+      ior:                { value: 1.45 },   // matches React Bits final config
+      thickness:          { value: 9.0 },
+      chromaticAberration:{ value: 0.23 },
+      anisotropy:         { value: 0.07 },
+      lensCenter:         { value: new THREE.Vector3(0, 0, 15) },
+      lensRadius:         { value: 1.0 },
+      // Lens center in SCREEN-UV space (updated each frame from JS).
+      // Needed so the fragment shader can pull sampling UV toward the
+      // lens center for true magnification (not just color refraction).
+      lensCenterUv:       { value: new THREE.Vector2(0.5, 0.5) },
+      // Magnification factor at lens center. 1.0 = no zoom; 2.2 ≈ a
+      // gentle reading-glass strength. Falls off smoothly toward the
+      // rim via an NdotV curve so the edge still does FluidGlass-style
+      // chromatic refraction without compounding zoom.
+      magnification:      { value: 2.2 }
+    },
+    vertexShader: /* glsl */`
+      varying vec3 vWorldNormal;
+      varying vec3 vWorldPosition;
+      void main(){
+        vec4 wp = modelMatrix * vec4(position, 1.0);
+        vWorldPosition = wp.xyz;
+        vWorldNormal = normalize(mat3(modelMatrix) * normal);
+        gl_Position = projectionMatrix * viewMatrix * wp;
+      }
+    `,
+    fragmentShader: /* glsl */`
+      uniform sampler2D bufferTex;
+      uniform vec2  resolution;
+      uniform float ior;
+      uniform float thickness;
+      uniform float chromaticAberration;
+      uniform float anisotropy;
+      uniform vec3  lensCenter;
+      uniform float lensRadius;
+      uniform vec2  lensCenterUv;
+      uniform float magnification;
+      varying vec3 vWorldNormal;
+      varying vec3 vWorldPosition;
+
+      // Trace a refracted ray through the sphere, return the exit ray direction.
+      vec3 traceGlass(vec3 V, vec3 N, float eta){
+        // 1) entry refraction
+        vec3 R1 = refract(-V, N, 1.0 / eta);
+        // 2) intersect with back of sphere (ray from entry point in dir R1)
+        vec3 fromCenter = vWorldPosition - lensCenter;
+        float t = -2.0 * dot(fromCenter, R1);
+        vec3 exitPoint  = vWorldPosition + R1 * t;
+        vec3 exitNormal = normalize(exitPoint - lensCenter);
+        // 3) exit refraction (going from glass back to air)
+        vec3 R2 = refract(R1, -exitNormal, eta);
+        // refract() returns (0,0,0) on total internal reflection — keep R1 in that case
+        return length(R2) < 0.1 ? R1 : R2;
+      }
+
+      void main(){
+        vec2 screenUv = gl_FragCoord.xy / resolution;
+        vec3 V = normalize(cameraPosition - vWorldPosition);
+        vec3 N = normalize(vWorldNormal);
+        float NdotV = max(dot(N, V), 0.0);
+
+        // === Per-wavelength dispersion ===
+        // Each colour channel has a slightly different IOR — that's how a glass
+        // prism splits light into a rainbow. RED bends least, BLUE bends most.
+        float disp = chromaticAberration * 0.25;
+        float iorR = ior - disp;
+        float iorG = ior;
+        float iorB = ior + disp;
+
+        // === Trace each channel through the sphere ===
+        vec3 Rr = traceGlass(V, N, iorR);
+        vec3 Rg = traceGlass(V, N, iorG);
+        vec3 Rb = traceGlass(V, N, iorB);
+
+        // === MAGNIFICATION ===
+        // Pull this fragment's sampling UV toward the lens-center UV by
+        // a factor of 'mag'. mag>1 → sampling a smaller region around
+        // the lens centre → that region appears LARGER through the lens.
+        // The NdotV-driven curve makes the centre magnify strongest and
+        // the rim ease back to mag=1 (no zoom), so the chromatic
+        // refraction below still reads as glassy at the silhouette.
+        float magCurve = pow(NdotV, 0.6);
+        float mag = mix(1.0, magnification, magCurve);
+        vec2 fromCenter = screenUv - lensCenterUv;
+        vec2 magUv = lensCenterUv + fromCenter / mag;
+
+        // === Sample the (magnified) buffer in each refracted direction ===
+        // Same offset trick as before, but now layered on top of the
+        // magnified sample point. Center → clean magnified content;
+        // rim → magnified PLUS chromatic dispersion.
+        float k = thickness * 0.011;
+        vec3 col;
+        col.r = texture2D(bufferTex, magUv + Rr.xy * k).r;
+        col.g = texture2D(bufferTex, magUv + Rg.xy * k).g;
+        col.b = texture2D(bufferTex, magUv + Rb.xy * k).b;
+
+        // === Fresnel — very subtle edge brightening, no obvious white rim ===
+        float fres = pow(1.0 - NdotV, 4.0);
+        col = mix(col, vec3(0.80, 0.88, 1.00), fres * 0.18);
+
+        // === Tiny specular pinpoint — just a hint, not a band ===
+        vec3 L = normalize(vec3(-0.4, 0.6, 1.0));   // light from upper-left
+        float spec = pow(max(dot(N, normalize(L + V)), 0.0), 80.0);
+        col += vec3(1.0) * spec * 0.35;
+
+        // === Anisotropic streak (very subtle) ===
+        float stripe = sin(vWorldPosition.x * 60.0 + vWorldPosition.y * 50.0) * anisotropy * 0.3;
+        col += stripe;
+
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `
+  });
+
+  // ── Lens mesh — smooth subdivided sphere ─
+  const lensGeo = new THREE.IcosahedronGeometry(1, 8);
+  const lens = new THREE.Mesh(lensGeo, lensMat);
+  lens.position.set(0, 0, 15);
+  mainScene.add(lens);
+
+  // Scale factor — smaller, like a focused marble
+  const baseScale = 0.027;
+  lens.scale.setScalar(1); // will be set in fit()
+
+  // Visible viewport size at z=15 (used both for sizing and pointer mapping)
+  let visibleW = 1, visibleH = 1;
+  function fitViewport(){
+    const distToLens = camera.position.z - lens.position.z;
+    visibleH = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov)/2) * distToLens;
+    visibleW = visibleH * camera.aspect;
+    const scl = visibleH * baseScale;
+    lens.scale.setScalar(scl);
+    lensMat.uniforms.lensRadius.value = scl;   // sphere radius in world units
+  }
+  fitViewport();
+
+  // ── Pointer tracking with damped lerp ───────────────────────────
+  const pointer = new THREE.Vector2(0, 0);
+  const target  = new THREE.Vector3(0, 0, 15);
+  const current = new THREE.Vector3(0, 0, 15);
+
+  hero.addEventListener('mousemove', (e)=>{
+    const r = hero.getBoundingClientRect();
+    pointer.x =  ((e.clientX - r.left) / r.width ) * 2 - 1;
+    pointer.y = -((e.clientY - r.top ) / r.height) * 2 + 1;
+  }, { passive:true });
+  hero.addEventListener('touchmove', (e)=>{
+    if(!e.touches.length) return;
+    const t = e.touches[0];
+    const r = hero.getBoundingClientRect();
+    pointer.x =  ((t.clientX - r.left) / r.width ) * 2 - 1;
+    pointer.y = -((t.clientY - r.top ) / r.height) * 2 + 1;
+  }, { passive:true });
+
+  // ── Resize ──────────────────────────────────────────────────────
+  function resize(){
+    const w = W(), h = H();
+    renderer.setSize(w, h, false);
+    buffer.setSize(w * DPR, h * DPR);
+    camera.aspect = w/h;
+    camera.updateProjectionMatrix();
+    lensMat.uniforms.resolution.value.set(w * DPR, h * DPR);
+    fitViewport();
+  }
+  window.addEventListener('resize', resize);
+
+  // ── Render loop ─────────────────────────────────────────────────
+  function animate(t){
+    // Damp the lens position toward the pointer (matches FluidGlass)
+    target.set((pointer.x * visibleW) / 2, (pointer.y * visibleH) / 2, 15);
+    current.lerp(target, 0.15);
+    lens.position.copy(current);
+    // Keep the shader's lens-center uniform in sync — required for the proper
+    // back-face refraction trace inside the sphere.
+    lensMat.uniforms.lensCenter.value.copy(current);
+    // Project the lens world position to screen UV (0..1) for the
+    // magnification shader. Three.Vector3.project goes world → NDC
+    // (-1..1); we map to UV space here. Done per frame because the
+    // lens follows the cursor and we want zoom-around-lens-center every
+    // tick, not stale once-per-resize.
+    const _ndc = current.clone().project(camera);
+    lensMat.uniforms.lensCenterUv.value.set(_ndc.x * 0.5 + 0.5, _ndc.y * 0.5 + 0.5);
+
+    // Slow drift rotation so highlights move even at rest
+    lens.rotation.x = t * 0.00015;
+    lens.rotation.y = t * 0.00022;
+
+    // 1. Render the background quad to the FBO
+    renderer.setRenderTarget(buffer);
+    renderer.render(bufferScene, bufferCamera);
+    renderer.setRenderTarget(null);
+
+    // 2. Render the lens on the (transparent) canvas, sampling the FBO
+    renderer.render(mainScene, camera);
+
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+})();
+</script>
+
 </body>
 </html>

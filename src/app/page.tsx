@@ -2,7 +2,10 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { LiquidChrome } from "@/components/LiquidChrome";
+import MetallicPaint from "@/components/MetallicPaint";
 
 type Lang = "en" | "zh";
 
@@ -29,18 +32,71 @@ const copy = {
 
 export default function Home() {
   const [lang, setLang] = useState<Lang>("en");
-  const [reveal, setReveal] = useState({ x: 0, y: 0, active: false });
   const t = copy[lang];
+
+  /* ─── Scroll-darkening transition to /work ───
+     Wheel events accumulate into `progress` (0..1) which drives a
+     black overlay's opacity.  When progress reaches 95%, we navigate
+     to /work — whose own entry choreography continues the fade-out
+     starting from full black so the visual handoff is seamless. */
+  const [progress, setProgress] = useState(0);
+  const progressRef = useRef(0);          /* sync mirror of progress for use inside event handlers */
+  const transitionStarted = useRef(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    router.prefetch("/work");
+    const handleWheel = (e: WheelEvent) => {
+      if (transitionStarted.current) return;
+      e.preventDefault();
+      /* Use ref (not the setState updater) so we can call router.push
+         OUTSIDE of React's render phase — the previous code called
+         router.push inside setProgress's updater function, which
+         triggers "Cannot update a component while rendering a
+         different component" because the Router state mutation
+         happens during Home's render. */
+      const next = Math.min(1, Math.max(0, progressRef.current + e.deltaY * 0.0015));
+      progressRef.current = next;
+      setProgress(next);
+      if (next >= 0.95 && !transitionStarted.current) {
+        transitionStarted.current = true;
+        router.push("/work");
+      }
+    };
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    return () => window.removeEventListener("wheel", handleWheel);
+  }, [router]);
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden">
+      {/* LiquidChrome — fullscreen fluid background.  Sits at z-0
+          (just above body bg, below all content which is at z>0).
+          NOTE: pointer-events DELIBERATELY enabled here so cursor
+          mousemove can reach LiquidChrome's container → ripple
+          interaction works.  Content sits at z-10 so links / hover
+          lens / language buttons still receive their own events
+          first (higher z always wins for pointer hit-testing). */}
+      <div
+        aria-hidden
+        className="fixed inset-0 z-0"
+      >
+        <LiquidChrome
+          baseColor={[0.05, 0.04, 0.08]}  /* dimmed another ~30% per user — was [0.07, 0.06, 0.12] */
+          speed={0.3}
+          amplitude={0.3}
+          frequencyX={3}
+          frequencyY={3}
+          interactive
+        />
+      </div>
+
       {/* warm ambient glow */}
       <div
         aria-hidden
         className="pointer-events-none absolute -top-1/3 left-1/2 -z-10 h-[120vh] w-[120vh] -translate-x-1/2 rounded-full"
         style={{
           background:
-            "radial-gradient(closest-side, rgba(217,165,116,0.18), rgba(184,132,63,0.06) 40%, transparent 70%)",
+            "radial-gradient(closest-side, rgba(45,101,224,0.18), rgba(26,78,186,0.06) 40%, transparent 70%)",
           filter: "blur(40px)",
         }}
       />
@@ -49,7 +105,7 @@ export default function Home() {
         className="pointer-events-none absolute -bottom-1/4 -right-1/4 -z-10 h-[80vh] w-[80vh] rounded-full"
         style={{
           background:
-            "radial-gradient(closest-side, rgba(217,165,116,0.10), transparent 70%)",
+            "radial-gradient(closest-side, rgba(45,101,224,0.10), transparent 70%)",
           filter: "blur(60px)",
         }}
         animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
@@ -57,7 +113,7 @@ export default function Home() {
       />
 
       {/* top bar */}
-      <header className="flex items-center justify-between px-6 py-6 sm:px-12 sm:py-8">
+      <header className="relative z-10 flex items-center justify-between px-6 py-6 sm:px-12 sm:py-8">
         <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           AX · {new Date().getFullYear()}
         </span>
@@ -83,7 +139,7 @@ export default function Home() {
       </header>
 
       {/* hero */}
-      <main className="flex flex-1 flex-col justify-center px-6 sm:px-12">
+      <main className="relative z-10 flex flex-1 flex-col justify-center px-6 sm:px-12">
         <div className="mx-auto w-full max-w-5xl">
           <motion.p
             key={`eyebrow-${lang}`}
@@ -95,124 +151,9 @@ export default function Home() {
             {t.eyebrow}
           </motion.p>
 
-          <div className="relative">
-            {/* Single breathing wrapper containing BOTH the etching and the
-                hover-reveal photo lens. Because they share the same animated
-                transform, they stay in perfect lockstep — no drift. */}
-            <motion.div
-              className="absolute left-1/2 top-1/2"
-              style={{
-                width: "min(80%, 640px)",
-                aspectRatio: "1 / 1",
-                marginLeft: "calc(min(80%, 640px) / -2)",
-                marginTop: "calc(min(80%, 640px) / -2)",
-                zIndex: 0,
-              }}
-              initial={{ opacity: 0, scale: 0.97 }}
-              animate={{
-                opacity: [0, 0.95, 0.88, 0.95],
-                scale: [0.97, 1, 1.012, 1],
-                rotate: [0, 0.5, -0.3, 0.5],
-              }}
-              transition={{
-                opacity: { duration: 1.4, delay: 0.2, ease: "easeOut" },
-                scale: {
-                  duration: 11,
-                  delay: 1.4,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  ease: "easeInOut",
-                },
-                rotate: {
-                  duration: 22,
-                  delay: 1.4,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  ease: "easeInOut",
-                },
-              }}
-            >
-              {/* Etching layer — wrapped so we can punch a hole in it at the
-                  cursor. The hole's radius is the animatable --lens-radius
-                  custom property, shared with the photo layer below so they
-                  open and close in perfect sync. */}
-              <div
-                className="absolute inset-0"
-                style={
-                  {
-                    "--lens-radius": reveal.active ? "100px" : "0px",
-                    WebkitMaskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.6) 65%, rgba(0,0,0,1) 100%)`,
-                    maskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.6) 65%, rgba(0,0,0,1) 100%)`,
-                    transition: "--lens-radius 0.45s cubic-bezier(0.2, 0.8, 0.2, 1)",
-                    pointerEvents: "none",
-                  } as React.CSSProperties
-                }
-              >
-                <Image
-                  src="/amber-hero.png"
-                  alt=""
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 80vw, 640px"
-                  style={{
-                    objectFit: "contain",
-                    filter:
-                      "sepia(0.18) hue-rotate(-8deg) saturate(1.05) brightness(1.05)",
-                  }}
-                />
-              </div>
-
-              {/* Hover hotspot + reveal lens — sibling of etching, same bounds */}
-              <div
-                className="absolute inset-0"
-                style={{ zIndex: 2, pointerEvents: "auto" }}
-                onPointerMove={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  setReveal({
-                    x: e.clientX - rect.left,
-                    y: e.clientY - rect.top,
-                    active: true,
-                  });
-                }}
-                onPointerLeave={() =>
-                  setReveal((r) => ({ ...r, active: false }))
-                }
-              >
-                <div
-                  className="absolute inset-0"
-                  style={
-                    {
-                      "--lens-radius": reveal.active ? "100px" : "0px",
-                      WebkitMaskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0) 100%)`,
-                      maskImage: `radial-gradient(circle var(--lens-radius) at ${reveal.x}px ${reveal.y}px, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0) 100%)`,
-                      transition:
-                        "--lens-radius 0.45s cubic-bezier(0.2, 0.8, 0.2, 1)",
-                    } as React.CSSProperties
-                  }
-                >
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      // measured static offset to align new photo onto etching:
-                      // 2.20° rotation, ~1.3% Y shift, ~0.99x scale
-                      transform:
-                        "translate(-0.05%, 1.34%) rotate(2.20deg) scale(1.009)",
-                      transformOrigin: "center",
-                    }}
-                  >
-                    <Image
-                      src="/amber-real.png"
-                      alt=""
-                      fill
-                      sizes="(max-width: 768px) 80vw, 640px"
-                      style={{ objectFit: "contain" }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* warm inner glow under the gem */}
+          <div className="relative flex items-center justify-center">
+            {/* (Amber etching + hover-reveal real-photo lens removed per user.
+                Signature wordmark below now stands alone in the hero.) */}
             <div
               aria-hidden
               className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
@@ -221,39 +162,57 @@ export default function Home() {
                 height: "min(70%, 560px)",
                 borderRadius: "50%",
                 background:
-                  "radial-gradient(ellipse 60% 70% at 55% 50%, rgba(217,165,116,0.18), transparent 72%)",
+                  "radial-gradient(ellipse 60% 70% at 55% 50%, rgba(45,101,224,0.18), transparent 72%)",
                 filter: "blur(36px)",
                 zIndex: 0,
               }}
             />
 
-            {/* Signature wordmark — replaces typed Amber Xu, sits on top so it's
-                always readable even through the hover lens */}
-            <h1
-              className="relative"
-              style={{ zIndex: 3, pointerEvents: "none" }}
+            {/* Signature wordmark removed per user — only the typed
+                AMBER XU block remains as the hero name treatment. */}
+            <h1 className="sr-only">Amber Xu</h1>
+
+            {/* Block-letter "Amber Xu" variant — same MetallicPaint shader,
+                applied to a typed sans-serif SVG instead of the handwritten
+                signature. Lets the user compare which name treatment they
+                prefer side-by-side. Sits directly under the signature in
+                the same hero column. */}
+            <motion.div
+              initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 1.2, delay: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
+              className="relative mx-auto"
+              style={{
+                width: "min(75%, 720px)",
+                aspectRatio: "1400 / 1100",  /* matches SVG viewBox (1.27:1) — taller block, XU pulled down 50px so AMBER/XU don't feel squashed together */
+              }}
             >
-              <span className="sr-only">Amber Xu</span>
-              <motion.div
-                initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ duration: 1.2, delay: 0.1, ease: [0.2, 0.8, 0.2, 1] }}
-                className="relative mx-auto"
-                style={{
-                  width: "min(100%, 880px)",
-                  aspectRatio: "1536 / 1024",
-                }}
-              >
-                <Image
-                  src="/signature.png"
-                  alt="Amber Xu"
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 100vw, 880px"
-                  style={{ objectFit: "contain" }}
+              <div className="absolute inset-0">
+                <MetallicPaint
+                  imageSrc="/amber-xu-block.svg"
+                  seed={37.49}
+                  scale={1.7}
+                  patternSharpness={0.5}
+                  noiseScale={2}
+                  speed={0.36}
+                  liquid={0.87}
+                  mouseAnimation
+                  brightness={1.95}
+                  contrast={0.5}
+                  refraction={0.048}
+                  blur={0.016}
+                  chromaticSpread={2.3}
+                  fresnel={2}
+                  angle={0}
+                  waveAmplitude={1.3}
+                  distortion={0.45}
+                  contour={0.8}
+                  lightColor="#cdc8e1"
+                  darkColor="#031943"
+                  tintColor="#a3ccf5"
                 />
-              </motion.div>
-            </h1>
+              </div>
+            </motion.div>
           </div>
 
           <motion.div
@@ -292,7 +251,7 @@ export default function Home() {
             </span>
             <a
               href="/work"
-              className="border-b border-amber/40 pb-0.5 text-amber transition-colors hover:text-foreground"
+              className="text-amber transition-colors hover:text-foreground"
             >
               Enter Universe →
             </a>
@@ -301,7 +260,7 @@ export default function Home() {
       </main>
 
       {/* footer */}
-      <footer className="flex flex-col items-start justify-between gap-3 px-6 py-6 sm:flex-row sm:items-center sm:px-12 sm:py-8">
+      <footer className="relative z-10 flex flex-col items-start justify-between gap-3 px-6 py-6 sm:flex-row sm:items-center sm:px-12 sm:py-8">
         <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           {t.footer}
         </span>
@@ -309,6 +268,16 @@ export default function Home() {
           {t.cta}
         </span>
       </footer>
+
+      {/* Scroll-darkening overlay — sits ABOVE all home content
+          (z-50) and gradually blocks the LiquidChrome / hero as the
+          user scrolls.  At 95% opacity the wheel handler routes to
+          /work which continues the fade-out from full black. */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-50 bg-black"
+        style={{ opacity: progress, transition: "opacity 80ms linear" }}
+      />
     </div>
   );
 }
