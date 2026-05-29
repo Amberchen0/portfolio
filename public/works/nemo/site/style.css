@@ -668,3 +668,35 @@ a{color:inherit;text-decoration:none}
   from{opacity:0;transform:translateY(40px)}
   to{opacity:1;transform:translateY(0)}
 }
+
+/* ═══════ PHONE PATCH (≤ 600px) ═══════
+   Existing 700/800/900px blocks don't touch the hero-title
+   clamp(120px, 22vw, 320px) — at 375px that's 120px, overflowing the
+   viewport. Cap display typography and stack any remaining 2-col
+   layouts so the page reads cleanly on iPhone-class screens. */
+@media (max-width:600px){
+  .hero-title{
+    font-size:clamp(56px, 18vw, 84px);
+    line-height:1.0;
+  }
+  .section-title{
+    font-size:clamp(32px, 8vw, 44px);
+  }
+  .about-text .section-title{
+    font-size:clamp(28px, 7vw, 38px);
+    text-align:left;
+    margin-bottom:24px;
+  }
+  .hero-sub{
+    font-size:0.95rem;
+  }
+  .hero-content{padding:0 1.25rem}
+  .nav{padding:1rem 1.25rem}
+  .nav-links{display:none}
+  .nav-meta{display:none}
+  .turnaround, .style-frames, .about-grid{
+    padding:0 1.25rem;
+  }
+  .stat-row{flex-wrap:wrap}
+  .strip-overview{display:none}
+}

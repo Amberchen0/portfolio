@@ -1570,6 +1570,41 @@
     .toc { display: none; }
   }
 
+  /* ─────────── PHONE PATCH (≤ 600px) ───────────
+     The existing 900px breakpoint covers tablet but the iPhone-class
+     viewport (≤ 600px) still gets overlap. Three classes of fixes:
+     1. Display titles: clamp's floor (2.6-2.8rem) is too big on 375px,
+        forcing words to wrap into / over the body text. Cap them to
+        a sane phone size.
+     2. Fixed/absolute decorative overlays (sticky nav rails, drop-shadow
+        backplates) that were positioned for desktop bleed past their
+        intended box on phone — push them static or hide.
+     3. Chapter padding 10vh × 6vw = ~22px horizontal on phone — fine —
+        but vertical 80px+ spacing between intro and body makes the
+        intro feel disconnected. Tighten. */
+  @media (max-width: 600px) {
+    .section-intro h2,
+    .dn-intro h2 {
+      font-size: clamp(1.6rem, 7vw, 2.2rem);
+      letter-spacing: 0.02em;
+      line-height: 1.15;
+    }
+    .section-intro .lead,
+    .dn-intro .lead {
+      font-size: 1rem;
+    }
+    .chapter {
+      padding: 6vh 5vw;
+    }
+    .topbar {
+      font-size: 0.7rem;
+    }
+    /* Side-rail section indicators (ORIGINS — 02 — 03 etc.) */
+    .toc, .side-rail, .section-index {
+      display: none !important;
+    }
+  }
+
   /* ═══════════ SIDEBAR TABLE OF CONTENTS — NEON × ADAPTIVE ═══════════ */
   /* Neon palette (pure magenta) with mix-blend-mode: difference, so
      it shifts to neon cyan on light backgrounds — flat colour, no

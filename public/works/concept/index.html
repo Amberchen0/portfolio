@@ -727,6 +727,54 @@
     .signature              { --sig-w: clamp(100px, 22vw, 160px); }
     .hero-img .signature    { --sig-w: clamp(140px, 32vw, 220px); }
   }
+
+  /* ═══════════ PHONE PATCH (≤ 600px) ═══════════
+     Concept had ZERO mobile media queries — hero title clamps to 74px
+     even at 375px viewport, which alone forces text into overflow and
+     overlap. This block is a defensive net: caps display typography,
+     stacks 2-column layouts, hides decorative meteors/stars/themes,
+     tightens padding. Doesn't touch the design language above 600px. */
+  @media (max-width: 600px) {
+    .hero h1 .title {
+      font-size: clamp(2.4rem, 11vw, 3.2rem);
+      letter-spacing: 0.03em;
+      line-height: 1.0;
+    }
+    .hero h1 .env,
+    .hero h1 .zh-sub {
+      font-size: clamp(0.7rem, 3.5vw, 1rem);
+      letter-spacing: 0.25em;
+    }
+    .hero, .editorial, .narrative {
+      padding: 4rem 1.25rem;
+    }
+    .hero-content {
+      padding: 0 1rem;
+    }
+    /* Stack any two-column grid layouts */
+    .editorial.flip, .editorial,
+    .narrative, .img-wrap {
+      grid-template-columns: 1fr !important;
+      flex-direction: column !important;
+      gap: 2rem;
+    }
+    /* Hide decorative overlays that bleed/overlap on phone */
+    .hero-meteors, .hero-stars, .hero-themes {
+      display: none;
+    }
+    .hero-img, .hero-img-wrapper {
+      max-width: 100% !important;
+      margin: 0 auto;
+    }
+    .nav-en {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+  }
 </style>
 </head>
 <body><a href="/work" style="position:fixed;top:1.25rem;left:1.25rem;z-index:9999;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.75);text-decoration:none;padding:0.5rem 0.85rem;border:1px solid rgba(255,255,255,0.25);border-radius:999px;background:rgba(10,8,7,0.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">← Universe</a>
