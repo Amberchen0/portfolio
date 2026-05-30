@@ -218,6 +218,35 @@
   .hero-text .title-spacer{
     height:clamp(220px,22vw,340px);
   }
+  /* Desktop: hide the phone fallback h1 — the SVG mask cutout above is
+     the real design and lives in #frostMask. */
+  .hero-text .hero-title-mobile{
+    display:none;
+  }
+  /* Phone (≤600px): iOS Safari's SVG mask + filter:blur pipeline is
+     unreliable enough that the cutout title silently vanishes. Show a
+     plain Caveat-script "Moonlight" instead so the chapter still reads
+     as a chapter, even without the glass effect. */
+  @media (max-width:600px){
+    .hero-text .title-spacer{
+      height:auto;
+      padding:0.5rem 0 0.25rem;
+    }
+    .hero-text .hero-title-mobile{
+      display:block;
+      font-family:'Caveat Brush','Caveat',cursive;
+      font-weight:500;
+      font-size:clamp(72px,22vw,110px);
+      line-height:1.0;
+      letter-spacing:0.02em;
+      color:rgba(255,255,255,0.95);
+      text-align:center;
+      margin:0;
+      text-shadow:
+        0 0 14px rgba(180,165,255,0.55),
+        0 6px 24px rgba(0,0,0,0.55);
+    }
+  }
   /* Subtitle — the three-part answer to the question above. */
   .hero-text .sub{
     font-family:'Cormorant Garamond',serif;
@@ -784,7 +813,12 @@
   <!-- Layer 4 · printed text that sits on the glass -->
   <div class="hero-text">
     <p class="eyebrow">A · DREAM · DEMON · IN · SEVEN · ACTS</p>
-    <div class="title-spacer"></div>
+    <!-- Title-spacer reserves vertical room for the SVG-mask-cutout MOONLIGHT
+         title on desktop. iOS Safari has trouble rendering the
+         mask:url(#frostMask) + filter:blur stack together, so we put a
+         phone-only Caveat fallback inside this space — hidden on desktop
+         (the cutout is the design), visible at ≤600px. -->
+    <div class="title-spacer"><h1 class="hero-title-mobile" aria-hidden="false">Moonlight</h1></div>
     <!-- These two lines form one unit: a question and its three answering details -->
     <p class="prologue"><em>Have you ever heard an urban legend?</em></p>
     <p class="sub"><span class="cap">C</span>rystal chimes for wings  ·  <span class="cap">M</span>asks that breathe peril  ·  <span class="cap">T</span>ears for feast</p>
