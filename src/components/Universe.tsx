@@ -1849,7 +1849,26 @@ function AmberCoreSun() {
 
   return (
     <Float speed={0.6} rotationIntensity={0.08} floatIntensity={0.12}>
-      <mesh ref={meshRef}>
+      <mesh
+        ref={meshRef}
+        // Sun acts as the "About Me" portal. Hard navigation rather than
+        // next/router because this is inside an R3F event chain and the
+        // app router instance would otherwise need to be plumbed through
+        // several layers of context. The destination is a real Next.js
+        // page at /about, fully prefetched.
+        onClick={(e) => {
+          e.stopPropagation();
+          window.location.href = "/about";
+        }}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          document.body.style.cursor = "pointer";
+        }}
+        onPointerOut={(e) => {
+          e.stopPropagation();
+          document.body.style.cursor = "default";
+        }}
+      >
         <sphereGeometry args={[1.2, 256, 256]} />
         <meshPhysicalMaterial
           ref={matRef}
@@ -2963,181 +2982,6 @@ function SceneContent({
         ]}
       />
 
-      {/* CLOUD G — horizontal teardrop at z=-6.2 (was F in v8, E in v7, BRIDGE
-          working name in v6).  Sits between the back layer (A/B/C/D)
-          and the front mid layer (F/G/H).  Long tapered shape:
-          narrow pointy left tail, wide rounded right end that
-          overlaps with A's purple block.  Whole body arches gently
-          like ∩ (倒着的U).  Pink-purple gradient: 洋芋粉 (potato pink)
-          on the pointy left tip → 淡紫 (light lavender) on the wide
-          right end, blending into A's purple family.  Anchor for a
-          future pink nebula on the far-left side of the screen. */}
-      <NebulaField
-        position={[1.445, 0.835, -6.2]}     /* whole-stack pushed back: F z=-5.5→-6.2 (BLOOM's old slot) */
-        rotation={[0, 0, 0.0873]}           /* +5° around Z (was 10° → 5° per user '回调 5度') */
-        extents={[4.151, 1.4, 1.6]}         /* X 6.5→4.151 (×0.6386) per user: screen ~830→530 px, Y/Z unchanged */
-        count={575}                         /* v18 density ×0.8 per user (was 719) */
-        particleSize={0.13}
-        noiseFreq={0.5}
-        densityThreshold={0.32}             /* loosened slightly — taper rejects a lot already */
-        octaves={4}
-        hueJitter={0.02}
-        satJitter={0.08}
-        lightJitter={0.12}
-        hueZoneScale={0.22}
-        hueSkew={1.6}
-        layerAxis="x"                       /* horizontal layering for a long cloud */
-        layerFreq={1.0}                     /* wider bands across the longer body */
-        layerPhase={0.7}
-        layerContrast={0.4}
-        centerBoost={0.92}
-        centerBoostFalloff={1.1}            /* gentle pull → keeps the elongated taper */
-        shape="tearLeft"                    /* pointy left tail, wide rounded right end */
-        archAmount={0.45}                   /* ∩ curve: middle lifted ~0.45 world units (~29 px) above the ends */
-        gradientAxis="x"
-        gradientColors={["#ff9d8a", "#c4b0e8"]}  /* L tip: warm potato pink → R bulk: light lavender into A's purple */
-        gradientMix={0.55}                  /* strong-ish blend so the gradient is unmistakable */
-        palettes={[
-          /* === NEW (2026-05-25): BRIDGE CHARACTER: TRANSITION mid-tone neutral.
-             Balanced between back & front, mid-purple + lavender + slight blue. === */
-          [
-            "#4a1838", "#6a2058", "#7a2868", "#3a1d5b", "#4a256b",
-            "#6a2058", "#7a2868", "#5b2c7c", "#6a3c94", "#4a1838",
-          ],
-          [
-            "#9a3888", "#b04098", "#c050a8", "#6a3c94", "#7754ac",
-            "#b04098", "#c050a8", "#8764c4", "#a25cb4", "#9a3888",
-          ],
-          [
-            "#d060b8", "#e078c0", "#f098cc", "#9684d4", "#ae9de3",
-            "#e078c0", "#f098cc", "#c7b6ea", "#d8c6f2", "#f0e0c8",
-          ],
-          /* === OLD palette backup (warm peach-pink teardrop palette) ===
-          ["#8e4a5a","#9a5060","#7e4858","#a05568","#8a5070","#704d7a","#7855a0","#7b528a","#985a90","#a06088"],
-          ["#d68a82","#e09088","#d4877a","#c87f70","#b894b0","#c0a8d8","#b0a0c8","#a898c0","#bba8d0","#c89cb0"],
-          ["#ffdac6","#ffe0d4","#fcd6c2","#fcdac4","#f5d4d8","#e8d8f0","#dccef0","#d8c8ec","#e0d8f5","#ecd8ec"],
-          */
-        ]}
-      />
-
-      {/* CLOUD B (was working name "DUSK" — sibling strip above F) — long horizontal teardrop
-          + ∩ arch + 10° tilt matching E, 50px above E (Y 0.385 → 1.169
-          @ z=-5.5, px/u≈63.8).
-
-          AESTHETIC — stays strictly inside the project's cool-iridescent
-          purple palette (no amber, no off-family hues):
-            - Left tip: pale pink-lavender #e8b8e8 (echoes the E /
-              I / ROSE pink accent thread, but slightly cooler).
-            - Right wide end: deep blue-violet #4a3aa0 (bridges
-              JEWEL sapphire + A's deep purple core).
-            - Palette bands are saturated violet midtones → mid
-              violet/lavender → pale lavender highlights — the whole
-              strip reads as "pink-lavender ribbon fading into deep
-              indigo violet" without ever leaving purple. */}
-      <NebulaField
-        position={[1.445, 2.069, -7.0]}       /* B (revert: was mistaken capital B, user meant lowercase) */
-        rotation={[0, 0, 0.349]}            /* +20° CCW total (was 10°, user added another 10°) */
-        extents={[6.5, 1.4, 1.6]}           /* match E's long teardrop dimensions */
-        count={1200}                        /* v18 density ×0.8 per user (was 1500) */
-        particleSize={0.13}
-        noiseFreq={0.5}
-        densityThreshold={0.32}
-        octaves={4}
-        hueJitter={0.04}
-        satJitter={0.20}
-        lightJitter={0.20}
-        hueZoneScale={0.22}
-        hueSkew={1.6}
-        layerAxis="x"
-        layerFreq={1.0}
-        layerPhase={3.4}                    /* unique phase so DUSK's bands don't align with E's */
-        layerContrast={0.4}
-        centerBoost={0.3}
-        centerBoostFalloff={1.4}
-        shape="tearLeft"
-        archAmount={0.45}                   /* ∩ same direction as E */
-        gradientAxis="x"
-        gradientColors={["#e8b8e8", "#4a3aa0"]}  /* L: pale pink-lavender → R: deep blue-violet */
-        gradientMix={0.55}
-        palettes={[
-          /* band 0 — saturated violet midtones (~60%) */
-          [
-            "#6a4ab0", "#7a4ab8", "#5a3aa0", "#6a3aa8", "#7044b0",
-            "#5e40a8", "#7848b0", "#6a3aa8", "#5a4aa0", "#7044b0",
-          ],
-          /* band 1 — mid violet + lavender (~25%) */
-          [
-            "#9070d0", "#a080d8", "#8868c8", "#9078d0", "#a080d4",
-            "#8870c8", "#9878d0", "#a880d8", "#9070d0", "#9888d4",
-          ],
-          /* band 2 — pale lavender + pink-lavender highlights (~15%) */
-          [
-            "#e8c8f0", "#e0bce8", "#d8b0e4", "#f0d0f4", "#e8c8ec",
-            "#d8c0e8", "#f0d8f4", "#e0bce8", "#ecc8f0", "#d8c8e8",
-          ],
-        ]}
-      />
-
-      {/* CLOUD F (was working name "BLOOM", v9 promoted to letter, sits at z=-6.5 between C and G) — long
-          horizontal teardrop + ∩ arch + 10° CCW tilt matching B and F.
-          Z=-6.2 places it geometrically + visually between the two siblings,
-          forming a 3-strip ribbon stack: B (top, behind) · BLOOM (mid) · F (bottom, front).
-
-          AESTHETIC — strict purple-family gradient per 星云调色参考.html v2:
-            - Left tip: pale薰衣草 #c8b8e8 (echoes B's pink-lavender hint,
-              slightly cooler so it doesn't clash with B's #e8b8e8)
-            - Right wide end: deep 紫罗兰 #5a3078 (echoes A's deep core,
-              shallower than B's #4a3aa0 so BLOOM stays "between" B and F
-              in tonal value as well as position)
-            - Bands: deep violet → mid violet → bright薰衣草, exactly the
-              v2 reference's "transition middle" zone (no magenta sparkle,
-              no blue accent — pure violet ribbon). */}
-      <NebulaField
-        position={[0.82, 1.45, -6.5]}        /* whole-stack pushed back: BLOOM z=-6.2→-6.5 (D/E's old slot) */
-        rotation={[0, 0, 0.1745]}           /* +10° CCW tilt matching B/F */
-        extents={[5.5, 1.2, 1.4]}           /* slightly smaller than B/F to feel like a "mid-thickness" stripe */
-        count={660}                         /* v18 density ×0.8 per user (was 825) */
-        particleSize={0.13}
-        noiseFreq={0.5}
-        densityThreshold={0.32}
-        octaves={4}
-        hueJitter={0.04}
-        satJitter={0.18}
-        lightJitter={0.20}
-        hueZoneScale={0.22}
-        hueSkew={1.6}
-        layerAxis="x"
-        layerFreq={1.0}
-        layerPhase={1.7}                    /* unique phase so BLOOM's bands don't align with B's */
-        layerContrast={0.4}
-        centerBoost={0.3}
-        centerBoostFalloff={1.4}
-        shape="tearLeft"
-        archAmount={0.45}
-        gradientAxis="x"
-        gradientColors={["#f2dcff", "#6e3595"]}  /* +10% L +10% S on prev (#dccaff → #633584) */
-        gradientMix={0.55}
-        palettes={[
-          /* Stacked +10% brightness ×1.10 then +10% saturation
-             (ch = avg + (ch-avg)×1.10), clamp 0..255 per ch. */
-          /* band 0 — deep violet base (~60%) */
-          [
-            "#46246f", "#592c81", "#6e3595", "#592c81", "#6e3595",
-            "#46246f", "#592c81", "#6e3595", "#46246f", "#6e3595",
-          ],
-          /* band 1 — mid violet + lavender (~25%) */
-          [
-            "#8148b3", "#9067d1", "#a478ee", "#9067d1", "#a478ee",
-            "#8148b3", "#9067d1", "#a478ee", "#9067d1", "#b6a1ff",
-          ],
-          /* band 2 — bright lavender highlights (~15%) */
-          [
-            "#b6a1ff", "#d4bfff", "#f2dcff", "#fff1ff", "#d4bfff",
-            "#f2dcff", "#fff1ff", "#d4bfff", "#f2dcff", "#fffff1",
-          ],
-        ]}
-      />
-
       {/* CLOUD K — z=-5 (was J in v8, I in v7).
           Pulled back from z=-3 → -4 per user (felt visually too close);
           still safely in front of the back layer. */}
@@ -3659,7 +3503,7 @@ function SceneContent({
           upper-left arc shows.  Lowercase naming separates this
           fan cluster from the main upper-right A-N group. */}
       <NebulaField
-        position={[16.359, -7.169, -4.0]}     /* whole fan +1.0 forward per user (was z=-5.0) */
+        position={[12.210, -7.092, -2.8]}     /* v28: b 右 40px @ scale 79.054 (X 11.704 → 12.210) */
         extents={[5, 5, 1.8]}            /* bigger so the visible arc covers the full green-marked region */
         count={2500}
         particleSize={0.14}
@@ -3679,22 +3523,22 @@ function SceneContent({
         centerBoostFalloff={1.8}
         shape="ellipsoid"
         palettes={[
-          /* b — v18 饱和度 +15%。v17 4 色映射：#185060→#125264, #2c3a78→#28387f,
-             #384a90→#334798, #445098→#3f4da0 */
+          /* b — v27 调亮 20% per user (each ×1.2 clamped). 映射:
+             #125264→#166278, #28387f→#304398, #334798→#3d55b6, #3f4da0→#4c5cc0 */
           /* Band 0 — 深海青 + 深靛蓝 (~55%) */
           [
-            "#125264", "#28387f", "#125264", "#28387f", "#125264",
-            "#28387f", "#125264", "#28387f", "#125264", "#28387f",
+            "#166278", "#304398", "#166278", "#304398", "#166278",
+            "#304398", "#166278", "#304398", "#166278", "#304398",
           ],
           /* Band 1 — 中段靛蓝 + 蓝紫桥色 (~30%) */
           [
-            "#28387f", "#334798", "#28387f", "#334798", "#28387f",
-            "#334798", "#28387f", "#334798", "#28387f", "#334798",
+            "#304398", "#3d55b6", "#304398", "#3d55b6", "#304398",
+            "#3d55b6", "#304398", "#3d55b6", "#304398", "#3d55b6",
           ],
           /* Band 2 — 蓝紫高光 (~15%) — 整体冷调 */
           [
-            "#334798", "#3f4da0", "#334798", "#3f4da0", "#334798",
-            "#3f4da0", "#334798", "#3f4da0", "#334798", "#3f4da0",
+            "#3d55b6", "#4c5cc0", "#3d55b6", "#4c5cc0", "#3d55b6",
+            "#4c5cc0", "#3d55b6", "#4c5cc0", "#3d55b6", "#4c5cc0",
           ],
         ]}
       />
@@ -3703,9 +3547,9 @@ function SceneContent({
           Sits at z=-2.8 tied with new "e" (was old "d") but slightly FARTHER from camera by distance
           (20.5 vs 19.9), so gets the earlier letter in far→near naming. */}
       <NebulaField
-        position={[12.210, -7.092, -2.8]}     /* whole fan +1.0 forward per user (post e-swap, was z=-3.8) */
-        extents={[2.8, 2.8, 1.2]}        /* ×4/5 (was 3.5/3.5/1.5) per user */
-        count={768}                       /* count ×(4/5)³≈0.512 (was 1500) to preserve density */
+        position={[15.470, -7.169, -4.0]}     /* v27: d 取 b 旧位置 (z=-4.0, X=15.470) per user 对调 */
+        extents={[5.6, 5.6, 2.4]}        /* v25: ×2 per user (was 2.8/2.8/1.2) — screen 885×885 px @ z=-2.8 */
+        count={6144}                      /* v25 density preserved (count ×2³=8): 768 → 6144 */
         particleSize={0.14}
         noiseFreq={0.5}
         densityThreshold={0.34}
@@ -3723,22 +3567,21 @@ function SceneContent({
         centerBoostFalloff={1.6}
         shape="ellipsoid"
         palettes={[
-          /* d — v19 sat+10% + bright+10%。映射：#1c93c1→#14a4dc, #3692c0→#33a2da,
-             #33b4d9→#2dc9f6, #8c96d6→#97a3f0 */
-          /* Band 0 — 深青蓝结构骨架 (~50%) */
+          /* d — v28 深蓝紫族 per user (右扇形最右，cx 1931 = gradient rightmost) */
+          /* Band 0 — 深紫罗兰骨架 (~50%) */
           [
-            "#14a4dc", "#33a2da", "#14a4dc", "#33a2da", "#14a4dc",
-            "#33a2da", "#14a4dc", "#33a2da", "#14a4dc", "#33a2da",
+            "#2a1858", "#301c68", "#2a1858", "#301c68", "#2a1858",
+            "#301c68", "#2a1858", "#301c68", "#2a1858", "#301c68",
           ],
-          /* Band 1 — 活跃中段青蓝 (~30%) */
+          /* Band 1 — 中段蓝紫 (~30%) */
           [
-            "#33a2da", "#2dc9f6", "#33a2da", "#2dc9f6", "#33a2da",
-            "#2dc9f6", "#33a2da", "#2dc9f6", "#33a2da", "#2dc9f6",
+            "#5440a8", "#5c48b0", "#6450b8", "#5440a8", "#5c48b0",
+            "#6450b8", "#5440a8", "#5c48b0", "#5440a8", "#5c48b0",
           ],
-          /* Band 2 — 高光 sparkler：亮青蓝 + 薰衣草锚点 */
+          /* Band 2 — 浅蓝紫高光 sparkler (~10%) */
           [
-            "#2dc9f6", "#97a3f0", "#2dc9f6", "#97a3f0", "#2dc9f6",
-            "#97a3f0", "#2dc9f6", "#97a3f0", "#2dc9f6", "#97a3f0",
+            "#9070d0", "#9878d8", "#a080e0", "#9070d0", "#9878d8",
+            "#a080e0", "#9070d0", "#9878d8", "#9070d0", "#9878d8",
           ],
         ]}
       />
@@ -3747,9 +3590,9 @@ function SceneContent({
           ext 4. Sits at z=-2.8 tied with new "d" (was old "c") but slightly CLOSER to camera by distance
           (19.9 vs 20.5), so gets the later letter in far→near naming. */}
       <NebulaField
-        position={[10.612, -7.891, -2.8]}   /* whole fan +1.0 forward per user (was z=-3.8) */
+        position={[11.245, -7.701, -2.8]}   /* v29d: e 右 15 + 上 15 @ scale 79.054 (X 11.055→11.245, Y -7.891→-7.701) */
         extents={[4, 4, 2.4]}            /* ×2 (was 2/2/1.2) per user */
-        count={5600}                      /* count ×2³=8 (was 700) to preserve density */
+        count={3920}                      /* v35: 密度 ×0.7 per user (5600 → 3920) */
         particleSize={0.14}
         noiseFreq={0.55}
         densityThreshold={0.34}
@@ -3766,23 +3609,26 @@ function SceneContent({
         centerBoost={0.35}
         centerBoostFalloff={1.5}
         shape="ellipsoid"
+        gradientAxis="x"                /* v35: cluster-wide 渐变 — 左→右越来越蓝 */
+        gradientColors={["#1d5c86", "#1c40a8"]}  /* v35: 左端=湖水蓝青(贴近 palette 偏蓝 10% 后的 mid-deep)，右端=深皇家蓝 (G 大降 B 大升) */
+        gradientMix={0.32}              /* v35: 32% blend — 渐变清晰但不抢 palette */
         palettes={[
-          /* e — v19 sat+10% + bright+10%（跟 c 同源）。映射：#28387f→#283c92,
-             #3f4da0→#4152b7, #425ea8→#4466bf, #7c7ccf→#8585ea, #7c85cf→#8590e9 */
-          /* Band 0 — 深靛蓝结构骨架 (~50%) */
+          /* e — v36 又偏蓝 40% per user (R×0.6, B=0.6B+102). 从 v35 湖水青蓝
+             转为深钴蓝/电蓝/冰蓝 (G 与 B 差距进一步拉大). */
+          /* Band 0 — 深钴蓝骨架 (~50%) */
           [
-            "#283c92", "#4152b7", "#283c92", "#4152b7", "#283c92",
-            "#4152b7", "#283c92", "#4152b7", "#283c92", "#4152b7",
+            "#0d50ad", "#0f58b4", "#115cb6", "#0f54b2", "#0d50ad",
+            "#115cb6", "#0f58b4", "#0d50ad", "#0f54b2", "#115cb6",
           ],
-          /* Band 1 — 中段靛蓝/蓝紫 (~30%) */
+          /* Band 1 — 中段电蓝 (~30%) */
           [
-            "#4152b7", "#4466bf", "#4152b7", "#4466bf", "#4152b7",
-            "#4466bf", "#4152b7", "#4466bf", "#4152b7", "#4466bf",
+            "#2798d4", "#2ea0d9", "#34a8dd", "#2798d4", "#2ea0d9",
+            "#34a8dd", "#2798d4", "#2ea0d9", "#34a8dd", "#2798d4",
           ],
-          /* Band 2 — 薰衣草蓝高光（两个 #8585ea/#8590e9 非常接近）*/
+          /* Band 2 — 浅冰蓝高光 (~10%) */
           [
-            "#4466bf", "#8585ea", "#8590e9", "#8585ea", "#8590e9",
-            "#8585ea", "#8590e9", "#8585ea", "#8590e9", "#4466bf",
+            "#52c8ea", "#5bd0ee", "#64d8f2", "#52c8ea", "#5bd0ee",
+            "#64d8f2", "#52c8ea", "#5bd0ee", "#64d8f2", "#52c8ea",
           ],
         ]}
       />
@@ -3791,7 +3637,7 @@ function SceneContent({
           ext 4. Sits at z=-3.5, deeper than the z=-2.8 pair (new d/e), so gets the EARLIEST letter among
           the front-trio in far→near naming. */}
       <NebulaField
-        position={[13.807, -7.25, -3.5]}   /* v13: reverted from v14 frontmost test per user request */
+        position={[13.145, -7.25, -3.5]}   /* v26: c 左 50px @ scale 75.48 (X 13.807 → 13.145) */
         extents={[4, 4, 2.4]}
         count={5600}
         particleSize={0.14}
@@ -3839,10 +3685,10 @@ function SceneContent({
           large particles + bright mint-cyan palette = jewel-like
           flickers on top of the deeper blue fan. */}
       <NebulaField
-        position={[11.108, -7, -2.5]}       /* v19d: f right 50px more @ z=-2.5 (scale 80.69): X 10.488 → 11.108 */
+        position={[11.551, -7, -2.8]}       /* v27: f 右 35px @ scale 79.054 (X 11.108 → 11.551) */
         rotation={[0, 0, 0.3491]}           /* v19: CW 5° from prev 25° → +20° CCW per user */
-        extents={[6, 4.5, 3]}               /* v19 ×1.5 per user (was 4/3/2) — covers ~968×726 px @ z=-2.5 */
-        count={1558}                         /* v19e: sparsity +30% per user (count /1.3 = 2025→1558), density 3.13 → 2.40 */
+        extents={[5.693, 4.112, 2.85]}      /* v26: 900×650 px @ z=-2.8 scale 79.05 (was 6/4.5/3) */
+        count={1283}                         /* v26 density preserved (vol ratio 0.823): 1558 → 1283 */
         particleSize={0.16}                  /* slightly larger so sparse particles still read as bright jewels */
         noiseFreq={0.6}                      /* finer noise → small bright nuggets */
         densityThreshold={0.42}              /* higher → fewer particles survive → more sparse */
@@ -3860,22 +3706,21 @@ function SceneContent({
         centerBoostFalloff={2.5}
         shape="ellipsoid"
         palettes={[
-          /* f — v17 用户指定调色板（3 色，全亮端）：#70d0e8 / #90dce8 /
-             #40b0d0。最前景 sparkler，整朵都是亮青冰，无暗底色. */
-          /* Band 0 — 中段亮青蓝（f 没有真正的暗色，最深就是 #40b0d0）*/
+          /* f — v28 青绿→青蓝过渡 per user (右扇形 cx 1713，gradient ~30% 位置) */
+          /* Band 0 — 深青蓝（带绿调） */
           [
-            "#40b0d0", "#70d0e8", "#40b0d0", "#70d0e8", "#40b0d0",
-            "#70d0e8", "#40b0d0", "#70d0e8", "#40b0d0", "#70d0e8",
+            "#207090", "#1c6888", "#246e94", "#207090", "#1c6888",
+            "#246e94", "#207090", "#1c6888", "#246e94", "#207090",
           ],
-          /* Band 1 — 亮青蓝过渡到冰青 (~30%) */
+          /* Band 1 — 中段青蓝 */
           [
-            "#70d0e8", "#40b0d0", "#70d0e8", "#90dce8", "#70d0e8",
-            "#40b0d0", "#70d0e8", "#90dce8", "#70d0e8", "#40b0d0",
+            "#48a0b8", "#50a8c0", "#5cb0c8", "#48a0b8", "#50a8c0",
+            "#5cb0c8", "#48a0b8", "#50a8c0", "#5cb0c8", "#48a0b8",
           ],
-          /* Band 2 — 最亮冰青 sparkler */
+          /* Band 2 — 浅青蓝高光 sparkler */
           [
-            "#90dce8", "#70d0e8", "#90dce8", "#70d0e8", "#90dce8",
-            "#70d0e8", "#90dce8", "#70d0e8", "#90dce8", "#70d0e8",
+            "#90d0d8", "#a0d8e0", "#b0e0e8", "#90d0d8", "#a0d8e0",
+            "#b0e0e8", "#90d0d8", "#a0d8e0", "#b0e0e8", "#a0d8e0",
           ],
         ]}
       />
@@ -3887,9 +3732,9 @@ function SceneContent({
           it reads as part of the same nebula band rather than a foreign
           new colour family. */}
       <NebulaField
-        position={[-11.81, -3.82, -5]}      /* unchanged */
-        extents={[7.747, 4.853, 2.0]}       /* scaled 2/3 from [11.62, 7.28, 3.0] → 1066×668 screen px */
-        count={4270}                         /* count ×(2/3)³=8/27 to preserve density ~14/world³ */
+        position={[-11.81, -3.094, -5]}     /* v25: 上 50px @ scale 68.82 (Y -3.82 → -3.094) */
+        extents={[8.064, 6.175, 2.0]}       /* v36 width +30px (step 3, tied with cloud 3) @ z=-5 (scale 68.82): ext_x 7.846→8.064 → screen 1110×850 px */
+        count={5404}                         /* v26 density preserved (vol ratio 1.127): 4795 → 5404 */
         particleSize={0.14}
         noiseFreq={0.45}
         densityThreshold={0.36}
@@ -3905,20 +3750,26 @@ function SceneContent({
         layerContrast={0.5}
         centerBoost={0.45}
         centerBoostFalloff={2.0}
+        gradientAxis="x"                       /* v29: 左蓝紫→右粉红 cluster 渐变 per user (参考图色谱) */
+        gradientColors={["#2a3098", "#c870a8"]}
+        gradientMix={0.55}
         palettes={[
-          /* A-family deep purple — same band 0 / 1 / 2 used by A, B, E so this
-             left-side cloud reads as the same nebula material extended left. */
+          /* v29b: sat +20% per user. 每色 1.2X - 0.2×gray. 整体仍是冷色
+             蓝紫→玫瑰粉光谱，但更鲜活. */
+          /* Band 0 — 深海军/深紫黑 (~60%) */
           [
-            "#1a1450", "#2a1b60", "#1d2860", "#3a1d70", "#202060",
-            "#1e2870", "#2a3580", "#2540a0", "#3a2070", "#3d2580",
+            "#09123d", "#0c1646", "#091a4a", "#160c46", "#091a4a",
+            "#10154f", "#161d57", "#0c1646", "#160c46", "#161d57",
           ],
+          /* Band 1 — 中段蓝紫罗兰 (~30%) */
           [
-            "#4a2890", "#5a30a0", "#3050b0", "#3d4090", "#3a4ab0",
-            "#404090", "#4a6dc0", "#5070d0", "#5040a0", "#3030a0",
+            "#2929af", "#3327b7", "#422fbf", "#3333b7", "#2929af",
+            "#3327b7", "#422fbf", "#2929af", "#3333b7", "#422fbf",
           ],
+          /* Band 2 — 浅紫罗兰 + 玫瑰粉高光 (~10%) */
           [
-            "#5a8de0", "#80a8e0", "#5cc8c8", "#6acde8", "#4ac0d0",
-            "#b090e0", "#c0a0e0", "#ffe8c0", "#c060c0", "#e090e0",
+            "#6447c4", "#6c59cc", "#7d57d4", "#a167d1", "#bb6ece",
+            "#cd77c8", "#d589c2", "#dca3c9", "#bf81c4", "#a781d7",
           ],
         ]}
       />
@@ -3931,13 +3782,16 @@ function SceneContent({
           ext [7.747, 4.853, 2.0] → world X ∈ [-19.56, -4.06], Y ∈
           [-8.67, 1.03], Z ∈ [-7, -3]).
 
-          v21 RESIZE: previous extents were only 3.5/2.8/1.8 (cluster 2)
-          down to 2.5/1.8/1.2 (cluster 5) — too small, looked detached
-          from cloud 1.  Now scaled to ~95% / 80% / 60% / 40% of cloud
-          1's extents (perspective shrink toward camera), so back layer
-          (2) matches cloud 1's footprint and progressive layers nest
-          inside it.  Cluster centers also shifted toward cloud 1's
-          geometric center (-11.81, -3.82) from (-7.5, -1.8).
+          v22 UNIFY: v21's 95%/80%/60%/40% staircase read as "4 nested
+          concentric ellipses of decreasing size" — felt weird because
+          the layers were obviously different SIZES rather than one
+          cloud with depth.  v22 instead targets ALL 4 layers at the
+          SAME screen footprint (~600 × 410 px centred at screen
+          (200, 650)) by inverse-perspective scaling world X/Y/extents
+          to compensate for each Z depth.  Layers now differ ONLY by
+          PALETTE and PARTICLE DENSITY, so the cluster reads as ONE
+          coherent cloud with internal depth (silk dim → silk bright
+          → dense magenta storm → sparse cool jewels).
           Names 2-5 continue the numeric convention started by 1.
 
           4-layer stack (back → front), each tuned to one Zone of the
@@ -3957,12 +3811,12 @@ function SceneContent({
           cluster, nested inside cloud 1).  Pure Zone A 深紫黑 + Zone B
           Band 1 暗绸, very low saturation jitter to keep moody.
           hueSkew 1.85 biases hard toward band 0 so the brighter bands
-          almost never appear.  v21: 4× volume to match cloud 1's footprint
-          (was 3.5/2.8/1.8 → too small, looked detached from 1). */}
+          almost never appear.  v22: position + extents inverse-scaled
+          for z=-6 so it projects to screen ~600 × 410 @ (200, 650). */}
       <NebulaField
-        position={[-10, -3, -6]}              /* shifted toward cloud 1's geometric center · screen ≈ (150, 695) @ scale 65 */
-        extents={[7, 4.5, 2.4]}               /* ~95% of cloud 1 extents · screen ~910 × 585 px @ z=-6, comparable to 1's visible footprint */
-        count={7000}                           /* density 12/world³ — moody fog density at the larger volume */
+        position={[-11.231, -3.077, -6]}      /* v26: 又左 30px @ scale 65 (X -10.769 → -11.231), screen (70, 700) — 不变 */
+        extents={[6.462, 4.462, 2.34]}        /* v36 width +40px (backmost, step 4) @ z=-6 (scale 65): ext_x 6.154→6.462 → screen 840×580 px */
+        count={7339}                          /* v29c density preserved 14.64 (vol 896.6→501.4): 13125 → 7339 */
         particleSize={0.14}
         noiseFreq={0.45}
         densityThreshold={0.36}
@@ -3979,23 +3833,26 @@ function SceneContent({
         centerBoost={0.40}
         centerBoostFalloff={1.8}
         shape="ellipsoid"
+        gradientAxis="x"                      /* v36: 左蓝→右粉 cluster 渐变 per user. 与 cloud 1/3/4/5 同向 */
+        gradientColors={["#2a2880", "#7a2050"]}  /* 左端深蓝紫 + 右端深玫瑰红，贴合 cloud 2 暗底深色族 */
+        gradientMix={0.40}                    /* 40% blend — 后景层不抢前景，但提供方向感 */
         palettes={[
-          /* 2 — 雾底 · 紫粉虹彩参考 Zone A + Zone B Band 1.  纯紫黑 +
-             深绸紫，极少量中段紫意外溢出 (band 2 用得很少). */
-          /* Band 0 — Zone A 深紫黑 (~60%) — 没有"真黑"，全部带紫色温 */
+          /* 2 (v29) — 改为深海军/深紫黑 per user (参考图最深部色谱).
+             移除所有红色，纯冷色：navy → 深紫蓝 → 偏紫红中亮. */
+          /* Band 0 — 极深海军 + 紫黑 (~60%) */
           [
-            "#0a0612", "#110a1c", "#1a0e28", "#0e1024", "#150a20",
-            "#08060e", "#1a0e28", "#110a1c", "#150a20", "#0e1024",
+            "#0a0e2a", "#0e1232", "#101638", "#0a0e2a", "#0e1638",
+            "#161a3c", "#0e1232", "#0a0e2a", "#101638", "#161a3c",
           ],
-          /* Band 1 — Zone B Band 1 深绸紫 (~30%) — 主体底面阴侧 */
+          /* Band 1 — 中段深紫蓝 (~30%) */
           [
-            "#2c2244", "#3a2e54", "#382e58", "#4a3a68", "#3a2e54",
-            "#5a4a7c", "#382e58", "#4a3a68", "#544668", "#3a2e54",
+            "#2a285c", "#302864", "#34306c", "#2a285c", "#302864",
+            "#34306c", "#2a285c", "#302864", "#342c64", "#302864",
           ],
-          /* Band 2 — Zone B Band 2 雾紫 mid (~10%) — 罕见，绝不亮 */
+          /* Band 2 — 偏紫红中亮 (~10%) — 极少量带红 anchor */
           [
-            "#6c5e8c", "#7a6c9c", "#5a4a7c", "#6c5e8c", "#7a6c9c",
-            "#8a86b8", "#6c5e8c", "#7a6c9c", "#544668", "#5a4a7c",
+            "#4a3068", "#503070", "#582c70", "#4a3068", "#503070",
+            "#582c70", "#4a3068", "#503070", "#582c70", "#503070",
           ],
         ]}
       />
@@ -4004,11 +3861,11 @@ function SceneContent({
           forward of 2 (z=-5).  hueSkew 1.4 + lightJitter 0.30 = wide
           brightness range mimicking silk reflection (some particles
           near-white, others medium lavender, all coexisting).
-          v21: scaled up 4× to match 2's expanded footprint. */}
+          v22: same screen footprint as 2 to merge into one cloud. */}
       <NebulaField
-        position={[-9.5, -2.5, -5]}           /* slightly fwd-right of 2 (perspective converging toward camera) · screen ≈ (147, 672) @ scale 68.82 */
-        extents={[5.5, 3.7, 2]}               /* ~80% of cluster 2's extents (smaller as it gets closer) · screen ~757 × 509 px */
-        count={4800}                           /* density 15/world³ at new vol 326 */
+        position={[-10.607, -2.906, -5]}      /* v27: 移到 cloud 2 中心 (70, 700) @ scale 68.82 */
+        extents={[7.265, 4.977, 2.6]}         /* v36 width +30px (step 3, tied with cloud 1) @ z=-5 (scale 68.82): ext_x 7.047→7.265 → screen 1000×685 px */
+        count={10500}                         /* v29b: count 链式递减 20% from 2 (13125 × 0.8) per user */
         particleSize={0.13}
         noiseFreq={0.5}
         densityThreshold={0.34}
@@ -4025,23 +3882,26 @@ function SceneContent({
         centerBoost={0.30}
         centerBoostFalloff={1.6}
         shape="ellipsoid"
+        gradientAxis="x"                      /* v36: 左蓝→右粉 cluster 渐变 per user. 与 cloud 1/2/4/5 同向 */
+        gradientColors={["#5060c0", "#c870a0"]}  /* 左端蓝紫罗兰 + 右端玫瑰紫，silk 层最明显的色温过渡 */
+        gradientMix={0.45}                    /* 45% blend — silk 中等亮度层，渐变明显 */
         palettes={[
-          /* 3 — 绸缎层 · Zone B Band 2 (中) + Band 3 (高光) 全用. */
-          /* Band 0 — Zone B Band 2 中段薰衣草 (~30%) */
+          /* 3 (v29) — 紫绸缎中层 + 玫瑰粉高光 per user. 参考图中等亮度
+             紫色丝绸 + 粉色光泽. silk 效果：宽明度范围，从中紫到亮粉. */
+          /* Band 0 — 中段紫罗兰 (~30%) */
           [
-            "#6c5e8c", "#7a6c9c", "#8a86b8", "#8c7caa", "#7a6c9c",
-            "#6c5e8c", "#8a86b8", "#7a6c9c", "#8c7caa", "#7a6c9c",
+            "#3a3088", "#403490", "#3a3088", "#443898", "#383088",
+            "#403490", "#3a3088", "#443898", "#383088", "#403490",
           ],
-          /* Band 1 — Zone B Band 2-3 之间 (~40%) — 主肌肉层 */
+          /* Band 1 — 中段紫 + 粉紫桥色 (~40%) */
           [
-            "#9a8ec0", "#a89cc8", "#b09cc8", "#9088a8", "#a89cc8",
-            "#9a8ec0", "#b09cc8", "#a89cc8", "#9a8ec0", "#9088a8",
+            "#7050b0", "#8060b8", "#9070c0", "#7050b0", "#8868b8",
+            "#8060b8", "#9070c0", "#7050b0", "#8060b8", "#9070c0",
           ],
-          /* Band 2 — Zone B Band 3 冰薰衣草高光 (~30%) — 绸光最亮端，
-             永远带粉/蓝色温，不能是 #ffffff. */
+          /* Band 2 — 浅薰衣草 + 玫瑰粉光泽 (~30%) — 绸光最亮端 */
           [
-            "#c4b8d8", "#d4cce0", "#e0d8e8", "#cab8c8", "#b8c0d4",
-            "#c8c0d8", "#c4b8d8", "#d4cce0", "#e0d8e8", "#cab8c8",
+            "#c8a0d0", "#d4a8d4", "#e0b0d8", "#c8a0d0", "#d4a8d4",
+            "#e0b0d8", "#c8a0d0", "#e8b8d8", "#d4a8d4", "#e0b0d8",
           ],
         ]}
       />
@@ -4051,13 +3911,13 @@ function SceneContent({
           petals drifting across the silk surface, not a flat blob.
           hueSkew 1.3 favors brighter bands so the sparkler effect
           dominates (matches the reference image's "粒子云层" feel).
-          v21: scaled up to ~60% of cluster 2's extents — biggest
-          particle storm yet without overpowering the silk underneath. */}
+          v22: same screen footprint as 2/3 but 2-3× HIGHER density →
+          clear magenta focal point without obvious size disparity. */}
       <NebulaField
-        position={[-9, -2, -3.8]}             /* fwd-right of 3 (perspective converging) · screen ≈ (134, 648) @ scale 74.05 */
+        position={[-9.858, -2.701, -3.8]}     /* v27: 移到 cloud 2 中心 (70, 700) @ scale 74.05 */
         rotation={[0, 0, 0.2618]}             /* +15° CCW — petal flow */
-        extents={[4.2, 2.8, 1.6]}             /* ~60% of cluster 2 · screen ~622 × 414 px @ z=-3.8 */
-        count={5200}                           /* density 35/world³ — dense particle storm for visual focus */
+        extents={[6.617, 4.524, 2.38]}        /* v36 width +10px (frontmost, step 1) @ z=-3.8 (scale 74.05): ext_x 6.549→6.617 → screen 980×670 px */
+        count={8400}                          /* v29b: count 链式递减 20% from 3 (10500 × 0.8) per user */
         particleSize={0.12}                   /* smaller — individual "粒子" feel */
         noiseFreq={0.55}
         densityThreshold={0.34}
@@ -4074,22 +3934,26 @@ function SceneContent({
         centerBoost={0.30}
         centerBoostFalloff={1.6}
         shape="ellipsoid"
+        gradientAxis="x"                      /* v36: 左蓝→右粉 cluster 渐变 per user. 焦点层强度最大 */
+        gradientColors={["#3848c0", "#e060a0"]}  /* 左端皇家蓝紫 + 右端纯玫瑰粉，焦点层蓝-粉对比最强 */
+        gradientMix={0.50}                    /* 50% blend — 视觉焦点层渐变最强，决定整体观感 */
         palettes={[
-          /* 4 — 粒子主云 · Zone C 全 3 段：深品红 → 玫瑰 → 桃粉. */
-          /* Band 0 — Zone C 深品红/玫瑰紫 (~30%) — 粒子阴侧/远端 */
+          /* 4 (v29) — 玫瑰粒子焦点 per user. 参考图最显眼的玫瑰品红粒子云，
+             深品红 → 中玫瑰 → 亮玫红. 剔除任何带橙/桃色的暖红，全部冷色玫瑰. */
+          /* Band 0 — 深玫瑰品红 (~30%) — 粒子阴侧 */
           [
-            "#7a285c", "#a83878", "#8c3068", "#6a2050", "#9c3878",
-            "#7a285c", "#8c3068", "#a83878", "#6a2050", "#9c3878",
+            "#5e286c", "#6a2c78", "#5e286c", "#6a2c78", "#7a3088",
+            "#5e286c", "#6a2c78", "#7a3088", "#5e286c", "#6a2c78",
           ],
-          /* Band 1 — Zone C 主玫瑰粉中段 (~40%) — 粒子主调 */
+          /* Band 1 — 中段玫瑰粉 (~40%) — 粒子主调 */
           [
-            "#c8408a", "#e060a0", "#d850a0", "#e870a8", "#b84088",
-            "#c8408a", "#e060a0", "#d850a0", "#e870a8", "#c850a0",
+            "#a04088", "#b04898", "#c05ca8", "#a04088", "#b04898",
+            "#c05ca8", "#a04088", "#b04898", "#c05ca8", "#a04088",
           ],
-          /* Band 2 — Zone C 亮粉 sparkler (~30%) — 粒子高光/近端最亮 */
+          /* Band 2 — 亮玫红 sparkler (~30%) — 全部冷色玫红，无桃橙 */
           [
-            "#ff70b8", "#ff8cc0", "#ffa8d0", "#ff60a8", "#ffc0d8",
-            "#ff70b8", "#ff8cc0", "#ffa8d0", "#ff60a8", "#ffc0d8",
+            "#e070a8", "#e878b0", "#f088b8", "#e070a8", "#e878b0",
+            "#f088b8", "#e070a8", "#e878b0", "#f088b8", "#e878b0",
           ],
         ]}
       />
@@ -4103,9 +3967,9 @@ function SceneContent({
           Same role / sparseness mechanics as fan-cluster's "f":
           high densityThreshold + large particleSize. */}
       <NebulaField
-        position={[-8.5, -1.7, -3]}           /* fwd-right of 4 (perspective converging) · screen ≈ (137, 633) @ scale 78 */
-        extents={[3, 2, 1.2]}                 /* ~40% of cluster 2 — smallest layer, frontmost · screen ~468 × 312 px */
-        count={400}                            /* density 7/world³ at vol 57.6 — sparse anchor scatter */
+        position={[-9.983, -2.735, -4.0]}     /* v28: 下移一层 z=-3→-4.0 (在 4 之后) per user. 保持屏幕 (70, 700) @ scale 73.125 */
+        extents={[6.770, 4.478, 2.21]}        /* v36 width +20px (step 2) @ z=-4 (scale 73.125): ext_x 6.633→6.770 → screen 990×655 px */
+        count={184}                           /* v29b: 恢复 v28b 值 per user "5 不动"（保留 sparkler 性质）*/
         particleSize={0.18}                   /* largest — jewels */
         noiseFreq={0.6}
         densityThreshold={0.42}               /* HIGHEST — matches fan-f */
@@ -4122,26 +3986,26 @@ function SceneContent({
         centerBoost={0.2}                     /* low — keep sparse */
         centerBoostFalloff={2.5}
         shape="ellipsoid"
+        gradientAxis="x"                      /* v36: 左蓝→右粉 cluster 渐变 per user. sparkler 层用浅色端点 */
+        gradientColors={["#7060d0", "#e088c0"]}  /* 左端鸢尾蓝紫 + 右端玫瑰粉，sparkler 顶层柔和过渡 */
+        gradientMix={0.45}                    /* 45% blend — sparkler 层亮，渐变不能太强否则盖过 palette */
         palettes={[
-          /* 5 — 冷锚 sparkler · 全冷色：电青蓝 + 虹彩紫 + 冷调冰白.
-             绝不出现金黄/桃橙/暖橙 (按用户要求剔除所有暖锚).
-             Band 0 仍用深紫红衬底，让冷锚 sparkler 不孤立漂浮. */
-          /* Band 0 — 深紫红衬底 (~30%) — 跟粒子云 band 0 同族，作"连续过渡" */
+          /* 5 (v29) — 浅粉 sparkler 锚点 per user. 参考图最亮的粉色光斑.
+             紫红 anchor → 浅粉紫 → 极淡近白粉. 整体冷色，无暖橙. */
+          /* Band 0 — 中段紫红 anchor (~30%) — 衬底带点深紫 */
           [
-            "#1a0e28", "#2c0840", "#3a0c50", "#280844", "#321050",
-            "#2c0840", "#3a0c50", "#280844", "#1a0e28", "#321050",
+            "#684078", "#704480", "#684078", "#704480", "#7c4888",
+            "#684078", "#704480", "#7c4888", "#684078", "#704480",
           ],
-          /* Band 1 — 中段电蓝/钴蓝桥色 (~30%) — 从深紫底过渡到亮电青 */
+          /* Band 1 — 浅粉紫 (~30%) */
           [
-            "#3060c0", "#4080d8", "#5878d0", "#4a90e8", "#2870c0",
-            "#3060c0", "#4080d8", "#5878d0", "#4a90e8", "#2870c0",
+            "#b890c8", "#c098cc", "#cca8d4", "#b890c8", "#c098cc",
+            "#cca8d4", "#b890c8", "#c098cc", "#cca8d4", "#b890c8",
           ],
-          /* Band 2 — 高亮冷 sparkler (~40%): 4 电青 + 3 虹彩紫 + 3 冰白.
-             整体 100% 冷色，跟玫瑰粒子云形成完整冷暖对比，绝无暖橙渗入. */
+          /* Band 2 — 极淡粉 sparkler (~40%): 浅粉 + 近白冷粉 */
           [
-            "#40e0e8", "#6cfafe", "#80c0e8", "#48d8e8",
-            "#b8a0e8", "#c8a8e8", "#a890d0",
-            "#d8e0f0", "#e0d8e8", "#c8d8e8",
+            "#f0c0d8", "#f4c8dc", "#f8d0e0", "#f0c0d8", "#f4c8dc",
+            "#f8d0e0", "#fcd8e4", "#f0c0d8", "#f4c8dc", "#fcd8e4",
           ],
         ]}
       />
