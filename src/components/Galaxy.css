@@ -1,0 +1,17 @@
+/* Galaxy — fills its parent. Used as a fixed-inset background layer in
+   WorkScene, with the wrapper getting pointer-events: none so cursor
+   events still reach Universe (z 10) for planet hover/rotate. Galaxy
+   itself listens on window for mousemove so its own repulsion still
+   responds even though the container ignores events. */
+.galaxy-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.galaxy-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
