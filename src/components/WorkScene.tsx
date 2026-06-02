@@ -152,16 +152,21 @@ export default function WorkScene() {
         }
       >
         <LiquidEther
-          mouseForce={20}
-          cursorSize={100}
-          isViscous
-          viscous={30}
-          colors={["#3b70dc", "#9a85e0", "#9084be"]}     /* 饱和度 -10% per user (每色向灰心推 10%，was #336ee6/#9881e6/#8f81c2) */
-          autoDemo={false}
-          autoSpeed={0.5}
-          autoIntensity={2.2}
+          colors={["#12467e", "#9182da", "#8193c0"]}     /* v3 per user: 用 color0/1/2 作为 palette (深湖蓝 → 薰衣草紫 → 灰蓝) */
+          mouseForce={10}
+          cursorSize={95}
+          isViscous={false}
+          viscous={19}
+          iterationsViscous={8}
+          iterationsPoisson={30}
+          resolution={0.45}
           isBounce={false}
-          resolution={0.5}
+          autoDemo
+          autoSpeed={0.05}
+          autoIntensity={1}
+          takeoverDuration={0.25}
+          autoResumeDelay={3000}
+          autoRampDuration={0.6}
         />
       </motion.div>
 

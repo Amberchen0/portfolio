@@ -18,6 +18,15 @@ const nextConfig: NextConfig = {
         source: "/works/:slug/",
         destination: "/works/:slug/index.html",
       },
+      // /about/ → the luxury-Maison-style static page at
+      // /public/about/index.html. Replaced the earlier Next.js
+      // src/app/about/page.tsx with hand-coded HTML so the editorial
+      // typography, scroll-reveal cadence, and grain texture can be
+      // tuned directly without React's abstraction.
+      {
+        source: "/about/",
+        destination: "/about/index.html",
+      },
     ];
   },
 };
