@@ -761,6 +761,20 @@
 
   /* Hide custom cursor on touch */
   @media (hover:none){.cursor-dot,.cursor-ring{display:none}html,body,*{cursor:auto!important}}
+
+  /* ═══ Reduced-motion respect (a11y) ═══
+     OS-level 'Reduce motion' (System Settings → Accessibility → Motion)
+     short-circuits every transition + animation. Reveals still fire but
+     instantly, so content arrives at its final state without vestibular
+     load. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 </style>
 </head>
 <body><a href="/work" style="position:fixed;top:1.25rem;left:1.25rem;z-index:9999;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.75);text-decoration:none;padding:0.5rem 0.85rem;border:1px solid rgba(255,255,255,0.25);border-radius:999px;background:rgba(10,8,7,0.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">← Universe</a>
