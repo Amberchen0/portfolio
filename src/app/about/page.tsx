@@ -68,8 +68,19 @@ export default function AboutPage() {
         className="relative flex w-full items-center justify-center"
         style={{ padding: "32px 24px 16px" }}
       >
+        {/* The component is the canonical React Bits ProfileCard; we
+            don't pass `name` or `title` so the canonical defaults
+            ("Javi A. Torres" / "Software Engineer") would normally
+            render at the bottom of the card. Two explicit empties
+            override those defaults, and the `pc-no-text` wrapper
+            class hides the now-empty .pc-details scrim band so the
+            card ends cleanly at the avatar. (CSS rule in
+            ProfileCard.css.) `showUserInfo={false}` separately hides
+            the handle / status / contact-button row. */}
         <ProfileCard
+          className="pc-no-text"
           name=""
+          title=""
           avatarUrl="/og-default.jpg"
           showUserInfo={false}
           enableTilt

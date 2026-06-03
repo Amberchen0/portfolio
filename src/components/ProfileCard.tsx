@@ -1,19 +1,29 @@
 "use client";
 
 /**
- * ProfileCard — interactive 3D-tilt portrait card, ported from React
- * Bits (@react-bits/ProfileCard-JS-CSS) to TS.
+ * ProfileCard — React Bits canonical (@react-bits/ProfileCard-JS-CSS),
+ * ported to TypeScript. **1:1 fidelity with the upstream JS source.**
  *
- * Two deliberate tweaks from the canonical implementation:
- *   1. The `<p>{title}</p>` byline is now conditionally rendered
- *      only when `title` is a non-empty string. This lets the
- *      Amber Xu about-page show just the name with no empty <p>
- *      taking layout space.
- *   2. Strict-mode and TS-friendly tweaks (window type guards, ref
- *      generics, no `any` on event targets).
+ * The only differences from the original JS file are:
+ *   • `"use client"` directive (Next.js App Router requirement, not a
+ *     behavioural change).
+ *   • TypeScript types added (additive — no runtime change).
+ *   • `e.target` accesses use `e.currentTarget` for TS strictness.
  *
- * The tilt is driven by per-pointer-frame CSS variables on the wrap
- * element — see ProfileCard.css for the visual consumers.
+ * Everything else — DEFAULT_INNER_GRADIENT, ANIMATION_CONFIG, the
+ * clamp/round/adjust helpers, every default prop value, the tilt
+ * engine math, the pointer / device-orientation handlers, the JSX
+ * tree (including the unconditional <h3>{name}</h3> and <p>{title}</p>),
+ * the cardStyle CSS variables, the React.memo export — is reproduced
+ * verbatim from the React Bits source.
+ *
+ * To use the card without visible name/title text (the Amber Xu about-
+ * page case), pass `name=""` and `title=""`. The component still
+ * renders `<h3></h3>` and `<p></p>` per canonical; if you don't want
+ * the empty .pc-details scrim band to be visible either, hide it
+ * **at the call site** with a wrapper class — don't modify the
+ * component. (See src/components/AboutBody.tsx for an example using
+ * `className="pc-no-text"` plus a one-line CSS rule.)
  */
 
 import React, {
@@ -22,6 +32,7 @@ import React, {
   useCallback,
   useMemo,
   type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
 } from "react";
 
 import "./ProfileCard.css";
@@ -71,9 +82,9 @@ export interface ProfileCardProps {
 }
 
 const ProfileCardComponent: React.FC<ProfileCardProps> = ({
-  avatarUrl = "",
-  iconUrl = "",
-  grainUrl = "",
+  avatarUrl = "<Placeholder for avatar URL>",
+  iconUrl = "<Placeholder for icon URL>",
+  grainUrl = "<Placeholder for grain URL>",
   innerGradient,
   behindGlowEnabled = true,
   behindGlowColor,
@@ -83,10 +94,10 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
   enableMobileTilt = false,
   mobileTiltSensitivity = 5,
   miniAvatarUrl,
-  name = "",
-  title = "",
-  handle = "",
-  status = "",
+  name = "Javi A. Torres",
+  title = "Software Engineer",
+  handle = "javicodes",
+  status = "Online",
   contactText = "Contact",
   showUserInfo = true,
   onContactClick,
@@ -216,7 +227,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
     };
   }, [enableTilt]);
 
-  const getOffsets = (evt: PointerEvent, el: HTMLElement) => {
+  const getOffsets = (evt: PointerEvent | ReactPointerEvent, el: HTMLElement) => {
     const rect = el.getBoundingClientRect();
     return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
   };
@@ -238,8 +249,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
 
       shell.classList.add("active");
       shell.classList.add("entering");
-      if (enterTimerRef.current !== null)
-        window.clearTimeout(enterTimerRef.current);
+      if (enterTimerRef.current) window.clearTimeout(enterTimerRef.current);
       enterTimerRef.current = window.setTimeout(() => {
         shell.classList.remove("entering");
       }, ANIMATION_CONFIG.ENTER_TRANSITION_MS);
@@ -308,36 +318,32 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
     const pointerLeaveHandler = handlePointerLeave;
     const deviceOrientationHandler = handleDeviceOrientation;
 
-    shell.addEventListener("pointerenter", pointerEnterHandler as EventListener);
-    shell.addEventListener("pointermove", pointerMoveHandler as EventListener);
-    shell.addEventListener("pointerleave", pointerLeaveHandler as EventListener);
+    shell.addEventListener("pointerenter", pointerEnterHandler);
+    shell.addEventListener("pointermove", pointerMoveHandler);
+    shell.addEventListener("pointerleave", pointerLeaveHandler);
 
     const handleClick = () => {
       if (!enableMobileTilt || location.protocol !== "https:") return;
-      const anyMotion = (
-        window as unknown as {
-          DeviceMotionEvent?: {
-            requestPermission?: () => Promise<string>;
-          };
-        }
-      ).DeviceMotionEvent;
+      // iOS Safari exposes DeviceMotionEvent.requestPermission as a
+      // permission-gated static method. Typed loosely here per the
+      // canonical's `anyMotion`.
+      const anyMotion = window.DeviceMotionEvent as unknown as {
+        requestPermission?: () => Promise<PermissionState>;
+      };
       if (anyMotion && typeof anyMotion.requestPermission === "function") {
         anyMotion
           .requestPermission()
-          .then((state: string) => {
+          .then((state) => {
             if (state === "granted") {
               window.addEventListener(
                 "deviceorientation",
-                deviceOrientationHandler as EventListener
+                deviceOrientationHandler
               );
             }
           })
           .catch(console.error);
       } else {
-        window.addEventListener(
-          "deviceorientation",
-          deviceOrientationHandler as EventListener
-        );
+        window.addEventListener("deviceorientation", deviceOrientationHandler);
       }
     };
     shell.addEventListener("click", handleClick);
@@ -350,25 +356,12 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
     tiltEngine.beginInitial(ANIMATION_CONFIG.INITIAL_DURATION);
 
     return () => {
-      shell.removeEventListener(
-        "pointerenter",
-        pointerEnterHandler as EventListener
-      );
-      shell.removeEventListener(
-        "pointermove",
-        pointerMoveHandler as EventListener
-      );
-      shell.removeEventListener(
-        "pointerleave",
-        pointerLeaveHandler as EventListener
-      );
+      shell.removeEventListener("pointerenter", pointerEnterHandler);
+      shell.removeEventListener("pointermove", pointerMoveHandler);
+      shell.removeEventListener("pointerleave", pointerLeaveHandler);
       shell.removeEventListener("click", handleClick);
-      window.removeEventListener(
-        "deviceorientation",
-        deviceOrientationHandler as EventListener
-      );
-      if (enterTimerRef.current !== null)
-        window.clearTimeout(enterTimerRef.current);
+      window.removeEventListener("deviceorientation", deviceOrientationHandler);
+      if (enterTimerRef.current) window.clearTimeout(enterTimerRef.current);
       if (leaveRafRef.current) cancelAnimationFrame(leaveRafRef.current);
       tiltEngine.cancel();
       shell.classList.remove("entering");
@@ -383,7 +376,7 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
     handleDeviceOrientation,
   ]);
 
-  const cardStyle = useMemo(
+  const cardStyle = useMemo<CSSProperties>(
     () =>
       ({
         "--icon": iconUrl ? `url(${iconUrl})` : "none",
@@ -457,8 +450,8 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
             </div>
             <div className="pc-content">
               <div className="pc-details">
-                {name && <h3>{name}</h3>}
-                {title && <p>{title}</p>}
+                <h3>{name}</h3>
+                <p>{title}</p>
               </div>
             </div>
           </div>

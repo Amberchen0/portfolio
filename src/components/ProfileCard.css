@@ -173,6 +173,16 @@
   border-radius: inherit;
 }
 
+/* Opt-out class for callers who pass empty name/title.
+   ProfileCard renders <h3></h3><p></p> unconditionally (canonical
+   React Bits behaviour); adding `pc-no-text` to the card wrapper
+   suppresses the empty .pc-details scrim band so the card surface
+   ends cleanly at the avatar. The component file itself is left
+   untouched. */
+.pc-no-text .pc-details {
+  display: none;
+}
+
 /* Name strip at the bottom over a dark scrim */
 .pc-details {
   margin-top: auto;
