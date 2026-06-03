@@ -246,26 +246,10 @@
     background: linear-gradient(to right, transparent, var(--line), transparent);
   }
 
-  /* Opener — first line displayed as a lead headline */
-  .essay-opener{
-    font-weight: 400;
-    line-height: 1.25;
-    letter-spacing: 0.005em;
-    text-align: center;
-    margin: 0 0 3.5rem;
-    color: var(--ink);
-    text-wrap: balance;
-  }
-  .lang-en .essay-opener{
-    font-family: var(--serif-en);
-    font-style: italic;
-    font-size: clamp(1.9rem, 4vw, 2.8rem);
-  }
-  .lang-zh .essay-opener{
-    font-family: var(--serif-zh);
-    font-size: clamp(1.6rem, 3.4vw, 2.3rem);
-    letter-spacing: 0.05em;
-  }
+  /* (Previous .essay-opener — the standalone large display line for
+     "Drawing is my way of understanding the world." — removed per
+     user. That line now flows as the first sentence of the first body
+     paragraph instead of being pulled out as a headline.) */
 
   /* Body paragraphs */
   .essay p{
@@ -459,16 +443,13 @@
   <div class="essay lang-en reveal" style="--d:0">
     <p class="essay-eyebrow">A Self-Portrait</p>
 
-    <p class="essay-opener">
-      Drawing is my way of <em>understanding the world.</em>
-    </p>
-
     <p>
-      More than a decade of artistic study and practice have made
-      images my natural way of observing and recording the things
-      language can't quite hold — emotions, memories, the subtle
-      bonds between people, and those easily overlooked moments
-      that nonetheless move us.
+      Drawing is my way of understanding the world. More than a
+      decade of artistic study and practice have made images my
+      natural way of observing and recording the things language
+      can't quite hold — emotions, memories, the subtle bonds
+      between people, and those easily overlooked moments that
+      nonetheless move us.
     </p>
 
     <p>
@@ -503,10 +484,8 @@
   <div class="essay lang-zh reveal" style="--d:0">
     <p class="essay-eyebrow">关于我 · 自述</p>
 
-    <p class="essay-opener">绘画是我理解世界的方式。</p>
-
     <p>
-      十余年的艺术学习与创作经历，让我习惯用图像去观察、记录那些难以被语言准确描述的东西——情绪、记忆、人与人之间微妙的联系，以及那些容易被忽略却足以打动人心的瞬间。
+      绘画是我理解世界的方式。十余年的艺术学习与创作经历，让我习惯用图像去观察、记录那些难以被语言准确描述的东西——情绪、记忆、人与人之间微妙的联系，以及那些容易被忽略却足以打动人心的瞬间。
     </p>
 
     <p>
