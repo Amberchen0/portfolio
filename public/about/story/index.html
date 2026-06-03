@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About — Amber Xu</title>
-<meta name="description" content="Amber Xu — multidisciplinary visual designer working across animation, brand, and AI-augmented production. UTS Animation Production · UMelb Global Media Communication. Sydney / Melbourne.">
+<title>About · Chronicle — Amber Xu</title>
+<meta name="description" content="Amber Xu — Visual Artist · Content Creator · Concept Designer. A self-portrait in six paragraphs. UTS Animation Production · UMelb Global Media Communication. Sydney / Melbourne.">
 <meta property="og:type" content="profile">
-<meta property="og:url" content="https://amberxu.vercel.app/about/">
-<meta property="og:title" content="About — Amber Xu">
-<meta property="og:description" content="Amber Xu — multidisciplinary visual designer. Animation · Brand · AI. Sydney / Melbourne.">
+<meta property="og:url" content="https://amberxu.vercel.app/about/story/">
+<meta property="og:title" content="About · Chronicle — Amber Xu">
+<meta property="og:description" content="Amber Xu — Visual Artist · Content Creator · Concept Designer. Drawing is my way of understanding the world.">
 <meta property="og:image" content="https://amberxu.vercel.app/og-default.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="About — Amber Xu">
-<meta name="twitter:description" content="Amber Xu — multidisciplinary visual designer. Animation · Brand · AI. Sydney / Melbourne.">
+<meta name="twitter:title" content="About · Chronicle — Amber Xu">
+<meta name="twitter:description" content="Amber Xu — Visual Artist · Content Creator · Concept Designer. Drawing is my way of understanding the world.">
 <meta name="twitter:image" content="https://amberxu.vercel.app/og-default.jpg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -215,7 +215,63 @@
     filter: contrast(1.05) brightness(0.92);
   }
 
-  /* ═══════ TIMELINE CHAPTERS ═══════ */
+  /* ═══════ EDITORIAL PROSE — six-paragraph essay ═══════
+     Centred column. The opener (.prose-opener) is the standalone
+     display line; the body paragraphs (.prose p) flow underneath
+     with generous line height. Replaces the year-anchored chapter
+     timeline so the page reads as one continuous reflection. */
+  .prose{
+    max-width: 38rem;
+    margin: 0 auto 12vh;
+    padding: 0 0.5rem;
+  }
+  .prose-eyebrow{
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    text-align: center;
+    margin: 0 0 5rem;
+  }
+  .prose-opener{
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(2rem, 4.2vw, 3.1rem);
+    line-height: 1.18;
+    letter-spacing: 0.005em;
+    color: var(--ink);
+    text-align: center;
+    margin: 0 0 5rem;
+    text-wrap: balance;
+  }
+  .prose-opener em{
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--amber);
+  }
+  .prose p{
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 18px;
+    line-height: 1.85;
+    letter-spacing: 0.005em;
+    color: var(--ink-mute);
+    margin: 0 0 1.6rem;
+  }
+  .prose p:last-child{ margin-bottom: 0; }
+  .prose p em{
+    font-style: italic;
+    color: var(--ink);
+  }
+  .prose-drop{
+    /* Bigger gap after the opener line — visually separates the
+       headline from the first paragraph the way an editorial
+       opener would in print. */
+    margin-top: 1.5rem;
+  }
+
+  /* ═══════ TIMELINE CHAPTERS (legacy — currently unused) ═══════ */
   .chapter{
     display: grid;
     grid-template-columns: 140px 1fr;
@@ -553,7 +609,7 @@
     <p class="hero-eyebrow">About · Chronicle</p>
     <h1 class="hero-name">Amber Xu</h1>
     <div class="hero-rule"></div>
-    <p class="hero-subtitle">Multidisciplinary Visual Designer</p>
+    <p class="hero-subtitle">Visual Artist &nbsp;·&nbsp; Content Creator &nbsp;·&nbsp; Concept Designer</p>
     <p class="hero-location">Sydney &nbsp;·&nbsp; Melbourne &nbsp;·&nbsp; Originally Chengdu</p>
 
     <div class="portrait">
@@ -561,89 +617,63 @@
     </div>
   </section>
 
-  <!-- ─────────────────────────── 2015 — ORIGIN ────────────────────────── -->
-  <section class="chapter reveal">
-    <div class="chapter-year">2015</div>
-    <div class="chapter-content">
-      <p class="chapter-eyebrow">Chapter I · Origin</p>
-      <h2>Where the <em>first sketches</em> were drawn.</h2>
+  <!-- ─────────────────────── EDITORIAL PROSE (6 paragraphs) ─────────────
+       Replaces the previous year-anchored chapter timeline. The opener
+       line is set on its own as a display headline; six paragraphs of
+       flowing serif body follow. Non-chronological by design — this is
+       a self-portrait, not a CV. -->
+  <section class="prose reveal">
+    <p class="prose-eyebrow">About · A Self-Portrait</p>
+
+    <p class="prose-opener">
+      Drawing is my way of <em>understanding the world.</em>
+    </p>
+
+    <div class="prose-drop">
       <p>
-        Ten years of drawing began here. Six paintbrushes, one notebook,
-        and an instinct that something had to be told — not just looked at.
+        More than a decade of artistic study and practice have made
+        images my natural way of observing and recording — emotions,
+        memories, and the quiet bonds between people that language
+        can't quite hold. Before I learned to explain things, I had
+        already learned to draw them.
       </p>
+
       <p>
-        Chinese traditional motifs were the first vocabulary. They remain
-        the anchor of everything I make.
+        For me, every act of creation is a complete cognitive
+        experiment. I begin with a feeling, search for the shape that
+        fits it, and then — through colour, structure, and rhythm —
+        return to read the feeling back. <em>The making itself is how
+        I understand.</em>
+      </p>
+
+      <p>
+        If drawing is my language, my bachelor's at the University of
+        Technology Sydney taught me how to speak it — figure, mood,
+        light; the patience of working frame by frame. The Master of
+        Global Media Communication at the University of Melbourne
+        didn't replace any of that. It broadened the dimensions
+        through which I understand the world: narrative, audience,
+        the way an image travels across platforms and cultures.
+      </p>
+
+      <p>
+        Studying overseas and working across disciplines slowly turned
+        me from a quiet observer into someone who reaches outward.
+        Brand visual, AI-augmented production, art department on
+        Australian short-drama sets, soft furnishing for pre-sale
+        homes, independent projects — each one a different grammar
+        for the same instinct. I learned that an idea only becomes
+        real when it lands inside someone else.
+      </p>
+
+      <p>
+        I love creating not only because it lets me say something,
+        but because it keeps me growing. Each project is, in some
+        quiet way, a re-finding of myself — a chance to test what
+        I notice, what I care about, and what I still want to
+        change about how I see.
       </p>
     </div>
-  </section>
-
-  <!-- ─────────────────────────── 2018 — SYDNEY ────────────────────────── -->
-  <section class="chapter reveal">
-    <div class="chapter-year">2018</div>
-    <div class="chapter-content">
-      <p class="chapter-eyebrow">Chapter II · Sydney</p>
-      <h2>Learning <em>how to make.</em></h2>
-      <p>
-        Bachelor of Animation Production at the University of Technology
-        Sydney. The craft of figure, mood, light. The patience of
-        frame-by-frame. Distinctions across 2D &amp; 3D animation,
-        animation studio, life drawing, and photography.
-      </p>
-      <p>
-        The discovery that craft is the floor, never the ceiling — that
-        taste is the ceiling, and taste is a habit you build over years.
-      </p>
-    </div>
-  </section>
-
-  <!-- ─────────────────────────── 2023 — MELBOURNE ─────────────────────── -->
-  <section class="chapter reveal">
-    <div class="chapter-year">2023</div>
-    <div class="chapter-content">
-      <p class="chapter-eyebrow">Chapter III · Melbourne</p>
-      <h2>Learning how <em>work travels.</em></h2>
-      <p>
-        Master of Global Media Communication at the University of
-        Melbourne. The shift from making images to making images
-        <em>land</em> — across audiences, platforms, languages, contexts.
-      </p>
-      <p>
-        Brand thinking entered the practice; so did the discipline of
-        thinking about an audience before a frame.
-      </p>
-    </div>
-  </section>
-
-  <!-- ─────────────────────────── 2025 — NOW ──────────────────────────── -->
-  <section class="chapter reveal">
-    <div class="chapter-year">2025</div>
-    <div class="chapter-content">
-      <p class="chapter-eyebrow">Chapter IV · Now</p>
-      <h2>Learning how an idea <em>becomes real.</em></h2>
-      <p>
-        Brand visual. Soft furnishing. AI-augmented production. Art
-        department on Australian short-drama sets. Independent projects.
-        The years of figuring out how an idea moves from imagination
-        through strategy and delivery into something a real person can
-        hold.
-      </p>
-      <p>
-        <em>The instinct behind all of it is the same: to keep beating
-        my last attempt. To refine until the work breathes. To outrun
-        who I was last year, and again the year after.</em>
-      </p>
-    </div>
-  </section>
-
-  <!-- ───────────────────── THREE PRINCIPLES — pull quote ─────────────── -->
-  <section class="principles reveal">
-    <p class="principles-label">Three Principles</p>
-    <ol>
-      <li>Atmosphere over event.</li>
-      <li>Beauty next to threat.</li>
-      <li>Slow attention to detail.</li>
-    </ol>
   </section>
 
   <!-- ─────────────────────────── WHAT I MAKE ─────────────────────────── -->
@@ -778,9 +808,16 @@
     </article>
   </section>
 
-  <!-- ─────────────────────────── ANCHOR LINE ─────────────────────────── -->
+  <!-- ─────────────────────────── ANCHOR LINE ───────────────────────────
+       Closing pull quote. Echoes the user's own closing line: the
+       coordinate system through which I see the world has only grown
+       richer and more layered. -->
   <section class="pull reveal">
-    <blockquote>Surprises live in the corners.</blockquote>
+    <blockquote>
+      I am still the person who loves to create. Only the coordinate
+      system through which I see the world has grown richer, more
+      layered.
+    </blockquote>
     <div class="pull-mark"></div>
   </section>
 
