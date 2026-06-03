@@ -21,17 +21,25 @@
 
 <style>
   :root{
-    --bg: #0a0807;
-    --ink: #f0ece4;
-    --ink-mute: rgba(240,236,228,0.55);
-    --ink-faint: rgba(240,236,228,0.32);
-    --amber: #d9a574;
-    --amber-glow: rgba(217,165,116,0.20);
-    --line: rgba(217,165,116,0.22);
-    --line-faint: rgba(240,236,228,0.08);
+    /* Palette aligned with /works/concept/ and the rebuilt /about/ —
+       so the whole "about" surface (entry → essay → chronicle) reads
+       as one continuous design system. Previously this page used a
+       warmer one-off scheme (#0a0807 / #d9a574); replaced with the
+       deeper ink-blue + antique gold palette that lives across the
+       other project pages. The CSS variable name `--amber` is kept
+       so existing rules don't need to be hunted down — the value is
+       just retuned to the concept-page gold. */
+    --bg: #05070b;
+    --ink: #ece7d8;
+    --ink-mute: rgba(236,231,216,0.55);
+    --ink-faint: rgba(236,231,216,0.32);
+    --amber: #a78a4f;                /* now: antique gold (was warm amber) */
+    --amber-glow: rgba(167,138,79,0.20);
+    --line: rgba(167,138,79,0.22);
+    --line-faint: rgba(236,231,216,0.08);
 
-    --serif: 'Cormorant Garamond', 'Times New Roman', serif;
-    --display: 'Italiana', 'Cormorant Garamond', serif;
+    --serif: 'Cormorant Garamond', 'Noto Serif SC', 'Times New Roman', serif;
+    --display: 'Cinzel', 'Cormorant Garamond', serif;
     --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
