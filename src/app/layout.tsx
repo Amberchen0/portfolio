@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   // each page repeating the suffix. `default` covers any page that
   // forgets to set a title (won't happen, but a safety net).
   title: {
-    default: "Amber Xu — Multidisciplinary Visual Designer",
+    default: "Amber Xu — Visual Artist · Content Creator · Concept Designer",
     template: "%s — Amber Xu",
   },
   description: SITE_DESC,
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     locale: "en_AU",
     url: SITE_URL,
     siteName: "Amber Xu",
-    title: "Amber Xu — Multidisciplinary Visual Designer",
+    title: "Amber Xu — Visual Artist · Content Creator · Concept Designer",
     description: SITE_DESC,
     // 1200×630 is the universal sweet spot. Drop the actual file at
     // /public/og-default.jpg when the cover art is ready; URL is
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Amber Xu — Multidisciplinary Visual Designer",
+    title: "Amber Xu — Visual Artist · Content Creator · Concept Designer",
     description: SITE_DESC,
     images: ["/og-default.jpg"],
   },
