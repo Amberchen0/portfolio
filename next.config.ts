@@ -18,19 +18,13 @@ const nextConfig: NextConfig = {
         source: "/works/:slug/",
         destination: "/works/:slug/index.html",
       },
-      // /about/ → minimal hero (photo + 1 line + 2 CTAs).
-      // /about/story/ → the long Maison-style chronicle for visitors
-      // who tap "Want to know more". Both are hand-coded HTML inside
-      // /public/about/ so the editorial typography + grain overlay
-      // can be tuned directly.
-      {
-        source: "/about/",
-        destination: "/about/index.html",
-      },
-      {
-        source: "/about/story/",
-        destination: "/about/story/index.html",
-      },
+      // (The earlier HTML-based /about/ + /about/story/ rewrites lived
+      // here, pointing at hand-coded files in /public/about/. They were
+      // removed when the page was restored to a real Next.js route at
+      // src/app/about/page.tsx — the user disliked the gold/Cinzel
+      // palette the HTML version had drifted into and asked us to go
+      // back to the React design. /public/about/ is gone with this
+      // commit so there's nothing left for the rewrite to hit anyway.)
     ];
   },
 };
