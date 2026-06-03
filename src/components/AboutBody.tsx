@@ -22,6 +22,8 @@
  */
 
 import { useState } from "react";
+import { motion } from "framer-motion";
+import MetallicPaint from "@/components/MetallicPaint";
 
 type Lang = "en" | "zh";
 
@@ -138,17 +140,53 @@ export default function AboutBody() {
         </nav>
       </div>
 
-      <h2
-        className="mb-10 text-3xl sm:text-4xl"
+      {/* Page name treatment — same MetallicPaint "AMBER XU" block-
+          letter wordmark used on the home page. Replaced the previous
+          Times-serif h2 per Amber's note that she really liked the
+          mixed-size capital logo and wanted it kept across the site.
+          Visible h2 is sr-only so screen readers + crawlers still get
+          a heading; the wordmark itself is a shader-rendered SVG so
+          it has no live text. Shader params are intentionally
+          identical to the home version so the identity reads the
+          same. */}
+      <h2 className="sr-only">{t.name}</h2>
+      <motion.div
+        initial={{ opacity: 0, y: 18, filter: "blur(8px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ duration: 1.0, delay: 0.15, ease: [0.2, 0.8, 0.2, 1] }}
+        className="relative mx-auto mb-10"
         style={{
-          fontFamily: 'Times, "Times New Roman", serif',
-          fontWeight: 700,
-          letterSpacing: "0.01em",
-          color: "#f5f1ea",
+          width: "100%",
+          maxWidth: "640px",
+          aspectRatio: "1400 / 1100",  /* matches the SVG viewBox */
         }}
       >
-        {t.name}
-      </h2>
+        <div className="absolute inset-0">
+          <MetallicPaint
+            imageSrc="/amber-xu-block.svg"
+            seed={37.49}
+            scale={1.7}
+            patternSharpness={0.5}
+            noiseScale={2}
+            speed={0.36}
+            liquid={0.87}
+            mouseAnimation
+            brightness={1.95}
+            contrast={0.5}
+            refraction={0.048}
+            blur={0.016}
+            chromaticSpread={2.3}
+            fresnel={2}
+            angle={0}
+            waveAmplitude={1.3}
+            distortion={0.45}
+            contour={0.8}
+            lightColor="#cdc8e1"
+            darkColor="#031943"
+            tintColor="#a3ccf5"
+          />
+        </div>
+      </motion.div>
 
       {/* Body essay — paragraphs flow as one block. Chinese sets a
           slightly looser leading so 16/17 px CJK characters breathe. */}

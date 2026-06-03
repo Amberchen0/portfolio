@@ -54,14 +54,22 @@ export default function AboutPage() {
     <main className="relative flex min-h-screen flex-col">
       {/* Hero: profile card centered at top of page. Cool blue/purple
           inner gradient + soft blue rim glow — the palette Amber
-          asked us to keep. */}
+          asked us to keep.
+
+          Whitespace tuned per feedback: previously this used
+          `minHeight: 80vh` which floated the card in a giant black
+          void above + below. Switched to natural sizing with snug
+          padding so the card sits close to the page top and the
+          essay body picks up right under it. `name=""` is passed so
+          the in-card "Amber Xu" label is suppressed — the metallic
+          AMBER XU wordmark below now carries the identity. */}
       <section
         aria-label="Profile card hero"
         className="relative flex w-full items-center justify-center"
-        style={{ minHeight: "80vh", padding: "48px 24px" }}
+        style={{ padding: "32px 24px 16px" }}
       >
         <ProfileCard
-          name="Amber Xu"
+          name=""
           avatarUrl="/og-default.jpg"
           showUserInfo={false}
           enableTilt
