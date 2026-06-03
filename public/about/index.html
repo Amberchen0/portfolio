@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hans">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -404,16 +404,22 @@
   }
 </style>
 </head>
-<body data-lang="en">
+<!-- /about/ defaults to ZH because the source-of-truth essay is in
+     Chinese (user wrote the six paragraphs in Chinese and explicitly
+     asked that those exact words be the About Me). The English
+     version is a faithful translation one toggle-click away.
+     Home page still defaults to EN — only the About essay flips. -->
+<body data-lang="zh">
 
 <a class="nav-back" href="/work">← Universe</a>
 
 <!-- EN/ZH toggle — same pattern as home page. Default to EN to match
      the metadata language; user can switch with one click. -->
 <div class="lang-toggle" aria-label="Language">
-  <button id="lang-en" class="is-active" type="button">EN</button>
+  <!-- ZH is the default-active state — matches body[data-lang="zh"] -->
+  <button id="lang-en" type="button">EN</button>
   <span class="sep">/</span>
-  <button id="lang-zh" type="button">中</button>
+  <button id="lang-zh" class="is-active" type="button">中</button>
 </div>
 
 <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
