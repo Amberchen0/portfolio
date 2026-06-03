@@ -13,8 +13,17 @@ const copy = {
   en: {
     eyebrow: "Portfolio · 2026",
     title: ["Amber", "Xu"],
-    subtitle: "Multidisciplinary Visual Designer",
-    body: "Crafting visual systems, motion, and interactive worlds — from stop-motion miniatures to cinematic interfaces.",
+    // Three-tag identity replaces the older single "Multidisciplinary
+    // Visual Designer" line. Each tag covers a distinct axis of the
+    // practice: artist (eye/hand/craft) · content creator (reach &
+    // distribution) · concept designer (worlds & narrative).
+    subtitle: "Visual Artist · Content Creator · Concept Designer",
+    // Manifesto, per user direction (post-GPT-feedback session).
+    // The previous tagline was generic; this two-sentence statement
+    // anchors the home with the core thesis: creation as the
+    // expansion of perception, emotion, and modes of expression
+    // — not a display of technique.
+    body: "A creator who began with drawing — growing continuously across visual expression and cross-disciplinary practice. For me, creation isn't a display of technique; it's the continuous expansion of perception, emotion, and the ways of telling.",
     soon: "The full archive is being assembled.",
     cta: "Selected works arriving soon.",
     footer: "Sydney · Available for select collaborations",
@@ -22,8 +31,8 @@ const copy = {
   zh: {
     eyebrow: "作品集 · 2026",
     title: ["Amber", "Xu"],
-    subtitle: "多领域视觉设计师",
-    body: "构建视觉体系、动态影像与交互世界 —— 从手作微缩模型到电影感界面。",
+    subtitle: "视觉艺术家 · 内容创作者 · 概念设计师",
+    body: "我是一个以绘画为起点，在视觉表达与跨领域创作之间持续生长的创造者。对我而言，创作不是技术的展示，而是认知、情感与表达方式的不断扩展。",
     soon: "完整作品归档正在装配中。",
     cta: "精选作品即将上线。",
     footer: "悉尼 · 接受精选合作",
