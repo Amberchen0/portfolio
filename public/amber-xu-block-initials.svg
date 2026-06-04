@@ -1,42 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1100" width="1400" height="1100" preserveAspectRatio="xMidYMid meet">
-  <!-- About-page variant of the "AMBER XU" wordmark.
-       Per Amber's note: "Keep A and X at this A's size; shrink all
-       other letters to a single uniform smaller size."
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 500" width="1400" height="500" preserveAspectRatio="xMidYMid meet">
+  <!-- About-page wordmark — single-row variant.
 
-       Compared with /public/amber-xu-block.svg (the home-page version
-       where AMBER is one uniform size and XU is set even larger), this
-       file uses a classic editorial "large initial" treatment:
-         • A and X are the same big size (360, the previous AMBER size).
-         • M B E R · U are uniformly half that (180) — the trailing
-           letters of each word read as a smaller wordmark trailing
-           a dropped initial.
+       Composition (latest, per Amber):
+         A M B E R · X U     all on one line, centred.
+         A and X are at 280 (two notches down from the previous 360
+         drop-initial size).
+         M B E R and U remain at 180.
+         A small dx="60" before the X opens a visual word-gap between
+         AMBER and XU so the two halves still read as two words rather
+         than a single seven-letter run.
 
-       Each row uses text-anchor="middle" so the entire run (big
-       initial + small remainder) centres on x=700 as one unit.
-       Tspans share the parent's baseline, giving the standard drop-
-       initial alignment: small letters sit on the big initial's
-       baseline, with their tops well below the initial's top.
+       ViewBox shrunk from 1400×1100 (two-row) to 1400×500 (one-row).
+       The MetallicPaint container in AboutBody has its aspectRatio
+       updated to match (1400 / 500 = 2.8) so the shader frames the
+       new shape without letterboxing or cropping.
 
-       ViewBox 1400×1100 is kept identical to the home-page SVG so the
-       MetallicPaint container's aspectRatio in AboutBody doesn't need
-       to change.
+       This file is dedicated to /about/. The home page still loads
+       /amber-xu-block.svg (AMBER 360 + XU 500, two rows), unchanged.
 
        Fallback chain: Didot → Bodoni 72 → GFS Didot → Hoefler Text →
        Times New Roman → generic serif. -->
-  <text x="700" y="420"
+  <text x="700" y="370"
         text-anchor="middle"
         font-family="'Didot', 'Bodoni 72', 'GFS Didot', 'Hoefler Text', 'Times New Roman', serif"
         font-weight="bold"
         letter-spacing="8"
         fill="#000000">
-    <tspan font-size="360">A</tspan><tspan font-size="180">MBER</tspan>
-  </text>
-  <text x="700" y="900"
-        text-anchor="middle"
-        font-family="'Didot', 'Bodoni 72', 'GFS Didot', 'Hoefler Text', 'Times New Roman', serif"
-        font-weight="bold"
-        letter-spacing="8"
-        fill="#000000">
-    <tspan font-size="360">X</tspan><tspan font-size="180">U</tspan>
+    <tspan font-size="280">A</tspan><tspan font-size="180">MBER</tspan><tspan font-size="280" dx="60">X</tspan><tspan font-size="180">U</tspan>
   </text>
 </svg>

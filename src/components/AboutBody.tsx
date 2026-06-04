@@ -157,8 +157,14 @@ export default function AboutBody() {
         className="relative mx-auto mb-10"
         style={{
           width: "100%",
-          maxWidth: "640px",
-          aspectRatio: "1400 / 1100",  /* matches the SVG viewBox */
+          maxWidth: "720px",
+          /* About variant of the wordmark is single-row, so its SVG
+             viewBox is 1400×500 — much wider than the home page's
+             1400×1100. aspectRatio updated to match so the
+             MetallicPaint surface frames the new shape. maxWidth
+             bumped to 720 so the banner still feels substantial in
+             the column. */
+          aspectRatio: "1400 / 500",
         }}
       >
         <div className="absolute inset-0">
