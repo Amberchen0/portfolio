@@ -1183,9 +1183,15 @@ function PlanetLabel({
   const distance = planetRadius * 1.1 + 0.06;
   return (
     <Billboard>
+      {/* All three layers share Tinos Bold (Google's metrics-equivalent
+          of Times New Roman) — drei/troika needs a real font file URL,
+          not the CSS "Times" family name, so we self-host the TTF in
+          /public/fonts/. Same file across the three layers keeps the
+          chromatic offset registration pixel-perfect. */}
       {/* magenta-red ghost */}
       <Text
         position={[shift, 0, distance]}
+        font="/fonts/Tinos-Bold.ttf"
         color="#ff2860"
         fontSize={fontSize}
         letterSpacing={0.22}
@@ -1199,6 +1205,7 @@ function PlanetLabel({
       {/* cyan ghost */}
       <Text
         position={[-shift, 0, distance]}
+        font="/fonts/Tinos-Bold.ttf"
         color="#00e0ff"
         fontSize={fontSize}
         letterSpacing={0.22}
@@ -1212,6 +1219,7 @@ function PlanetLabel({
       {/* warm-cream main fill, drawn last on top */}
       <Text
         position={[0, 0, distance + 0.002]}
+        font="/fonts/Tinos-Bold.ttf"
         color={hovered ? "#f0e0c5" : "#c8bca0"}
         fontSize={fontSize}
         letterSpacing={0.22}
@@ -4180,14 +4188,34 @@ export default function Universe() {
           floating over the universe canvas.  Glass takes width/height from
           fit-content + inline padding; the inner flex row provides the
           actual layout. */}
-      {/* Top nav — shared <TopNav /> component. Universe is the only
-          page that passes a `left` cluster (brand + INDEX disclosure
-          + dropdown below). /, /about and other pages mount TopNav
-          with no left arg so they only show HOME · WORKS · ABOUT on
-          the right. */}
-      <TopNav
-        left={
-          <>
+      {/* Right-corner capsule — shared HOME · WORKS · ABOUT pill.
+          Lives in TopNav.tsx so /, /about and Universe all share the
+          same glass dial. fit-content width, pinned top-right. */}
+      <TopNav />
+
+      {/* Left-corner capsule — /work-only brand mark + INDEX
+          disclosure. Pinned to the top-left, fit-content width (NOT a
+          full-width bar — Amber wants the centre of the viewport
+          free). When INDEX is open the planets list drops down
+          underneath the pill inside the same fixed wrapper. */}
+      <div className="pointer-events-none fixed left-6 top-6 sm:left-12 sm:top-8 z-50">
+        <GlassSurface
+          width="fit-content"
+          height="fit-content"
+          borderRadius={22}
+          displace={3}
+          distortionScale={-180}
+          redOffset={5}
+          greenOffset={10}
+          blueOffset={20}
+          brightness={50}
+          opacity={0.93}
+          blur={14}
+          backgroundOpacity={0.1}
+          saturation={1}
+          mixBlendMode="normal"
+        >
+          <div className="flex items-center gap-4 px-5 py-2.5">
             <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
               Amber Xu · Universe
             </span>
@@ -4201,37 +4229,36 @@ export default function Universe() {
               <span>{menuOpen ? "Close" : "Index"}</span>
               <span className="text-[10px] opacity-80 transition-transform" style={{ transform: menuOpen ? "rotate(90deg)" : "rotate(0)" }}>▸</span>
             </button>
-          </>
-        }
-        below={
-          menuOpen ? (
-            <ul
-              id="universe-works-menu"
-              className="pointer-events-auto mt-3 flex flex-col gap-1.5 font-mono text-[11px] uppercase tracking-[0.15em] border-l border-white/10 pl-3"
-            >
-              {/* Flatten planets + moons so HYSTON gets its own <li> and
-                  inherits the parent gap-1.5 (was nested inside Photography's
-                  <li> → no gap between them).  Marker is a 4-point sparkle
-                  star (vertical taller than horizontal) per user request. */}
-              {PLANETS.flatMap((p) => [
-                { slug: p.slug, name: p.name, color: p.iridescenceColor },
-                ...((p.moons ?? []).map((m) => ({
-                  slug: m.slug,
-                  name: m.name,
-                  color: m.iridescenceColor,
-                }))),
-              ]).map((item) => (
-                <li key={item.slug}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      handlePlanetClick(item.slug);
-                    }}
-                    className="group flex items-center gap-2.5 text-muted hover:text-white transition-colors w-full text-left py-0.5"
-                  >
-                    <svg
-                      width="9"
+          </div>
+        </GlassSurface>
+        {menuOpen && (
+          <ul
+            id="universe-works-menu"
+            className="pointer-events-auto mt-3 flex flex-col gap-1.5 font-mono text-[11px] uppercase tracking-[0.15em] border-l border-white/10 pl-3"
+          >
+            {/* Flatten planets + moons so HYSTON gets its own <li> and
+                inherits the parent gap-1.5 (was nested inside Photography's
+                <li> → no gap between them).  Marker is a 4-point sparkle
+                star (vertical taller than horizontal) per user request. */}
+            {PLANETS.flatMap((p) => [
+              { slug: p.slug, name: p.name, color: p.iridescenceColor },
+              ...((p.moons ?? []).map((m) => ({
+                slug: m.slug,
+                name: m.name,
+                color: m.iridescenceColor,
+              }))),
+            ]).map((item) => (
+              <li key={item.slug}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    handlePlanetClick(item.slug);
+                  }}
+                  className="group flex items-center gap-2.5 text-muted hover:text-white transition-colors w-full text-left py-0.5"
+                >
+                  <svg
+                    width="9"
                     height="14"
                     viewBox="-9 -14 18 28"
                     className="shrink-0 opacity-80 group-hover:opacity-100 transition-opacity"
@@ -4249,10 +4276,9 @@ export default function Universe() {
                 </button>
               </li>
             ))}
-            </ul>
-          ) : null
-        }
-      />
+          </ul>
+        )}
+      </div>
 
       {/* hint removed per user — "← move cursor to rotate →" no longer rendered */}
 
