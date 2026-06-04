@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { LiquidChrome } from "@/components/LiquidChrome";
 import MetallicPaint from "@/components/MetallicPaint";
+import TopNav from "@/components/TopNav";
 
 type Lang = "en" | "zh";
 
@@ -121,11 +122,18 @@ export default function Home() {
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* top bar */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-6 sm:px-12 sm:py-8">
-        <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          AX · {new Date().getFullYear()}
-        </span>
+      {/* Shared TopNav — right cluster only (HOME · WORKS · ABOUT).
+          Per Amber, only the /work universe page carries the brand
+          + INDEX disclosure on the left; on home and /about the bar
+          shows just the page-link cluster aligned right. */}
+      <TopNav />
+
+      {/* Local top row — now only the EN / 中 language toggle. The
+          earlier "AX · 2026" brand mark is gone (the page nav above
+          carries the identity context). `pt-20 sm:pt-24` pushes this
+          row below TopNav so the lang controls don't sit underneath
+          the floating bar. */}
+      <header className="relative z-10 flex items-center justify-end px-6 pb-2 pt-20 sm:px-12 sm:pb-3 sm:pt-24">
         <nav className="font-mono text-xs uppercase tracking-[0.2em]">
           <button
             onClick={() => setLang("en")}

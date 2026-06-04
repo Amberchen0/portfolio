@@ -15,6 +15,7 @@ import { EffectComposer, HueSaturation, Bloom } from "@react-three/postprocessin
 import { useRef, useMemo, useState, useEffect } from "react";
 import * as THREE from "three";
 import GlassSurface from "./GlassSurface";
+import TopNav from "./TopNav";
 
 /** 9 distinct glass / metal / pearl recipes — one per planet so the user
  *  can compare them side by side and pick a favourite. Each maps to a
@@ -1163,13 +1164,20 @@ function PlanetLabel({
   name,
   planetRadius,
   hovered,
+  sizeMultiplier = 1,
 }: {
   name: string;
   planetRadius: number;
   hovered: boolean;
+  /** Multiplies fontSize only — the chromatic three-layer styling stays
+   *  identical for every label. Defaults to 1 so existing planet/moon
+   *  callsites render unchanged. The sun callsite passes a value > 1
+   *  because its 1.2 radius dwarfs every other body and the default
+   *  label is too small to read against the emissive surface. */
+  sizeMultiplier?: number;
 }) {
   const shift = hovered ? 0.018 : 0.008;
-  const fontSize = hovered ? 0.16 : 0.13;
+  const fontSize = (hovered ? 0.16 : 0.13) * sizeMultiplier;
   const fillOpacity = hovered ? 0.95 : 0.8;
   // sit just outside hover-scaled (1.1x) sphere, on the camera-facing side
   const distance = planetRadius * 1.1 + 0.06;
@@ -4037,7 +4045,12 @@ function SceneContent({
           better than a wobbling one. raycast={() => null} inside
           PlanetLabel means clicks still pass through to the sun
           mesh's onClick → /about. */}
-      <PlanetLabel name="Amber Xu" planetRadius={1.2} hovered={false} />
+      <PlanetLabel
+        name="Amber Xu"
+        planetRadius={1.2}
+        hovered
+        sizeMultiplier={1.6}
+      />
 
       <PlanetSystem
         onPlanetClick={onPlanetClick}
@@ -4167,115 +4180,58 @@ export default function Universe() {
           floating over the universe canvas.  Glass takes width/height from
           fit-content + inline padding; the inner flex row provides the
           actual layout. */}
-      {/* Top nav — now a full-width glass bar pinned across the top
-          instead of a corner pill, per user. Composition:
-            LEFT  : AMBER XU · UNIVERSE   [INDEX ▸]
-            RIGHT : HOME   WORKS   ABOUT
-          `justify-between` opens the dead space in the middle. The
-          outer wrapper keeps pointer-events-none so the scene can
-          still be clicked through any blank space between groups;
-          each link/button re-enables pointer-events-auto on itself. */}
-      <div className="pointer-events-none absolute left-6 right-6 top-6 sm:left-12 sm:right-12 sm:top-8 z-10">
-        <GlassSurface
-          width="100%"
-          height="fit-content"
-          borderRadius={22}
-          /* Glass-feel tuning. The previous corner-pill values went
-             near-invisible against the dark cosmic backdrop — almost
-             nothing for the refraction to bend, and difference mode
-             inverted what little did show through. Adjustments:
-             • backgroundOpacity 0 → 0.10  (light frost so the pill
-               shape is read even with mostly-empty space behind).
-             • blur 11 → 14                (visible blur of star field).
-             • mixBlendMode difference → normal  (passes colours through
-               cleanly instead of inverting them).
-             • displace 0 → 3 + redOffset 0 → 5  (small visible RGB
-               shift at the pill edges — the actual "refraction" cue).
-             Refractive intent preserved via displace + RGB offsets;
-             frost added so the bar reads on any backdrop. */
-          displace={3}
-          distortionScale={-180}
-          redOffset={5}
-          greenOffset={10}
-          blueOffset={20}
-          brightness={50}
-          opacity={0.93}
-          blur={14}
-          backgroundOpacity={0.1}
-          saturation={1}
-          mixBlendMode="normal"
-        >
-          <div className="flex items-center justify-between gap-4 flex-wrap px-5 py-2.5">
-            {/* LEFT cluster — brand + INDEX disclosure */}
-            <div className="flex items-center gap-4">
-              <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
-                Amber Xu · Universe
-              </span>
-              <button
-                type="button"
-                onClick={() => setMenuOpen((v) => !v)}
-                className="pointer-events-auto inline-flex items-center gap-2 px-2.5 py-1 border border-white/15 rounded-sm font-mono text-[11px] uppercase tracking-[0.25em] text-white/70 hover:text-amber hover:border-amber/40 hover:bg-white/[0.02] transition-colors"
-                aria-expanded={menuOpen}
-                aria-controls="universe-works-menu"
-              >
-                <span>{menuOpen ? "Close" : "Index"}</span>
-                <span className="text-[10px] opacity-80 transition-transform" style={{ transform: menuOpen ? "rotate(90deg)" : "rotate(0)" }}>▸</span>
-              </button>
-            </div>
-
-            {/* RIGHT cluster — page nav. "Works" is the English
-                translation of 作品集 (the portfolio archive), routing
-                to the universe scene itself. */}
-            <div className="flex items-center gap-6">
-              <a
-                href="/"
-                className="pointer-events-auto font-mono text-xs uppercase tracking-[0.3em] text-muted hover:text-amber transition-colors"
-              >
-                Home
-              </a>
-              <a
-                href="/work"
-                className="pointer-events-auto font-mono text-xs uppercase tracking-[0.3em] text-muted hover:text-amber transition-colors"
-              >
-                Works
-              </a>
-              <a
-                href="/about"
-                className="pointer-events-auto font-mono text-xs uppercase tracking-[0.3em] text-muted hover:text-amber transition-colors"
-              >
-                About
-              </a>
-            </div>
-          </div>
-        </GlassSurface>
-        {menuOpen && (
-          <ul
-            id="universe-works-menu"
-            className="pointer-events-auto mt-3 flex flex-col gap-1.5 font-mono text-[11px] uppercase tracking-[0.15em] border-l border-white/10 pl-3"
-          >
-            {/* Flatten planets + moons so HYSTON gets its own <li> and
-                inherits the parent gap-1.5 (was nested inside Photography's
-                <li> → no gap between them).  Marker is a 4-point sparkle
-                star (vertical taller than horizontal) per user request. */}
-            {PLANETS.flatMap((p) => [
-              { slug: p.slug, name: p.name, color: p.iridescenceColor },
-              ...((p.moons ?? []).map((m) => ({
-                slug: m.slug,
-                name: m.name,
-                color: m.iridescenceColor,
-              }))),
-            ]).map((item) => (
-              <li key={item.slug}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    handlePlanetClick(item.slug);
-                  }}
-                  className="group flex items-center gap-2.5 text-muted hover:text-white transition-colors w-full text-left py-0.5"
-                >
-                  <svg
-                    width="9"
+      {/* Top nav — shared <TopNav /> component. Universe is the only
+          page that passes a `left` cluster (brand + INDEX disclosure
+          + dropdown below). /, /about and other pages mount TopNav
+          with no left arg so they only show HOME · WORKS · ABOUT on
+          the right. */}
+      <TopNav
+        left={
+          <>
+            <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
+              Amber Xu · Universe
+            </span>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              className="pointer-events-auto inline-flex items-center gap-2 px-2.5 py-1 border border-white/15 rounded-sm font-mono text-[11px] uppercase tracking-[0.25em] text-white/70 hover:text-amber hover:border-amber/40 hover:bg-white/[0.02] transition-colors"
+              aria-expanded={menuOpen}
+              aria-controls="universe-works-menu"
+            >
+              <span>{menuOpen ? "Close" : "Index"}</span>
+              <span className="text-[10px] opacity-80 transition-transform" style={{ transform: menuOpen ? "rotate(90deg)" : "rotate(0)" }}>▸</span>
+            </button>
+          </>
+        }
+        below={
+          menuOpen ? (
+            <ul
+              id="universe-works-menu"
+              className="pointer-events-auto mt-3 flex flex-col gap-1.5 font-mono text-[11px] uppercase tracking-[0.15em] border-l border-white/10 pl-3"
+            >
+              {/* Flatten planets + moons so HYSTON gets its own <li> and
+                  inherits the parent gap-1.5 (was nested inside Photography's
+                  <li> → no gap between them).  Marker is a 4-point sparkle
+                  star (vertical taller than horizontal) per user request. */}
+              {PLANETS.flatMap((p) => [
+                { slug: p.slug, name: p.name, color: p.iridescenceColor },
+                ...((p.moons ?? []).map((m) => ({
+                  slug: m.slug,
+                  name: m.name,
+                  color: m.iridescenceColor,
+                }))),
+              ]).map((item) => (
+                <li key={item.slug}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      handlePlanetClick(item.slug);
+                    }}
+                    className="group flex items-center gap-2.5 text-muted hover:text-white transition-colors w-full text-left py-0.5"
+                  >
+                    <svg
+                      width="9"
                     height="14"
                     viewBox="-9 -14 18 28"
                     className="shrink-0 opacity-80 group-hover:opacity-100 transition-opacity"
@@ -4293,14 +4249,12 @@ export default function Universe() {
                 </button>
               </li>
             ))}
-          </ul>
-        )}
-      </div>
+            </ul>
+          ) : null
+        }
+      />
 
-      {/* hint */}
-      <div className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 font-mono text-xs uppercase tracking-[0.3em] text-muted sm:bottom-8">
-        ← move cursor to rotate →
-      </div>
+      {/* hint removed per user — "← move cursor to rotate →" no longer rendered */}
 
       {/* back-to-home moved to left header row */}
 

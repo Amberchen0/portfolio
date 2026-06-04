@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import ProfileCard from "@/components/ProfileCard";
+import ProfileCardHero from "@/components/ProfileCardHero";
 import AboutBody from "@/components/AboutBody";
+import TopNav from "@/components/TopNav";
 
 /**
  * /about — About Me page.
@@ -53,18 +53,12 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <main className="relative flex min-h-screen flex-col">
-      {/* Back-to-Universe nav pill — matches the chrome on every
-          /works/<slug>/ project page so navigation feels consistent
-          across the whole portfolio. Fixed top-left, pointer-events
-          live so it sits above ProfileCard's hover surface. The HTML
-          version had this and it dropped off when we moved to React;
-          restored here. */}
-      <Link
-        href="/work"
-        className="fixed left-6 top-6 z-50 inline-flex items-center rounded-full border border-white/20 bg-black/40 px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.3em] text-white/75 backdrop-blur-md transition-colors hover:border-white/50 hover:text-white"
-      >
-        ← Universe
-      </Link>
+      {/* Shared TopNav — right cluster only (HOME · WORKS · ABOUT).
+          The left cluster (brand mark + INDEX disclosure) is /work
+          exclusive per Amber, so no `left` prop is passed here. The
+          earlier ← Universe corner pill is gone — TopNav now carries
+          the back-to-/work navigation. */}
+      <TopNav />
 
       {/* Hero: profile card centered at top of page. Cool blue/purple
           inner gradient + soft blue rim glow — the palette Amber
@@ -91,18 +85,7 @@ export default function AboutPage() {
             card ends cleanly at the avatar. (CSS rule in
             ProfileCard.css.) `showUserInfo={false}` separately hides
             the handle / status / contact-button row. */}
-        <ProfileCard
-          className="pc-no-text"
-          name=""
-          title=""
-          avatarUrl="/og-default.jpg"
-          showUserInfo={false}
-          enableTilt
-          enableMobileTilt
-          behindGlowEnabled
-          behindGlowColor="rgba(125, 190, 255, 0.67)"
-          innerGradient="linear-gradient(145deg,#60496e8c 0%,#71C4FF44 100%)"
-        />
+        <ProfileCardHero />
       </section>
 
       {/* Body block — eyebrow + name + 6-paragraph essay + closing pull
