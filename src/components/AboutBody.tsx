@@ -162,8 +162,14 @@ export default function AboutBody() {
         }}
       >
         <div className="absolute inset-0">
+          {/* About-page variant of the wordmark — A and X are big, the
+              trailing M B E R · U are uniformly smaller (drop-initial
+              treatment). The home page still uses the original
+              /amber-xu-block.svg with both rows at uniform size, so
+              the two pages now have visually distinct masthead
+              compositions. */}
           <MetallicPaint
-            imageSrc="/amber-xu-block.svg"
+            imageSrc="/amber-xu-block-initials.svg"
             seed={37.49}
             scale={1.7}
             patternSharpness={0.5}

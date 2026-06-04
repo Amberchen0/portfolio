@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1100" width="1400" height="1100" preserveAspectRatio="xMidYMid meet">
+  <!-- About-page variant of the "AMBER XU" wordmark.
+       Per Amber's note: "Keep A and X at this A's size; shrink all
+       other letters to a single uniform smaller size."
+
+       Compared with /public/amber-xu-block.svg (the home-page version
+       where AMBER is one uniform size and XU is set even larger), this
+       file uses a classic editorial "large initial" treatment:
+         • A and X are the same big size (360, the previous AMBER size).
+         • M B E R · U are uniformly half that (180) — the trailing
+           letters of each word read as a smaller wordmark trailing
+           a dropped initial.
+
+       Each row uses text-anchor="middle" so the entire run (big
+       initial + small remainder) centres on x=700 as one unit.
+       Tspans share the parent's baseline, giving the standard drop-
+       initial alignment: small letters sit on the big initial's
+       baseline, with their tops well below the initial's top.
+
+       ViewBox 1400×1100 is kept identical to the home-page SVG so the
+       MetallicPaint container's aspectRatio in AboutBody doesn't need
+       to change.
+
+       Fallback chain: Didot → Bodoni 72 → GFS Didot → Hoefler Text →
+       Times New Roman → generic serif. -->
+  <text x="700" y="420"
+        text-anchor="middle"
+        font-family="'Didot', 'Bodoni 72', 'GFS Didot', 'Hoefler Text', 'Times New Roman', serif"
+        font-weight="bold"
+        letter-spacing="8"
+        fill="#000000">
+    <tspan font-size="360">A</tspan><tspan font-size="180">MBER</tspan>
+  </text>
+  <text x="700" y="900"
+        text-anchor="middle"
+        font-family="'Didot', 'Bodoni 72', 'GFS Didot', 'Hoefler Text', 'Times New Roman', serif"
+        font-weight="bold"
+        letter-spacing="8"
+        fill="#000000">
+    <tspan font-size="360">X</tspan><tspan font-size="180">U</tspan>
+  </text>
+</svg>
