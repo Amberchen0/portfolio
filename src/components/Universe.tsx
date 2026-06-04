@@ -4167,27 +4167,32 @@ export default function Universe() {
           floating over the universe canvas.  Glass takes width/height from
           fit-content + inline padding; the inner flex row provides the
           actual layout. */}
-      <div className="pointer-events-none absolute left-6 top-6 sm:left-12 sm:top-8 max-w-[480px]">
-        {/* Single row: Brand · Home · INDEX — wrapped in glass pill */}
+      {/* Top nav — now a full-width glass bar pinned across the top
+          instead of a corner pill, per user. Composition:
+            LEFT  : AMBER XU · UNIVERSE   [INDEX ▸]
+            RIGHT : HOME   WORKS   ABOUT
+          `justify-between` opens the dead space in the middle. The
+          outer wrapper keeps pointer-events-none so the scene can
+          still be clicked through any blank space between groups;
+          each link/button re-enables pointer-events-auto on itself. */}
+      <div className="pointer-events-none absolute left-6 right-6 top-6 sm:left-12 sm:right-12 sm:top-8 z-10">
         <GlassSurface
-          width="fit-content"
+          width="100%"
           height="fit-content"
           borderRadius={22}
-          /* Glass-feel tuning. The previous values produced a clear
-             refractive pill that read perfectly on photo-rich backdrops
-             but went near-invisible on the dark cosmic scene — the
-             refraction has almost no high-frequency content to bend.
-             Adjustments:
+          /* Glass-feel tuning. The previous corner-pill values went
+             near-invisible against the dark cosmic backdrop — almost
+             nothing for the refraction to bend, and difference mode
+             inverted what little did show through. Adjustments:
              • backgroundOpacity 0 → 0.10  (light frost so the pill
                shape is read even with mostly-empty space behind).
              • blur 11 → 14                (visible blur of star field).
-             • mixBlendMode difference → normal  (was inverting colours
-               and reading dark/dead; now passes through cleanly).
+             • mixBlendMode difference → normal  (passes colours through
+               cleanly instead of inverting them).
              • displace 0 → 3 + redOffset 0 → 5  (small visible RGB
                shift at the pill edges — the actual "refraction" cue).
-             Refractive look preserved via the displace + RGB offsets;
-             frosted look added as a base layer so glass reads on any
-             backdrop. */
+             Refractive intent preserved via displace + RGB offsets;
+             frost added so the bar reads on any backdrop. */
           displace={3}
           distortionScale={-180}
           redOffset={5}
@@ -4200,35 +4205,47 @@ export default function Universe() {
           saturation={1}
           mixBlendMode="normal"
         >
-          <div className="flex items-center gap-4 flex-wrap px-5 py-2.5">
-            <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
-              Amber Xu · Universe
-            </span>
-            <a
-              href="/"
-              className="pointer-events-auto font-mono text-xs uppercase tracking-[0.3em] text-muted hover:text-amber transition-colors"
-            >
-              Home
-            </a>
-            {/* About link — added per user. Sits between Home and the
-                Index disclosure button so the nav reads
-                Brand · Home · About · Index. */}
-            <a
-              href="/about"
-              className="pointer-events-auto font-mono text-xs uppercase tracking-[0.3em] text-muted hover:text-amber transition-colors"
-            >
-              About
-            </a>
-            <button
-              type="button"
-              onClick={() => setMenuOpen((v) => !v)}
-              className="pointer-events-auto inline-flex items-center gap-2 px-2.5 py-1 border border-white/15 rounded-sm font-mono text-[11px] uppercase tracking-[0.25em] text-white/70 hover:text-amber hover:border-amber/40 hover:bg-white/[0.02] transition-colors"
-              aria-expanded={menuOpen}
-              aria-controls="universe-works-menu"
-            >
-              <span>{menuOpen ? "Close" : "Index"}</span>
-              <span className="text-[10px] opacity-80 transition-transform" style={{ transform: menuOpen ? "rotate(90deg)" : "rotate(0)" }}>▸</span>
-            </button>
+          <div className="flex items-center justify-between gap-4 flex-wrap px-5 py-2.5">
+            {/* LEFT cluster — brand + INDEX disclosure */}
+            <div className="flex items-center gap-4">
+              <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
+                Amber Xu · Universe
+              </span>
+              <button
+                type="button"
+                onClick={() => setMenuOpen((v) => !v)}
+                className="pointer-events-auto inline-flex items-center gap-2 px-2.5 py-1 border border-white/15 rounded-sm font-mono text-[11px] uppercase tracking-[0.25em] text-white/70 hover:text-amber hover:border-amber/40 hover:bg-white/[0.02] transition-colors"
+                aria-expanded={menuOpen}
+                aria-controls="universe-works-menu"
+              >
+                <span>{menuOpen ? "Close" : "Index"}</span>
+                <span className="text-[10px] opacity-80 transition-transform" style={{ transform: menuOpen ? "rotate(90deg)" : "rotate(0)" }}>▸</span>
+              </button>
+            </div>
+
+            {/* RIGHT cluster — page nav. "Works" is the English
+                translation of 作品集 (the portfolio archive), routing
+                to the universe scene itself. */}
+            <div className="flex items-center gap-6">
+              <a
+                href="/"
+                className="pointer-events-auto font-mono text-xs uppercase tracking-[0.3em] text-muted hover:text-amber transition-colors"
+              >
+                Home
+              </a>
+              <a
+                href="/work"
+                className="pointer-events-auto font-mono text-xs uppercase tracking-[0.3em] text-muted hover:text-amber transition-colors"
+              >
+                Works
+              </a>
+              <a
+                href="/about"
+                className="pointer-events-auto font-mono text-xs uppercase tracking-[0.3em] text-muted hover:text-amber transition-colors"
+              >
+                About
+              </a>
+            </div>
           </div>
         </GlassSurface>
         {menuOpen && (
