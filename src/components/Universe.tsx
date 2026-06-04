@@ -14,6 +14,7 @@ import {
 import { EffectComposer, HueSaturation, Bloom } from "@react-three/postprocessing";
 import { useRef, useMemo, useState, useEffect } from "react";
 import * as THREE from "three";
+import GlassSurface from "./GlassSurface";
 
 /** 9 distinct glass / metal / pearl recipes — one per planet so the user
  *  can compare them side by side and pick a favourite. Each maps to a
@@ -4025,6 +4026,18 @@ function SceneContent({
           - <AmberCoreSun />   mattdesl-style internal-light SSS (warm core glow)
           All three keep the LOCKED displacement + pulse + pano spec. */}
       <AmberCoreSun />
+      {/* Sun label — same chromatic three-layer Text/Billboard treatment
+          used by every planet (PlanetLabel above), so the sun reads as
+          a navigable "world" too. Sits in front of the sun core in
+          screen-space (Billboard always faces the camera). Sun radius
+          is 1.2, so the label sits at distance ≈ 1.2 * 1.1 + 0.06 =
+          1.38 world units toward the camera. Not wrapped in <Float>:
+          the parent sun bobs gently (floatIntensity 0.12) but the
+          drift is well under one frame and a stable label reads
+          better than a wobbling one. raycast={() => null} inside
+          PlanetLabel means clicks still pass through to the sun
+          mesh's onClick → /about. */}
+      <PlanetLabel name="Amber Xu" planetRadius={1.2} hovered={false} />
 
       <PlanetSystem
         onPlanetClick={onPlanetClick}
@@ -4148,30 +4161,76 @@ export default function Universe() {
         />
       </Canvas>
 
-      {/* brand + collapsible works directory */}
+      {/* brand + collapsible works directory.
+          The brand row sits inside a <GlassSurface> (React Bits glass with
+          chromatic SVG displacement) so the nav reads as a frosted pill
+          floating over the universe canvas.  Glass takes width/height from
+          fit-content + inline padding; the inner flex row provides the
+          actual layout. */}
       <div className="pointer-events-none absolute left-6 top-6 sm:left-12 sm:top-8 max-w-[480px]">
-        {/* Single row: Brand · Home · INDEX */}
-        <div className="flex items-center gap-4 flex-wrap">
-          <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
-            Amber Xu · Universe
-          </span>
-          <a
-            href="/"
-            className="pointer-events-auto font-mono text-xs uppercase tracking-[0.3em] text-muted hover:text-amber transition-colors"
-          >
-            Home
-          </a>
-          <button
-            type="button"
-            onClick={() => setMenuOpen((v) => !v)}
-            className="pointer-events-auto inline-flex items-center gap-2 px-2.5 py-1 border border-white/15 rounded-sm font-mono text-[11px] uppercase tracking-[0.25em] text-white/70 hover:text-amber hover:border-amber/40 hover:bg-white/[0.02] transition-colors"
-            aria-expanded={menuOpen}
-            aria-controls="universe-works-menu"
-          >
-            <span>{menuOpen ? "Close" : "Index"}</span>
-            <span className="text-[10px] opacity-80 transition-transform" style={{ transform: menuOpen ? "rotate(90deg)" : "rotate(0)" }}>▸</span>
-          </button>
-        </div>
+        {/* Single row: Brand · Home · INDEX — wrapped in glass pill */}
+        <GlassSurface
+          width="fit-content"
+          height="fit-content"
+          borderRadius={22}
+          /* Glass-feel tuning. The previous values produced a clear
+             refractive pill that read perfectly on photo-rich backdrops
+             but went near-invisible on the dark cosmic scene — the
+             refraction has almost no high-frequency content to bend.
+             Adjustments:
+             • backgroundOpacity 0 → 0.10  (light frost so the pill
+               shape is read even with mostly-empty space behind).
+             • blur 11 → 14                (visible blur of star field).
+             • mixBlendMode difference → normal  (was inverting colours
+               and reading dark/dead; now passes through cleanly).
+             • displace 0 → 3 + redOffset 0 → 5  (small visible RGB
+               shift at the pill edges — the actual "refraction" cue).
+             Refractive look preserved via the displace + RGB offsets;
+             frosted look added as a base layer so glass reads on any
+             backdrop. */
+          displace={3}
+          distortionScale={-180}
+          redOffset={5}
+          greenOffset={10}
+          blueOffset={20}
+          brightness={50}
+          opacity={0.93}
+          blur={14}
+          backgroundOpacity={0.1}
+          saturation={1}
+          mixBlendMode="normal"
+        >
+          <div className="flex items-center gap-4 flex-wrap px-5 py-2.5">
+            <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
+              Amber Xu · Universe
+            </span>
+            <a
+              href="/"
+              className="pointer-events-auto font-mono text-xs uppercase tracking-[0.3em] text-muted hover:text-amber transition-colors"
+            >
+              Home
+            </a>
+            {/* About link — added per user. Sits between Home and the
+                Index disclosure button so the nav reads
+                Brand · Home · About · Index. */}
+            <a
+              href="/about"
+              className="pointer-events-auto font-mono text-xs uppercase tracking-[0.3em] text-muted hover:text-amber transition-colors"
+            >
+              About
+            </a>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              className="pointer-events-auto inline-flex items-center gap-2 px-2.5 py-1 border border-white/15 rounded-sm font-mono text-[11px] uppercase tracking-[0.25em] text-white/70 hover:text-amber hover:border-amber/40 hover:bg-white/[0.02] transition-colors"
+              aria-expanded={menuOpen}
+              aria-controls="universe-works-menu"
+            >
+              <span>{menuOpen ? "Close" : "Index"}</span>
+              <span className="text-[10px] opacity-80 transition-transform" style={{ transform: menuOpen ? "rotate(90deg)" : "rotate(0)" }}>▸</span>
+            </button>
+          </div>
+        </GlassSurface>
         {menuOpen && (
           <ul
             id="universe-works-menu"
