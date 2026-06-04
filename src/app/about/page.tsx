@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import ProfileCard from "@/components/ProfileCard";
 import AboutBody from "@/components/AboutBody";
 
@@ -52,6 +53,19 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <main className="relative flex min-h-screen flex-col">
+      {/* Back-to-Universe nav pill — matches the chrome on every
+          /works/<slug>/ project page so navigation feels consistent
+          across the whole portfolio. Fixed top-left, pointer-events
+          live so it sits above ProfileCard's hover surface. The HTML
+          version had this and it dropped off when we moved to React;
+          restored here. */}
+      <Link
+        href="/work"
+        className="fixed left-6 top-6 z-50 inline-flex items-center rounded-full border border-white/20 bg-black/40 px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.3em] text-white/75 backdrop-blur-md transition-colors hover:border-white/50 hover:text-white"
+      >
+        ← Universe
+      </Link>
+
       {/* Hero: profile card centered at top of page. Cool blue/purple
           inner gradient + soft blue rim glow — the palette Amber
           asked us to keep.

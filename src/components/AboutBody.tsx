@@ -31,19 +31,16 @@ const copy = {
   zh: {
     eyebrow: "关于",
     name: "Amber Xu",
-    // Six paragraphs the user provided. Paragraph 1 merges her opener
-    // line "绘画是我理解世界的方式。" with the second sentence so it
-    // doesn't get pulled out as a standalone display headline (per her
-    // earlier feedback: don't shout the opener).
+    // Five paragraphs. The final paragraph (was 4) now absorbs the
+    // closing line that previously lived as a separate italic pull
+    // quote — per Amber's note, the two sentences read as one
+    // continuous thought and should not be visually split.
     paragraphs: [
       "绘画是我理解世界的方式。十余年的艺术学习与创作经历，让我习惯用图像去观察、记录那些难以被语言准确描述的东西——情绪、记忆、人与人之间微妙的联系，以及那些容易被忽略却足以打动人心的瞬间。",
       "如果说绘画是我的语言，那么本科教会我如何表达，硕士拓宽了我理解世界的维度，而社会则让我学会如何让这些表达真正产生价值。",
       "长期的学习、实践与现实磨砺，让我逐渐能够将天赋、审美、认知与表达能力整合起来，并运用于不同领域的创作与合作之中。从视觉设计到内容创作，从品牌传播到跨学科项目，我始终关注同一件事：如何将复杂的想法转化为清晰而有感染力的表达。",
-      "我相信，技术可以通过练习获得，而认知决定创作能够抵达的高度。社会让我从一个有天赋的人，成长为一个懂得如何使用天赋的人。",
+      "我相信，技术可以通过练习获得，而认知决定创作能够抵达的高度。社会让我从一个有天赋的人，成长为一个懂得如何使用天赋的人。我依然是那个热爱创作的人，只是看待世界的坐标系变得更加丰富与复杂。",
     ],
-    // Closing pull quote (line 6 of her text)
-    closing:
-      "我依然是那个热爱创作的人，只是看待世界的坐标系变得更加丰富与复杂。",
     disciplines: [
       {
         label: "视觉艺术家",
@@ -69,10 +66,8 @@ const copy = {
       "Drawing is my way of understanding the world. More than a decade of artistic study and practice have made images my natural way of observing and recording the things language can't quite hold — emotions, memories, the subtle bonds between people, and those easily overlooked moments that nonetheless move us.",
       "If drawing is my language, my bachelor's taught me how to express it; my master's broadened the dimensions through which I understand the world; and the years in the working world taught me how to make that expression land — how to give it real value.",
       "Long-running study, practice, and the friction of real-world work have gradually let me integrate talent, taste, cognition, and expression into a single working instrument — one I can bring to creation and collaboration across very different fields. From visual design to content creation, from brand communication to cross-disciplinary projects, I keep returning to the same question: how do you translate a complex idea into something clear, and something that moves a person.",
-      "I believe craft can be earned through practice — but cognition decides how high a piece of work can reach. The working world took someone with raw ability and slowly turned her into someone who knows how to use it.",
+      "I believe craft can be earned through practice — but cognition decides how high a piece of work can reach. The working world took someone with raw ability and slowly turned her into someone who knows how to use it. I am still the person who loves to create — only the coordinate system through which I see the world has grown richer, more layered.",
     ],
-    closing:
-      "I am still the person who loves to create. Only the coordinate system through which I see the world has grown richer, more layered.",
     disciplines: [
       {
         label: "Visual Artist",
@@ -157,25 +152,21 @@ export default function AboutBody() {
         className="relative mx-auto mb-10"
         style={{
           width: "100%",
-          maxWidth: "720px",
-          /* About variant of the wordmark is single-row, so its SVG
-             viewBox is 1400×500 — much wider than the home page's
-             1400×1100. aspectRatio updated to match so the
-             MetallicPaint surface frames the new shape. maxWidth
-             bumped to 720 so the banner still feels substantial in
-             the column. */
-          aspectRatio: "1400 / 500",
+          /* Reverted to the home page's 2-row AMBER / XU wordmark per
+             user — the single-row drop-initial variant (1400×500) was
+             rendering 2.8:1 wide and the letters looked horizontally
+             squashed ("怎么会这么扁"). The 2-row SVG is 1400×1100
+             (1.27:1, near-square) so letters keep their normal
+             vertical proportion. maxWidth reduced to 480 since the
+             2-row shape is taller than the single-row banner and needs
+             less horizontal room to feel substantial. */
+          maxWidth: "480px",
+          aspectRatio: "1400 / 1100",
         }}
       >
         <div className="absolute inset-0">
-          {/* About-page variant of the wordmark — A and X are big, the
-              trailing M B E R · U are uniformly smaller (drop-initial
-              treatment). The home page still uses the original
-              /amber-xu-block.svg with both rows at uniform size, so
-              the two pages now have visually distinct masthead
-              compositions. */}
           <MetallicPaint
-            imageSrc="/amber-xu-block-initials.svg"
+            imageSrc="/amber-xu-block.svg"
             seed={37.49}
             scale={1.7}
             patternSharpness={0.5}
@@ -200,7 +191,49 @@ export default function AboutBody() {
         </div>
       </motion.div>
 
-      {/* Body essay — paragraphs flow as one block. Chinese sets a
+      {/* Contact strip — email + phone (and Instagram once Amber
+          provides the handle), set above the self-portrait essay per
+          her note. Mono small-caps with vertical pipe separators,
+          centred in the column; visually quiet so it doesn't compete
+          with the wordmark above or the essay below. */}
+      <div
+        className="mb-12 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-mono text-xs sm:text-sm"
+        style={{ color: "rgba(255,255,255,0.55)" }}
+      >
+        <a
+          href="mailto:877793893@qq.com"
+          className="transition-colors hover:text-white"
+        >
+          877793893@qq.com
+        </a>
+        <span style={{ color: "rgba(255,255,255,0.25)" }}>|</span>
+        <a
+          href="tel:+61424943415"
+          className="transition-colors hover:text-white"
+        >
+          +61 4249 43415
+        </a>
+        {/* Instagram slot — uncomment + fill the handle once Amber
+            confirms the @username. Keeping the markup parked here so
+            the pipe-separator pattern is obvious to extend.
+
+            <span style={{ color: "rgba(255,255,255,0.25)" }}>|</span>
+            <a
+              href="https://instagram.com/<handle>"
+              target="_blank"
+              rel="noopener"
+              className="transition-colors hover:text-white"
+            >
+              @<handle>
+            </a>
+        */}
+      </div>
+
+      {/* Body essay — paragraphs flow as one block. The closing line
+          ("我依然是那个热爱创作的人……" / "I am still the person who
+          loves to create…") used to live as a separate italic pull
+          quote below a rule; per Amber it now lives as the tail of
+          paragraph 4 so the thought reads continuous. Chinese sets a
           slightly looser leading so 16/17 px CJK characters breathe. */}
       <div
         className="space-y-6 text-base leading-relaxed sm:text-lg"
@@ -212,24 +245,6 @@ export default function AboutBody() {
         {t.paragraphs.map((p, i) => (
           <p key={i}>{p}</p>
         ))}
-      </div>
-
-      {/* Closing pull quote — italic serif, separated by a thin rule.
-          Carries her closing line about the coordinate system. */}
-      <div
-        className="mt-12 pt-8"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}
-      >
-        <blockquote
-          className="text-lg leading-relaxed sm:text-xl"
-          style={{
-            fontFamily: 'Times, "Times New Roman", serif',
-            fontStyle: "italic",
-            color: "#f5f1ea",
-          }}
-        >
-          {t.closing}
-        </blockquote>
       </div>
 
       {/* Three disciplines — kept from the previous design she liked.
