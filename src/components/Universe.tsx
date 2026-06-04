@@ -4215,14 +4215,20 @@ export default function Universe() {
           saturation={1}
           mixBlendMode="normal"
         >
-          <div className="flex items-center gap-4 px-5 py-2.5">
+          <div className="flex items-center gap-5 px-5 py-2.5">
             <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
               Amber Xu · Universe
             </span>
+            {/* INDEX disclosure — same plain text styling as the brand
+                label next to it. Previously wrapped in a border+padding
+                "button frame" which Amber said read as a separate small
+                box; stripped down to a bare text button so the whole
+                left cluster reads as one continuous label. The ▸
+                rotate-90 still signals open/closed state. */}
             <button
               type="button"
               onClick={() => setMenuOpen((v) => !v)}
-              className="pointer-events-auto inline-flex items-center gap-2 px-2.5 py-1 border border-white/15 rounded-sm font-mono text-[11px] uppercase tracking-[0.25em] text-white/70 hover:text-amber hover:border-amber/40 hover:bg-white/[0.02] transition-colors"
+              className="pointer-events-auto inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.3em] text-muted hover:text-amber transition-colors"
               aria-expanded={menuOpen}
               aria-controls="universe-works-menu"
             >
