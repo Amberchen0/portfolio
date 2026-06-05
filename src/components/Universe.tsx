@@ -4197,7 +4197,10 @@ export default function Universe() {
       <TopNav
         left={
           <>
-            <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
+            {/* Brand mark + INDEX — font-mono removed so both children
+                inherit the Times serif declared on TopNav's inner row.
+                Letter-spacing + uppercase + colour preserved. */}
+            <span className="text-xs uppercase tracking-[0.3em] text-muted">
               Amber Xu · Universe
             </span>
             {/* INDEX disclosure — plain text matching the brand label
@@ -4206,7 +4209,7 @@ export default function Universe() {
             <button
               type="button"
               onClick={() => setMenuOpen((v) => !v)}
-              className="pointer-events-auto inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.3em] text-muted hover:text-amber transition-colors"
+              className="pointer-events-auto inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.3em] text-muted hover:text-amber transition-colors"
               aria-expanded={menuOpen}
               aria-controls="universe-works-menu"
             >
@@ -4219,7 +4222,8 @@ export default function Universe() {
           menuOpen ? (
             <ul
               id="universe-works-menu"
-              className="pointer-events-auto mt-3 flex flex-col gap-1.5 font-mono text-[11px] uppercase tracking-[0.15em] border-l border-white/10 pl-3"
+              className="pointer-events-auto mt-3 flex flex-col gap-1.5 text-[11px] uppercase tracking-[0.15em] border-l border-white/10 pl-3"
+              style={{ fontFamily: 'Times, "Times New Roman", serif' }}
             >
               {/* Flatten planets + moons so HYSTON gets its own <li> and
                   inherits the parent gap-1.5 (was nested inside Photography's

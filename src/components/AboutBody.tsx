@@ -21,9 +21,9 @@
  * footer rule.
  */
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import MetallicPaint from "@/components/MetallicPaint";
+import { useLang } from "@/lib/useLang";
 
 type Lang = "en" | "zh";
 
@@ -48,7 +48,7 @@ const copy = {
       },
       {
         label: "内容创作者",
-        body: "图像、影像、编辑式叙事——让作品在 feed、画面与情绪中流动。",
+        body: "图像、影像、编辑式叙事——让作品在信息流、画面与情绪中流动。",
       },
       {
         label: "概念设计师",
@@ -89,52 +89,18 @@ const copy = {
 } as const;
 
 export default function AboutBody() {
-  const [lang, setLang] = useState<Lang>("zh");
+  // Language reads from the shared store — the EN/中 toggle now lives
+  // inside the TopNav glass capsule, so this body component is a pure
+  // subscriber (no setLang call here). The previous in-page eyebrow
+  // row (the "About" small-caps label on the left + EN/中 nav on the
+  // right) was removed per Amber, since the wordmark below already
+  // carries the page identity and TopNav already carries the lang
+  // switch — both controls were duplicated chrome.
+  const [lang] = useLang();
   const t = copy[lang];
 
   return (
     <section className="mx-auto w-full max-w-3xl px-6 pb-24 pt-4 sm:px-12">
-      {/* Eyebrow row: small caps label on the left, language toggle on
-          the right. Same typographic rhythm as the home page nav. */}
-      <div className="mb-3 flex items-center justify-between">
-        <div
-          className="font-mono text-xs uppercase tracking-[0.3em]"
-          style={{ color: "rgba(255,255,255,0.55)" }}
-        >
-          {t.eyebrow}
-        </div>
-        <nav
-          aria-label="Language"
-          className="font-mono text-xs uppercase tracking-[0.2em]"
-        >
-          <button
-            onClick={() => setLang("en")}
-            className={`transition-colors ${
-              lang === "en"
-                ? "text-amber"
-                : "hover:text-white"
-            }`}
-            style={lang === "en" ? undefined : { color: "rgba(255,255,255,0.55)" }}
-          >
-            EN
-          </button>
-          <span className="mx-2" style={{ color: "rgba(255,255,255,0.3)" }}>
-            /
-          </span>
-          <button
-            onClick={() => setLang("zh")}
-            className={`transition-colors ${
-              lang === "zh"
-                ? "text-amber"
-                : "hover:text-white"
-            }`}
-            style={lang === "zh" ? undefined : { color: "rgba(255,255,255,0.55)" }}
-          >
-            中
-          </button>
-        </nav>
-      </div>
-
       {/* Page name treatment — same MetallicPaint "AMBER XU" block-
           letter wordmark used on the home page. Replaced the previous
           Times-serif h2 per Amber's note that she really liked the
@@ -152,21 +118,17 @@ export default function AboutBody() {
         className="relative mx-auto mb-10"
         style={{
           width: "100%",
-          /* Reverted to the home page's 2-row AMBER / XU wordmark per
-             user — the single-row drop-initial variant (1400×500) was
-             rendering 2.8:1 wide and the letters looked horizontally
-             squashed ("怎么会这么扁"). The 2-row SVG is 1400×1100
-             (1.27:1, near-square) so letters keep their normal
-             vertical proportion. maxWidth reduced to 480 since the
-             2-row shape is taller than the single-row banner and needs
-             less horizontal room to feel substantial. */
-          maxWidth: "480px",
-          aspectRatio: "1400 / 1100",
+          /* v4: single-row AMBER XU but with generous viewBox padding
+             (2:1, was 3.56:1) so the rendering doesn't read as a flat
+             banner. The padding adds vertical breathing room without
+             distorting letters. */
+          maxWidth: "650px",                /* v6: 520→650 同步 SVG viewBox 1600→2000，可见字母大小保持 v5 不变 */
+          aspectRatio: "2000 / 410",        /* v9 per user ("空白减少，字高度不变"): maxWidth 650 不动 → canvas 宽度物理不变 → 字母物理宽度不变；SVG viewBox 同步收紧到 410 高（只留字母 ~95% + 上下少量呼吸），container aspectRatio 跟着改成 2000/410。canvas 物理高度 650/(2000/410)=133px，字母物理高度 ≈ 133*0.95=126px（v8 是 114px，略高一点）。空白上下几乎消失。 */
         }}
       >
         <div className="absolute inset-0">
           <MetallicPaint
-            imageSrc="/amber-xu-block.svg"
+            imageSrc="/amber-xu-block-row.svg"
             seed={37.49}
             scale={1.7}
             patternSharpness={0.5}
@@ -197,8 +159,11 @@ export default function AboutBody() {
           centred in the column; visually quiet so it doesn't compete
           with the wordmark above or the essay below. */}
       <div
-        className="mb-12 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-mono text-xs sm:text-sm"
-        style={{ color: "rgba(255,255,255,0.55)" }}
+        className="mb-12 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs sm:text-sm"
+        style={{
+          color: "rgba(255,255,255,0.55)",
+          fontFamily: 'Times, "Times New Roman", serif',
+        }}
       >
         <a
           href="mailto:877793893@qq.com"
@@ -252,7 +217,10 @@ export default function AboutBody() {
       <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3">
         {t.disciplines.map((d) => (
           <div key={d.label}>
-            <div className="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-amber">
+            <div
+              className="mb-2 text-xs uppercase tracking-[0.2em] text-amber"
+              style={{ fontFamily: 'Times, "Times New Roman", serif' }}
+            >
               {d.label}
             </div>
             <p
@@ -267,10 +235,11 @@ export default function AboutBody() {
 
       {/* Footer — Sydney line + CV download + contact link */}
       <div
-        className="mt-16 flex flex-col gap-3 pt-6 font-mono text-xs uppercase tracking-[0.2em] sm:flex-row sm:items-center sm:justify-between"
+        className="mt-16 flex flex-col gap-3 pt-6 text-xs uppercase tracking-[0.2em] sm:flex-row sm:items-center sm:justify-between"
         style={{
           borderTop: "1px solid rgba(255,255,255,0.1)",
           color: "rgba(255,255,255,0.55)",
+          fontFamily: 'Times, "Times New Roman", serif',
         }}
       >
         <span>{t.footerLeft}</span>
