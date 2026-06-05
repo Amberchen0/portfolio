@@ -1,11 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1100" width="1400" height="1100" preserveAspectRatio="xMidYMid meet">
-  <!-- "AMBER" / "XU" stacked over two lines — Vogue-masthead /
-       fashion-editorial layout. ViewBox bumped from 950 → 1100 for
-       more vertical breathing room so the block doesn't read as
-       squashed flat. XU sits 97 viewBox units below previous
-       baseline (≈ 50 screen px @ container scale 0.514).
-       Fallback chain: Didot → Bodoni 72 → GFS Didot → Hoefler Text →
-       Times New Roman → generic serif. -->
+  <!-- HOME PAGE wordmark — 2-row Vogue-masthead layout with UNIFORM
+       letter sizes inside each row (no drop-initial). This is the
+       original home composition; the drop-initial treatment (A big,
+       MBER small) lives only on /about's single-row variant
+       (/amber-xu-block-row.svg). Home and About are visually
+       decoupled — never mirror /about's drop-initial tuning back into
+       this file.
+
+       AMBER all at 360, XU bumped to 500 so XU reads as the
+       dominant lower line (the original home visual hierarchy).
+       Fallback font chain: Didot → Bodoni 72 → GFS Didot →
+       Hoefler Text → Times New Roman → generic serif. -->
   <text x="700" y="420"
         text-anchor="middle"
         font-family="'Didot', 'Bodoni 72', 'GFS Didot', 'Hoefler Text', 'Times New Roman', serif"
