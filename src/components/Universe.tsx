@@ -34,19 +34,25 @@ type PlanetMaterialVariant =
   | "amber"; // warm tight attenuation (deep amber bead)
 
 /** A moon orbits a parent planet (not the sun). */
+/** Bilingual UI label. The 3D scene's chromatic PlanetLabel always
+ *  reads `.en` so floating planet text stays in latin script
+ *  regardless of which language the visitor reads in (per Amber).
+ *  The INDEX dropdown directory + the PlanetModal title both pick
+ *  whichever side matches the current `lang`. */
+type LocalisedLabel = {
+  zh: string;
+  en: string;
+};
+
 type Moon = {
   slug: string;
-  name: string;
-  /** Optional English-only label used by the floating 3D PlanetLabel
-   *  above the planet. Falls back to `name` when omitted. Lets a work
-   *  carry a Chinese display name (`name`) in the INDEX directory + the
-   *  PlanetModal while the planet's chromatic spatial label stays in
-   *  English regardless of which language the visitor is reading in. */
-  planetLabel?: string;
+  /** Display name shown in the INDEX directory + PlanetModal (follows
+   *  language toggle). The 3D PlanetLabel above the moon reads `.en`
+   *  unconditionally — see PlanetLabel call sites. */
+  name: LocalisedLabel;
   /** Short medium / discipline tag shown after the name in the INDEX
-   *  dropdown ("摄影", "插画 / 叙事", etc.). Sourced from each work's
-   *  /public/works/<slug>/index.html — see PLANETS below. */
-  category?: string;
+   *  dropdown. Same toggle behaviour as `name`. */
+  category?: LocalisedLabel;
   color: string;
   iridescenceColor: string;
   material: PlanetMaterialVariant;
@@ -76,18 +82,14 @@ type Moon = {
 
 /** Each work-planet's identity. */
 type Planet = {
-  /** Optional English-only label used by the floating 3D PlanetLabel
-   *  above the planet. Falls back to `name` when omitted. Lets a work
-   *  carry a Chinese display name (`name`) in the INDEX directory +
-   *  the PlanetModal while the planet's chromatic spatial label stays
-   *  in English regardless of language toggle. */
-  planetLabel?: string;
-  /** Short medium / discipline tag shown after the name in the INDEX
-   *  dropdown ("建筑概念", "角色与世界", etc.). Determined per
-   *  /public/works/<slug>/index.html. */
-  category?: string;
+  /** Bilingual display name. INDEX directory + PlanetModal follow the
+   *  language toggle; the 3D PlanetLabel reads `.en` only (planet
+   *  surface labels stay English per Amber). */
+  name: LocalisedLabel;
+  /** Bilingual short medium / discipline tag shown after the name in
+   *  the INDEX dropdown. */
+  category?: LocalisedLabel;
   slug: string;
-  name: string;
   color: string;
   iridescenceColor: string;
   material: PlanetMaterialVariant;
@@ -145,36 +147,36 @@ const PLANETS: Planet[] = [
   // electric-plasma panorama that aligns with the work's actual name.
   // Colours shifted from amber-orange to violet so the amber material's
   // attenuation tinting doesn't bleed warm hues into the cool texture.
-  { slug: "model",     name: "L'HEURE VIOLETTE", category: "建筑概念", color: "#4a2880", iridescenceColor: "#9870e8", material: "ice", texturePath: "/L-pano-2.png", pulse: true, breathTrough: 0.25, cloudShell: true, cloudOpacity: 0.95, cloudColor: "#6a40a0",
+  { slug: "model",     name: { zh: "紫罗兰时分", en: "L'HEURE VIOLETTE" }, category: { zh: "建筑概念", en: "Architecture" }, color: "#4a2880", iridescenceColor: "#9870e8", material: "ice", texturePath: "/L-pano-2.png", pulse: true, breathTrough: 0.25, cloudShell: true, cloudOpacity: 0.95, cloudColor: "#6a40a0",
     size: 1.00, orbitRadius: 4.6, angle: Math.PI / 2,                          orbitSpeed: ORBIT_SPEED, orbitTilt: [0.22, -0.10] },
-  { slug: "nemo",      name: "Nemo",            category: "角色与世界", color: "#1a6b8e", iridescenceColor: "#3dd5b0", material: "crystal", texturePath: "/nemo-pano-2.JPG", waterFlow: true,
+  { slug: "nemo",      name: { zh: "尼莫", en: "Nemo" }, category: { zh: "角色与世界", en: "Character & World" }, color: "#1a6b8e", iridescenceColor: "#3dd5b0", material: "crystal", texturePath: "/nemo-pano-2.JPG", waterFlow: true,
     size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.30, 0.12] },
-  { slug: "concept",   name: "寰外", planetLabel: "Concept Design", category: "概念插画", color: "#1d5b58", iridescenceColor: "#7ad5e8", material: "dispersion", texturePath: "/concept-pano-1.png",
+  { slug: "concept",   name: { zh: "寰外", en: "Concept Design" }, category: { zh: "概念插画", en: "Concept Illustration" }, color: "#1d5b58", iridescenceColor: "#7ad5e8", material: "dispersion", texturePath: "/concept-pano-1.png",
     size: 1.00, orbitRadius: 6.0, angle: Math.PI / 2 + (4 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [0.15, 0.26] },
-  { slug: "moonlight", name: "Moonlight",       category: "视觉叙事", color: "#2a1f3d", iridescenceColor: "#c08af0", material: "pearl", texturePath: "/moonlight-pano-3.JPG",
+  { slug: "moonlight", name: { zh: "月光", en: "Moonlight" }, category: { zh: "视觉叙事", en: "Visual Narrative" }, color: "#2a1f3d", iridescenceColor: "#c08af0", material: "pearl", texturePath: "/moonlight-pano-3.JPG",
     size: 0.85, orbitRadius: 7.2, angle: Math.PI / 2 + (6 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.24, -0.18] },
-  { slug: "mask",      name: "Under the Mask",  category: "插画 / 叙事", color: "#e60012", iridescenceColor: "#ff621f", material: "sss", texturePath: "/mask-pano-4.png", breathTrough: 0.25,
+  { slug: "mask",      name: { zh: "面具之下", en: "Under the Mask" }, category: { zh: "插画 / 叙事", en: "Illustration / Story" }, color: "#e60012", iridescenceColor: "#ff621f", material: "sss", texturePath: "/mask-pano-4.png", breathTrough: 0.25,
     size: 0.85, orbitRadius: 5.3, angle: Math.PI / 2 + Math.PI,                orbitSpeed: ORBIT_SPEED, orbitTilt: [0.30, 0.05] },
   // game — mirrors mask's SSS material recipe (internal-light pulsing,
   // same red iridescence) but wears its own dedicated panorama
   // (game-pano-1.png — pure red nebula with starfield). Mask now wears
   // the red/cyan fire-vs-ice variant; together the two SSS planets pulse
   // in red on opposite sides of the sun, forming a "twin heartbeat" pair.
-  { slug: "game",      name: "Gamer",           category: "短篇动画", color: "#e60012", iridescenceColor: "#d40010", material: "sss", texturePath: "/game-pano-1.png",
+  { slug: "game",      name: { zh: "玩家", en: "Gamer" }, category: { zh: "短篇动画", en: "Short Animation" }, color: "#e60012", iridescenceColor: "#d40010", material: "sss", texturePath: "/game-pano-1.png",
     size: 0.55, orbitRadius: 8.2, angle: Math.PI / 2 + (10 * Math.PI) / 8,    orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.14, 0.28] },
 
   // Drawing — placeholder (ink-toned)
-  { slug: "drawing",      name: "Drawing",      category: "绘画", color: "#2a2a32", iridescenceColor: "#b0a8b8", material: "crystal", texturePath: "/draw-pano-4.JPG", cloudShell: true, cloudOpacity: 0.65, cloudColor: "#f0c060",
+  { slug: "drawing",      name: { zh: "速写", en: "Drawing" }, category: { zh: "绘画", en: "Drawing" }, color: "#2a2a32", iridescenceColor: "#b0a8b8", material: "crystal", texturePath: "/draw-pano-4.JPG", cloudShell: true, cloudOpacity: 0.65, cloudColor: "#f0c060",
     size: 0.55, orbitRadius: 7.6, angle: Math.PI / 2 + (12 * Math.PI) / 8,    orbitSpeed: ORBIT_SPEED, orbitTilt: [0.28, 0.10] },
 
   // Photography — placeholder + HYSTON moon-system parent (sized up to be believable parent)
-  { slug: "photography",  name: "Photography",  category: "摄影", color: "#3a4a58", iridescenceColor: "#a8c0d8", material: "anisotropic", texturePath: "/phy-pano-2.JPG",
+  { slug: "photography",  name: { zh: "影像", en: "Photography" }, category: { zh: "摄影", en: "Photography" }, color: "#3a4a58", iridescenceColor: "#a8c0d8", material: "anisotropic", texturePath: "/phy-pano-2.JPG",
     size: 0.95, orbitRadius: 6.7, angle: Math.PI / 2 + (14 * Math.PI) / 8,    orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.20, 0.30],
     moons: [
       {
         slug: "hyston",
-        name: "HYSTON",
-        category: "个人纪录片",
+        name: { zh: "HYSTON", en: "HYSTON" },
+        category: { zh: "个人纪录片", en: "Documentary" },
         // 2026-05: switched from warm amber tones (#7a4520 / #e8b070,
         // legacy default) to cold steel + ice blue to match the cool
         // silvery water-caustic texture and to align with the
@@ -1318,7 +1320,7 @@ function MoonSystem({
             />
           </mesh>
           <PlanetLabel
-            name={moon.planetLabel ?? moon.name}
+            name={moon.name.en}
             planetRadius={moon.size}
             hovered={hovered}
           />
@@ -1400,12 +1402,12 @@ function Planet({
 
           {/* curved 3D chromatic label wrapping the planet's equator — sibling
               of body so it doesn't spin with body's self-rotation.
-              Prefer the English `planetLabel` when set so the floating
-              label always reads in latin script regardless of the
-              language toggle. Falls back to `name` for works that
-              don't have a separate English title. */}
+              Always reads `name.en` so the floating spatial label
+              stays in latin script regardless of the EN/中 toggle —
+              that's a deliberate split from the INDEX dropdown +
+              modal, which both swap language. */}
           <PlanetLabel
-            name={planet.planetLabel ?? planet.name}
+            name={planet.name.en}
             planetRadius={planet.size}
             hovered={hovered}
           />
@@ -4285,50 +4287,53 @@ export default function Universe() {
                   category: m.category,
                   color: m.iridescenceColor,
                 }))),
-              ]).map((item) => (
-                <li key={item.slug}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      handlePlanetClick(item.slug);
-                    }}
-                    className="group flex items-center gap-2.5 text-muted hover:text-white transition-colors w-full text-left py-0.5"
-                  >
-                    <svg
-                      width="9"
-                      height="14"
-                      viewBox="-9 -14 18 28"
-                      className="shrink-0 opacity-80 group-hover:opacity-100 transition-opacity"
-                      aria-hidden
+              ]).map((item) => {
+                /* Both `name` and `category` are bilingual dicts ({zh,en}).
+                   Pick the side matching the site-wide language store, so
+                   when Amber flips EN/中 in the TopNav the directory
+                   updates left + right column in sync. CJK names ignore
+                   the uppercase utility on the <span>, so 寰外/月光/etc.
+                   render as-is; latin names get capitalised. */
+                const itemName = item.name[lang];
+                const itemCategory = item.category?.[lang];
+                return (
+                  <li key={item.slug}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        handlePlanetClick(item.slug);
+                      }}
+                      className="group flex items-center gap-2.5 text-muted hover:text-white transition-colors w-full text-left py-0.5"
                     >
-                      {/* 4-point sparkle: vertical points at y=±14, horizontal
-                          at x=±5, inner waist ±3 → tall thin twinkle shape.
-                          Silver fill per user (was per-planet iridescent). */}
-                      <path
-                        d="M 0 -14 L 3 -3 L 9 0 L 3 3 L 0 14 L -3 3 L -9 0 L -3 -3 Z"
-                        fill="#d0d4dc"
-                      />
-                    </svg>
-                    {/* Force English names to render uppercase in the
-                        dropdown only — PlanetLabel inside the 3D scene
-                        already uppercases its own copy of `name` (see
-                        PlanetLabel above), and the modal title keeps
-                        mixed-case for legibility. So this transform is
-                        scoped to this menu render, not the underlying
-                        PLANETS data. */}
-                    <span className="truncate uppercase tracking-wider">{item.name}</span>
-                    {item.category && (
-                      <span
+                      <svg
+                        width="9"
+                        height="14"
+                        viewBox="-9 -14 18 28"
+                        className="shrink-0 opacity-80 group-hover:opacity-100 transition-opacity"
                         aria-hidden
-                        className="ml-auto pl-3 text-[10px] tracking-[0.15em] text-muted/55 group-hover:text-muted/80 transition-colors shrink-0"
                       >
-                        {item.category}
-                      </span>
-                    )}
-                  </button>
-                </li>
-              ))}
+                        {/* 4-point sparkle: vertical points at y=±14, horizontal
+                            at x=±5, inner waist ±3 → tall thin twinkle shape.
+                            Silver fill per user (was per-planet iridescent). */}
+                        <path
+                          d="M 0 -14 L 3 -3 L 9 0 L 3 3 L 0 14 L -3 3 L -9 0 L -3 -3 Z"
+                          fill="#d0d4dc"
+                        />
+                      </svg>
+                      <span className="truncate uppercase tracking-wider">{itemName}</span>
+                      {itemCategory && (
+                        <span
+                          aria-hidden
+                          className="ml-auto pl-3 text-[10px] tracking-[0.15em] text-muted/55 group-hover:text-muted/80 transition-colors shrink-0"
+                        >
+                          {itemCategory}
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           ) : null
         }
@@ -4353,6 +4358,10 @@ function PlanetModal({
   onClose: () => void;
 }) {
   const planet = PLANETS.find((p) => p.slug === slug);
+  // Read the shared language store so the modal title swaps in sync
+  // with the INDEX dropdown when Amber flips EN/中 in TopNav. The
+  // `name` field on each planet is a {zh,en} dict (see Planet type).
+  const [lang] = useLang();
   if (!planet) return null;
   return (
     <div
@@ -4364,7 +4373,7 @@ function PlanetModal({
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="mb-2 font-serif text-3xl italic text-amber">
-          {planet.name}
+          {planet.name[lang]}
         </h2>
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted">
           This world is still forming. Come back when the dust settles.
