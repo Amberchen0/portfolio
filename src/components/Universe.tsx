@@ -137,7 +137,7 @@ const PLANETS: Planet[] = [
     size: 1.00, orbitRadius: 4.6, angle: Math.PI / 2,                          orbitSpeed: ORBIT_SPEED, orbitTilt: [0.22, -0.10] },
   { slug: "nemo",      name: "Nemo",            category: "角色与世界", color: "#1a6b8e", iridescenceColor: "#3dd5b0", material: "crystal", texturePath: "/nemo-pano-2.JPG", waterFlow: true,
     size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.30, 0.12] },
-  { slug: "concept",   name: "Concept Design",  category: "概念插画", color: "#1d5b58", iridescenceColor: "#7ad5e8", material: "dispersion", texturePath: "/concept-pano-1.png",
+  { slug: "concept",   name: "寰外",            category: "概念插画", color: "#1d5b58", iridescenceColor: "#7ad5e8", material: "dispersion", texturePath: "/concept-pano-1.png",
     size: 1.00, orbitRadius: 6.0, angle: Math.PI / 2 + (4 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [0.15, 0.26] },
   { slug: "moonlight", name: "Moonlight",       category: "视觉叙事", color: "#2a1f3d", iridescenceColor: "#c08af0", material: "pearl", texturePath: "/moonlight-pano-3.JPG",
     size: 0.85, orbitRadius: 7.2, angle: Math.PI / 2 + (6 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.24, -0.18] },
