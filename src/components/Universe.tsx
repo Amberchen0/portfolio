@@ -16,6 +16,7 @@ import { useRef, useMemo, useState, useEffect } from "react";
 import * as THREE from "three";
 import GlassSurface from "./GlassSurface";
 import TopNav from "./TopNav";
+import { useLang } from "@/lib/useLang";
 
 /** 9 distinct glass / metal / pearl recipes — one per planet so the user
  *  can compare them side by side and pick a favourite. Each maps to a
@@ -36,6 +37,10 @@ type PlanetMaterialVariant =
 type Moon = {
   slug: string;
   name: string;
+  /** Short medium / discipline tag shown after the name in the INDEX
+   *  dropdown ("摄影", "插画 / 叙事", etc.). Sourced from each work's
+   *  /public/works/<slug>/index.html — see PLANETS below. */
+  category?: string;
   color: string;
   iridescenceColor: string;
   material: PlanetMaterialVariant;
@@ -65,6 +70,10 @@ type Moon = {
 
 /** Each work-planet's identity. */
 type Planet = {
+  /** Short medium / discipline tag shown after the name in the INDEX
+   *  dropdown ("建筑概念", "角色与世界", etc.). Determined per
+   *  /public/works/<slug>/index.html. */
+  category?: string;
   slug: string;
   name: string;
   color: string;
@@ -124,35 +133,36 @@ const PLANETS: Planet[] = [
   // electric-plasma panorama that aligns with the work's actual name.
   // Colours shifted from amber-orange to violet so the amber material's
   // attenuation tinting doesn't bleed warm hues into the cool texture.
-  { slug: "model",     name: "L'HEURE VIOLETTE", color: "#4a2880", iridescenceColor: "#9870e8", material: "ice", texturePath: "/L-pano-2.png", pulse: true, breathTrough: 0.25, cloudShell: true, cloudOpacity: 0.95, cloudColor: "#6a40a0",
+  { slug: "model",     name: "L'HEURE VIOLETTE", category: "建筑概念", color: "#4a2880", iridescenceColor: "#9870e8", material: "ice", texturePath: "/L-pano-2.png", pulse: true, breathTrough: 0.25, cloudShell: true, cloudOpacity: 0.95, cloudColor: "#6a40a0",
     size: 1.00, orbitRadius: 4.6, angle: Math.PI / 2,                          orbitSpeed: ORBIT_SPEED, orbitTilt: [0.22, -0.10] },
-  { slug: "nemo",      name: "Nemo",            color: "#1a6b8e", iridescenceColor: "#3dd5b0", material: "crystal", texturePath: "/nemo-pano-2.JPG", waterFlow: true,
+  { slug: "nemo",      name: "Nemo",            category: "角色与世界", color: "#1a6b8e", iridescenceColor: "#3dd5b0", material: "crystal", texturePath: "/nemo-pano-2.JPG", waterFlow: true,
     size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.30, 0.12] },
-  { slug: "concept",   name: "Concept Design",  color: "#1d5b58", iridescenceColor: "#7ad5e8", material: "dispersion", texturePath: "/concept-pano-1.png",
+  { slug: "concept",   name: "Concept Design",  category: "概念插画", color: "#1d5b58", iridescenceColor: "#7ad5e8", material: "dispersion", texturePath: "/concept-pano-1.png",
     size: 1.00, orbitRadius: 6.0, angle: Math.PI / 2 + (4 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [0.15, 0.26] },
-  { slug: "moonlight", name: "Moonlight",       color: "#2a1f3d", iridescenceColor: "#c08af0", material: "pearl", texturePath: "/moonlight-pano-3.JPG",
+  { slug: "moonlight", name: "Moonlight",       category: "视觉叙事", color: "#2a1f3d", iridescenceColor: "#c08af0", material: "pearl", texturePath: "/moonlight-pano-3.JPG",
     size: 0.85, orbitRadius: 7.2, angle: Math.PI / 2 + (6 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.24, -0.18] },
-  { slug: "mask",      name: "Under the Mask",  color: "#e60012", iridescenceColor: "#ff621f", material: "sss", texturePath: "/mask-pano-4.png", breathTrough: 0.25,
+  { slug: "mask",      name: "Under the Mask",  category: "插画 / 叙事", color: "#e60012", iridescenceColor: "#ff621f", material: "sss", texturePath: "/mask-pano-4.png", breathTrough: 0.25,
     size: 0.85, orbitRadius: 5.3, angle: Math.PI / 2 + Math.PI,                orbitSpeed: ORBIT_SPEED, orbitTilt: [0.30, 0.05] },
   // game — mirrors mask's SSS material recipe (internal-light pulsing,
   // same red iridescence) but wears its own dedicated panorama
   // (game-pano-1.png — pure red nebula with starfield). Mask now wears
   // the red/cyan fire-vs-ice variant; together the two SSS planets pulse
   // in red on opposite sides of the sun, forming a "twin heartbeat" pair.
-  { slug: "game",      name: "Game",            color: "#e60012", iridescenceColor: "#d40010", material: "sss", texturePath: "/game-pano-1.png",
+  { slug: "game",      name: "Game",            category: "游戏设计", color: "#e60012", iridescenceColor: "#d40010", material: "sss", texturePath: "/game-pano-1.png",
     size: 0.55, orbitRadius: 8.2, angle: Math.PI / 2 + (10 * Math.PI) / 8,    orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.14, 0.28] },
 
   // Drawing — placeholder (ink-toned)
-  { slug: "drawing",      name: "Drawing",      color: "#2a2a32", iridescenceColor: "#b0a8b8", material: "crystal", texturePath: "/draw-pano-4.JPG", cloudShell: true, cloudOpacity: 0.65, cloudColor: "#f0c060",
+  { slug: "drawing",      name: "Drawing",      category: "绘画", color: "#2a2a32", iridescenceColor: "#b0a8b8", material: "crystal", texturePath: "/draw-pano-4.JPG", cloudShell: true, cloudOpacity: 0.65, cloudColor: "#f0c060",
     size: 0.55, orbitRadius: 7.6, angle: Math.PI / 2 + (12 * Math.PI) / 8,    orbitSpeed: ORBIT_SPEED, orbitTilt: [0.28, 0.10] },
 
   // Photography — placeholder + HYSTON moon-system parent (sized up to be believable parent)
-  { slug: "photography",  name: "Photography",  color: "#3a4a58", iridescenceColor: "#a8c0d8", material: "anisotropic", texturePath: "/phy-pano-2.JPG",
+  { slug: "photography",  name: "Photography",  category: "摄影", color: "#3a4a58", iridescenceColor: "#a8c0d8", material: "anisotropic", texturePath: "/phy-pano-2.JPG",
     size: 0.95, orbitRadius: 6.7, angle: Math.PI / 2 + (14 * Math.PI) / 8,    orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.20, 0.30],
     moons: [
       {
         slug: "hyston",
         name: "HYSTON",
+        category: "摄影系列",
         // 2026-05: switched from warm amber tones (#7a4520 / #e8b070,
         // legacy default) to cold steel + ice blue to match the cool
         // silvery water-caustic texture and to align with the
@@ -4120,6 +4130,10 @@ const PUBLISHED_WORKS = new Set([
 export default function Universe() {
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  // Shared site-wide EN/中 toggle — drives the INDEX/目录 + Close/关闭
+  // labels on the left cluster passed to <TopNav>. The TopNav itself
+  // already wires HOME/WORKS/ABOUT to this store.
+  const [lang] = useLang();
   // Mobile / weak-GPU detection drives quality degradation: lower dpr,
   // skip Bloom, fewer stars. See useIsMobile + SceneContent.lowQuality.
   const isMobile = useIsMobile();
@@ -4219,7 +4233,11 @@ export default function Universe() {
               aria-expanded={menuOpen}
               aria-controls="universe-works-menu"
             >
-              <span>{menuOpen ? "Close" : "Index"}</span>
+              <span>
+                {menuOpen
+                  ? lang === "zh" ? "关闭" : "Close"
+                  : lang === "zh" ? "目录" : "Index"}
+              </span>
               <span className="text-[10px] opacity-80 transition-transform" style={{ transform: menuOpen ? "rotate(90deg)" : "rotate(0)" }}>▸</span>
             </button>
           </>
@@ -4236,10 +4254,11 @@ export default function Universe() {
                   <li> → no gap between them).  Marker is a 4-point sparkle
                   star (vertical taller than horizontal) per user request. */}
               {PLANETS.flatMap((p) => [
-                { slug: p.slug, name: p.name, color: p.iridescenceColor },
+                { slug: p.slug, name: p.name, category: p.category, color: p.iridescenceColor },
                 ...((p.moons ?? []).map((m) => ({
                   slug: m.slug,
                   name: m.name,
+                  category: m.category,
                   color: m.iridescenceColor,
                 }))),
               ]).map((item) => (
@@ -4268,6 +4287,14 @@ export default function Universe() {
                       />
                     </svg>
                     <span className="truncate">{item.name}</span>
+                    {item.category && (
+                      <span
+                        aria-hidden
+                        className="ml-auto pl-3 text-[10px] tracking-[0.15em] text-muted/55 group-hover:text-muted/80 transition-colors shrink-0"
+                      >
+                        {item.category}
+                      </span>
+                    )}
                   </button>
                 </li>
               ))}
