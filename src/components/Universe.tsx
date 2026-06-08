@@ -162,7 +162,7 @@ const PLANETS: Planet[] = [
       {
         slug: "hyston",
         name: "HYSTON",
-        category: "摄影系列",
+        category: "个人纪录片",
         // 2026-05: switched from warm amber tones (#7a4520 / #e8b070,
         // legacy default) to cold steel + ice blue to match the cool
         // silvery water-caustic texture and to align with the
@@ -4286,7 +4286,14 @@ export default function Universe() {
                         fill="#d0d4dc"
                       />
                     </svg>
-                    <span className="truncate">{item.name}</span>
+                    {/* Force English names to render uppercase in the
+                        dropdown only — PlanetLabel inside the 3D scene
+                        already uppercases its own copy of `name` (see
+                        PlanetLabel above), and the modal title keeps
+                        mixed-case for legibility. So this transform is
+                        scoped to this menu render, not the underlying
+                        PLANETS data. */}
+                    <span className="truncate uppercase tracking-wider">{item.name}</span>
                     {item.category && (
                       <span
                         aria-hidden
