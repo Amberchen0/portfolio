@@ -5,10 +5,11 @@ import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { LiquidChrome } from "@/components/LiquidChrome";
+import DotField from "@/components/DotField";
 import MetallicPaint from "@/components/MetallicPaint";
+import ShinyText from "@/components/ShinyText";
 import TopNav from "@/components/TopNav";
-
-type Lang = "en" | "zh";
+import { useLang } from "@/lib/useLang";
 
 const copy = {
   en: {
@@ -41,7 +42,11 @@ const copy = {
 } as const;
 
 export default function Home() {
-  const [lang, setLang] = useState<Lang>("en");
+  // Language now lives in the shared `useLang` store (localStorage +
+  // window event), driven by the EN/中 toggle inside TopNav. The
+  // local header that used to render its own EN/中 row was removed —
+  // see the deleted <header> below for what used to live there.
+  const [lang] = useLang();
   const t = copy[lang];
 
   /* ─── Scroll-darkening transition to /work ───
@@ -91,8 +96,13 @@ export default function Home() {
         className="fixed inset-0 z-0"
       >
         <LiquidChrome
-          baseColor={[0.05, 0.04, 0.08]}  /* dimmed another ~30% per user — was [0.07, 0.06, 0.12] */
-          speed={0.3}
+          /* v3 per Amber: switched to the React Bits docs-default
+             values. baseColor was [0.05, 0.04, 0.08] (very dim cool
+             purple) → [0.1, 0.1, 0.1] (neutral mid-grey, brighter
+             overall). speed 0.3 → 0.2 (calmer flow). amplitude /
+             frequencyX / frequencyY / interactive unchanged. */
+          baseColor={[0.1, 0.1, 0.1]}
+          speed={0.2}
           amplitude={0.3}
           frequencyX={3}
           frequencyY={3}
@@ -122,38 +132,13 @@ export default function Home() {
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* Shared TopNav — right cluster only (HOME · WORKS · ABOUT).
-          Per Amber, only the /work universe page carries the brand
-          + INDEX disclosure on the left; on home and /about the bar
-          shows just the page-link cluster aligned right. */}
+      {/* Shared TopNav — HOME · WORKS · ABOUT plus the EN / 中 lang
+          toggle, all inside the same glass capsule on the top-right.
+          Amber asked for the lang switch to live inside the pill
+          rather than float below it, so the local <header> that used
+          to render a standalone EN/中 row was removed. The pt-20
+          spacing below now starts directly from the hero column. */}
       <TopNav />
-
-      {/* Local top row — now only the EN / 中 language toggle. The
-          earlier "AX · 2026" brand mark is gone (the page nav above
-          carries the identity context). `pt-20 sm:pt-24` pushes this
-          row below TopNav so the lang controls don't sit underneath
-          the floating bar. */}
-      <header className="relative z-10 flex items-center justify-end px-6 pb-2 pt-20 sm:px-12 sm:pb-3 sm:pt-24">
-        <nav className="font-mono text-xs uppercase tracking-[0.2em]">
-          <button
-            onClick={() => setLang("en")}
-            className={`transition-colors ${
-              lang === "en" ? "text-amber" : "text-muted hover:text-foreground"
-            }`}
-          >
-            EN
-          </button>
-          <span className="mx-2 text-muted/50">/</span>
-          <button
-            onClick={() => setLang("zh")}
-            className={`transition-colors ${
-              lang === "zh" ? "text-amber" : "text-muted hover:text-foreground"
-            }`}
-          >
-            中
-          </button>
-        </nav>
-      </header>
 
       {/* hero */}
       <main className="relative z-10 flex flex-1 flex-col justify-center px-6 sm:px-12">
@@ -163,7 +148,11 @@ export default function Home() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="mb-8 font-mono text-xs uppercase tracking-[0.3em] text-muted"
+            /* Eyebrow font swapped from font-mono → Times per user.
+               Keeps uppercase + 0.3em tracking + muted colour, just the
+               typeface is now serif (matches subtitle + top nav). */
+            className="mb-8 text-xs uppercase tracking-[0.3em] text-muted"
+            style={{ fontFamily: 'Times, "Times New Roman", serif' }}
           >
             {t.eyebrow}
           </motion.p>
@@ -204,6 +193,89 @@ export default function Home() {
                 aspectRatio: "1400 / 1100",  /* matches SVG viewBox (1.27:1) — taller block, XU pulled down 50px so AMBER/XU don't feel squashed together */
               }}
             >
+              {/* Layer 1 (back): DotField — React Bits dot-grid with
+                  cursor-driven bulge + radial glow. Replaced the
+                  previous LetterGlitch character matrix per Amber:
+                  she wanted a calmer, more lavender field as the
+                  back layer so the metallic AMBER XU wordmark on top
+                  reads as the focal point rather than competing with
+                  scrolling characters.
+                  Props are the exact trio she pasted from the docs:
+                    bulgeStrength 67, glowRadius 160, cursorRadius
+                    500, dotRadius 2.5, dotSpacing 14, bulgeOnly,
+                    gradientFrom #9055f7 (violet) → gradientTo
+                    #a997cf (dusty lavender), glowColor #120F17
+                    (near-black for a dim "shadow" follow). The
+                    LetterGlitch.tsx file is kept around in case we
+                    want to switch back later.
+                  v3 per Amber ("点阵向两侧各多铺 100px"): horizontal
+                  extension bumped 30 → 100 on each side (so the dot
+                  field is 200px wider than the wordmark slot, 100 to
+                  the left and 100 to the right). MetallicPaint stays
+                  inset:0 (front layer) so the AMBER XU letters keep
+                  their original width — only the dot field grows.
+                  v4 per Amber ("上下高度各减少150px，左右增加150px"):
+                  top/bottom now inset 150px (dot field is shorter
+                  than the wordmark slot — leaves bare LiquidChrome
+                  above and below the dots), left/right extension
+                  bumped -100 → -250 (each side adds another 150px,
+                  so the field stretches +250px past the wordmark
+                  on each side, total 500px wider).
+                  v5 per Amber ("左右各减少40px"): horizontal extension
+                  pulled in 40px each side, -250 → -210. Field still
+                  bleeds 210px past the wordmark on each end but
+                  doesn't quite kiss the viewport edges anymore.
+                  v6 per Amber ("左右各减少25px"): pulled in another
+                  25px each side, -210 → -185. */}
+              <div
+                className="absolute"
+                style={{
+                  top: "150px",
+                  bottom: "150px",
+                  left: "-185px",
+                  right: "-185px",
+                }}
+              >
+                {/* v7 props per Amber: dotSpacing 11 → 10 (one
+                    more notch tighter — densest version so far)
+                    + glowColor #14101c → #312549 (was near-black,
+                    cursor glow barely registered; now a clearly
+                    visible deep purple so the radial follow reads).
+                    Everything else from v6 holds. */}
+                {/* v8 per user: switching the dot grid from the bright
+                    purple palette (#8155f7→#d4bbfc + #312549 cursor glow)
+                    to a near-black charcoal one — gradient #292930→#19191c
+                    with a #1f2026 cursor glow. The dots themselves become
+                    nearly invisible against the LiquidChrome backdrop;
+                    only the bulge ripple + faint cursor halo register,
+                    which Amber wanted to compare against the louder
+                    purple version. dotRadius bumped 3.5→3, dotSpacing
+                    10→11 (slightly looser grid), bulgeStrength 30→53
+                    (stronger push so the now-low-contrast dots still
+                    show movement), glowRadius 90→160 (wider halo since
+                    glow colour is darker), cursorRadius 350→600 and
+                    cursorForce 0.3→0.28 (bigger but slightly gentler
+                    interaction area). */}
+                <DotField
+                  dotRadius={3}
+                  dotSpacing={11}
+                  bulgeStrength={53}
+                  glowRadius={160}
+                  sparkle={false}
+                  waveAmplitude={0}
+                  cursorRadius={600}
+                  cursorForce={0.28}
+                  bulgeOnly
+                  gradientFrom="#292930"
+                  gradientTo="#19191c"
+                  glowColor="#1f2026"
+                />
+              </div>
+
+              {/* Layer 2 (front): MetallicPaint AMBER XU wordmark.
+                  Painted after LetterGlitch in DOM order, so it stacks
+                  on top automatically (both are absolute inset-0 inside
+                  a relative motion.div — same z-index, later wins). */}
               <div className="absolute inset-0">
                 <MetallicPaint
                   imageSrc="/amber-xu-block.svg"
@@ -239,10 +311,34 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="mt-12 max-w-xl space-y-4"
           >
-            <p className="text-lg font-light tracking-wide text-foreground/90 sm:text-xl">
-              {t.subtitle}
+            {/* Subtitle: Times Bold + ShinyText 扫光特效（之前被回退掉了，
+                按最后一次认可的参数恢复）。Re-key on lang so the shine
+                animation restarts cleanly on EN/中 toggle. */}
+            <p
+              className="text-lg tracking-wide sm:text-xl"
+              style={{
+                fontFamily: 'Times, "Times New Roman", serif',
+                fontWeight: 700,
+              }}
+            >
+              <ShinyText
+                key={`subtitle-${lang}`}
+                text={t.subtitle}
+                speed={3.2}
+                delay={1}                    /* v3 per user: was 1.4 */
+                color="#202a46"              /* v2: +20% brightness per user (was #1b233a) */
+                shineColor="#e2f3fc"
+                spread={95}
+                shineWidth={39}              /* v2: +30% coverage per user (was 30, the original 35%-65% band) */
+                direction="left"
+                yoyo
+                pauseOnHover
+              />
             </p>
-            <p className="text-sm leading-relaxed text-muted sm:text-base">
+            <p
+              className="text-sm leading-relaxed text-muted sm:text-base"
+              style={{ fontFamily: 'Times, "Times New Roman", serif' }}
+            >
               {t.body}
             </p>
           </motion.div>
