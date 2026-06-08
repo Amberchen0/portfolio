@@ -1183,15 +1183,23 @@ function PlanetLabel({
   const distance = planetRadius * 1.1 + 0.06;
   return (
     <Billboard>
-      {/* All three layers share Tinos Bold (Google's metrics-equivalent
-          of Times New Roman) — drei/troika needs a real font file URL,
-          not the CSS "Times" family name, so we self-host the TTF in
-          /public/fonts/. Same file across the three layers keeps the
-          chromatic offset registration pixel-perfect. */}
+      {/* `font` prop removed from all three <Text> layers — the
+          self-hosted /public/fonts/Tinos-Bold.ttf turned out to be a
+          GitHub 404 HTML page mis-saved with a .ttf extension (file
+          header reads `<!DOCTYPE html>` not the TTF magic bytes), so
+          Troika's font parser threw `RangeError: Offset is outside
+          the bounds of the DataView` at request.onload. That error
+          surfaces async during canvas init and silently empties the
+          entire R3F scene (sun + planets + orbit rings all gone,
+          only the StarField rendered behind everything).
+          With no `font`, drei/troika falls back to its bundled
+          Roboto, which renders fine. If we want the Times serif
+          look back, drop a real Tinos-Bold.ttf (download from
+          Google Fonts — verify magic header) into /public/fonts/
+          and re-add font="/fonts/Tinos-Bold.ttf" here. */}
       {/* magenta-red ghost */}
       <Text
         position={[shift, 0, distance]}
-        font="/fonts/Tinos-Bold.ttf"
         color="#ff2860"
         fontSize={fontSize}
         letterSpacing={0.22}
@@ -1205,7 +1213,6 @@ function PlanetLabel({
       {/* cyan ghost */}
       <Text
         position={[-shift, 0, distance]}
-        font="/fonts/Tinos-Bold.ttf"
         color="#00e0ff"
         fontSize={fontSize}
         letterSpacing={0.22}
@@ -1219,7 +1226,6 @@ function PlanetLabel({
       {/* warm-cream main fill, drawn last on top */}
       <Text
         position={[0, 0, distance + 0.002]}
-        font="/fonts/Tinos-Bold.ttf"
         color={hovered ? "#f0e0c5" : "#c8bca0"}
         fontSize={fontSize}
         letterSpacing={0.22}
