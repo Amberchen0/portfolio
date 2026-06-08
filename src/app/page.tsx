@@ -232,8 +232,9 @@ export default function Home() {
                 style={{
                   top: "150px",
                   bottom: "150px",
-                  left: "-185px",
-                  right: "-185px",
+                  /* v7: -185 → -165, pulled in another 20px each side. */
+                  left: "-165px",
+                  right: "-165px",
                 }}
               >
                 {/* v7 props per Amber: dotSpacing 11 → 10 (one
@@ -242,17 +243,19 @@ export default function Home() {
                     cursor glow barely registered; now a clearly
                     visible deep purple so the radial follow reads).
                     Everything else from v6 holds. */}
-                {/* v9 per user: still the charcoal palette from v8 but
-                    with two retunes — dotRadius 3 → 3.5 so the dots
-                    read just barely above the gradient, and glowColor
-                    #1f2026 → #373944 (mid-tone blue-grey, ~80% brighter)
-                    so the cursor halo is properly visible against the
-                    near-black field. All other knobs from v8 hold:
-                    dotSpacing 11, bulgeStrength 53, glowRadius 160,
-                    cursorRadius 600, cursorForce 0.28, gradient
-                    #292930 → #19191c. */}
+                {/* v11 per Amber — four retunes on top of v10:
+                    • dotRadius 4 → 4.5 (one more chunkier step).
+                    • Gradient simplified: both stops now #010113 — a
+                      single flat near-black with the slightest navy
+                      undertone. The diagonal #03031c → #030321 fade
+                      is gone; the field reads as one continuous
+                      colour, so the dots become the only spatial cue.
+                    • glowColor #232030 → #323237 — a touch brighter
+                      and more neutral graphite, so the cursor halo is
+                      legible again (the v10 #232030 was almost
+                      invisible per Amber). */}
                 <DotField
-                  dotRadius={3.5}
+                  dotRadius={4.5}
                   dotSpacing={11}
                   bulgeStrength={53}
                   glowRadius={160}
@@ -261,9 +264,9 @@ export default function Home() {
                   cursorRadius={600}
                   cursorForce={0.28}
                   bulgeOnly
-                  gradientFrom="#292930"
-                  gradientTo="#19191c"
-                  glowColor="#373944"
+                  gradientFrom="#010113"
+                  gradientTo="#010113"
+                  glowColor="#323237"
                 />
               </div>
 
