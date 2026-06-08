@@ -243,29 +243,31 @@ export default function Home() {
                     cursor glow barely registered; now a clearly
                     visible deep purple so the radial follow reads).
                     Everything else from v6 holds. */}
-                {/* v11 per Amber — four retunes on top of v10:
-                    • dotRadius 4 → 4.5 (one more chunkier step).
-                    • Gradient simplified: both stops now #010113 — a
-                      single flat near-black with the slightest navy
-                      undertone. The diagonal #03031c → #030321 fade
-                      is gone; the field reads as one continuous
-                      colour, so the dots become the only spatial cue.
-                    • glowColor #232030 → #323237 — a touch brighter
-                      and more neutral graphite, so the cursor halo is
-                      legible again (the v10 #232030 was almost
-                      invisible per Amber). */}
+                {/* v12 per Amber — four retunes on top of v11:
+                    • dotRadius 4.5 → 4 (back down one notch, less heavy).
+                    • waveAmplitude 0 → 2  ★ biggest change ★ —
+                      ambient global wave kicks in. Each dot gets a
+                      small sine-driven sway driven by its grid coords +
+                      time, so the whole field reads as a quietly
+                      breathing membrane instead of a static grid. The
+                      bulge interaction still rides on top.
+                    • Gradient diversified again: #010113 flat split
+                      into #030322 (slightly more saturated deep navy)
+                      → #040422 (a hair more purple). The diagonal
+                      fade is back but extremely subtle.
+                    glowColor #323237 unchanged. */}
                 <DotField
-                  dotRadius={4.5}
+                  dotRadius={4}
                   dotSpacing={11}
                   bulgeStrength={53}
                   glowRadius={160}
                   sparkle={false}
-                  waveAmplitude={0}
+                  waveAmplitude={2}
                   cursorRadius={600}
                   cursorForce={0.28}
                   bulgeOnly
-                  gradientFrom="#010113"
-                  gradientTo="#010113"
+                  gradientFrom="#030322"
+                  gradientTo="#040422"
                   glowColor="#323237"
                 />
               </div>
