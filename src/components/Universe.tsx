@@ -37,6 +37,12 @@ type PlanetMaterialVariant =
 type Moon = {
   slug: string;
   name: string;
+  /** Optional English-only label used by the floating 3D PlanetLabel
+   *  above the planet. Falls back to `name` when omitted. Lets a work
+   *  carry a Chinese display name (`name`) in the INDEX directory + the
+   *  PlanetModal while the planet's chromatic spatial label stays in
+   *  English regardless of which language the visitor is reading in. */
+  planetLabel?: string;
   /** Short medium / discipline tag shown after the name in the INDEX
    *  dropdown ("摄影", "插画 / 叙事", etc.). Sourced from each work's
    *  /public/works/<slug>/index.html — see PLANETS below. */
@@ -70,6 +76,12 @@ type Moon = {
 
 /** Each work-planet's identity. */
 type Planet = {
+  /** Optional English-only label used by the floating 3D PlanetLabel
+   *  above the planet. Falls back to `name` when omitted. Lets a work
+   *  carry a Chinese display name (`name`) in the INDEX directory +
+   *  the PlanetModal while the planet's chromatic spatial label stays
+   *  in English regardless of language toggle. */
+  planetLabel?: string;
   /** Short medium / discipline tag shown after the name in the INDEX
    *  dropdown ("建筑概念", "角色与世界", etc.). Determined per
    *  /public/works/<slug>/index.html. */
@@ -137,7 +149,7 @@ const PLANETS: Planet[] = [
     size: 1.00, orbitRadius: 4.6, angle: Math.PI / 2,                          orbitSpeed: ORBIT_SPEED, orbitTilt: [0.22, -0.10] },
   { slug: "nemo",      name: "Nemo",            category: "角色与世界", color: "#1a6b8e", iridescenceColor: "#3dd5b0", material: "crystal", texturePath: "/nemo-pano-2.JPG", waterFlow: true,
     size: 1.00, orbitRadius: 3.6, angle: Math.PI / 2 + (2 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.30, 0.12] },
-  { slug: "concept",   name: "寰外",            category: "概念插画", color: "#1d5b58", iridescenceColor: "#7ad5e8", material: "dispersion", texturePath: "/concept-pano-1.png",
+  { slug: "concept",   name: "寰外", planetLabel: "Concept Design", category: "概念插画", color: "#1d5b58", iridescenceColor: "#7ad5e8", material: "dispersion", texturePath: "/concept-pano-1.png",
     size: 1.00, orbitRadius: 6.0, angle: Math.PI / 2 + (4 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [0.15, 0.26] },
   { slug: "moonlight", name: "Moonlight",       category: "视觉叙事", color: "#2a1f3d", iridescenceColor: "#c08af0", material: "pearl", texturePath: "/moonlight-pano-3.JPG",
     size: 0.85, orbitRadius: 7.2, angle: Math.PI / 2 + (6 * Math.PI) / 8,     orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.24, -0.18] },
@@ -1306,7 +1318,7 @@ function MoonSystem({
             />
           </mesh>
           <PlanetLabel
-            name={moon.name}
+            name={moon.planetLabel ?? moon.name}
             planetRadius={moon.size}
             hovered={hovered}
           />
@@ -1387,9 +1399,13 @@ function Planet({
           </group>
 
           {/* curved 3D chromatic label wrapping the planet's equator — sibling
-              of body so it doesn't spin with body's self-rotation */}
+              of body so it doesn't spin with body's self-rotation.
+              Prefer the English `planetLabel` when set so the floating
+              label always reads in latin script regardless of the
+              language toggle. Falls back to `name` for works that
+              don't have a separate English title. */}
           <PlanetLabel
-            name={planet.name}
+            name={planet.planetLabel ?? planet.name}
             planetRadius={planet.size}
             hovered={hovered}
           />
