@@ -23,6 +23,7 @@
 
 import { motion } from "framer-motion";
 import MetallicPaint from "@/components/MetallicPaint";
+import ResumeScroll from "@/components/ResumeScroll";
 import { useLang } from "@/lib/useLang";
 
 type Lang = "en" | "zh";
@@ -58,6 +59,7 @@ const copy = {
     footerLeft: "悉尼 · 接受精选合作",
     contactLabel: "联系",
     cvLabel: "下载简历",
+    ctaCaption: "了解更多请查看简历",   /* v14 per user: 替代原本的 [下载简历↓][联系→] 双按钮 */
   },
   en: {
     eyebrow: "About",
@@ -85,6 +87,7 @@ const copy = {
     footerLeft: "Sydney · Available for select collaborations",
     contactLabel: "Get in touch",
     cvLabel: "Download CV",
+    ctaCaption: "For more, see the CV",   /* v14 EN counterpart */
   },
 } as const;
 
@@ -100,7 +103,7 @@ export default function AboutBody() {
   const t = copy[lang];
 
   return (
-    <section className="mx-auto w-full max-w-3xl px-6 pb-24 pt-4 sm:px-12">
+    <section className="mx-auto w-full max-w-4xl px-6 pb-24 pt-4 sm:px-12">{/* v13 per Amber: ResumeScroll moved INSIDE this section (in-flow under the footer) instead of `fixed` floating at the viewport bottom, so the giant pb-[450px] safety-clearance is no longer needed — back to pb-24. The `contents` wrapper that used to host the two siblings (section + ResumeScroll) is gone too. */}
       {/* Page name treatment — same MetallicPaint "AMBER XU" block-
           letter wordmark used on the home page. Replaced the previous
           Times-serif h2 per Amber's note that she really liked the
@@ -122,8 +125,8 @@ export default function AboutBody() {
              (2:1, was 3.56:1) so the rendering doesn't read as a flat
              banner. The padding adds vertical breathing room without
              distorting letters. */
-          maxWidth: "650px",                /* v6: 520→650 同步 SVG viewBox 1600→2000，可见字母大小保持 v5 不变 */
-          aspectRatio: "2000 / 410",        /* v9 per user ("空白减少，字高度不变"): maxWidth 650 不动 → canvas 宽度物理不变 → 字母物理宽度不变；SVG viewBox 同步收紧到 410 高（只留字母 ~95% + 上下少量呼吸），container aspectRatio 跟着改成 2000/410。canvas 物理高度 650/(2000/410)=133px，字母物理高度 ≈ 133*0.95=126px（v8 是 114px，略高一点）。空白上下几乎消失。 */
+          maxWidth: "800px",                /* v11 per user: 650→800px (+23%, ~两档字号), 父 section 同步放宽到 max-w-4xl 才能容纳 */
+          aspectRatio: "2000 / 720",        /* v13 per user "只增加高度，其他变量不动": aspectRatio 分母 560→720 (+28.6%) → canvas 物理高度 800 × 720/2000 = 288px (was 224px). preserveAspectRatio="xMidYMid meet" 保持，SVG 仍按宽度铺满 (800×224 不变)，多出来的 64px 作为上下 vertical margin。maxWidth/viewBox/transform/scaleX/scaleY/font-size 全部不动。 */
         }}
       >
         <div className="absolute inset-0">
@@ -205,6 +208,7 @@ export default function AboutBody() {
         style={{
           color: "rgba(245,241,234,0.88)",
           lineHeight: lang === "zh" ? 1.95 : 1.7,
+          fontFamily: 'Times, "Times New Roman", serif',   /* v12 per user: 正文也用 Times，统一全页字体 */
         }}
       >
         {t.paragraphs.map((p, i) => (
@@ -225,7 +229,10 @@ export default function AboutBody() {
             </div>
             <p
               className="text-sm leading-relaxed"
-              style={{ color: "rgba(255,255,255,0.7)" }}
+              style={{
+                color: "rgba(255,255,255,0.7)",
+                fontFamily: 'Times, "Times New Roman", serif',   /* v12 per user: discipline 描述也 Times */
+              }}
             >
               {d.body}
             </p>
@@ -233,9 +240,17 @@ export default function AboutBody() {
         ))}
       </div>
 
-      {/* Footer — Sydney line + CV download + contact link */}
+      {/* v16 per Amber: removed the line-art "offer document + 了解更多请
+          查看简历" CTA that used to live here. The CV entry is now the
+          floating wax-sealed parchment scroll rendered below (the
+          ResumeScroll component), which acts as the single CV access
+          point and routes to the new /cv React page on click. */}
+
+      {/* Footer rule — Sydney availability line, sits under the horizontal
+          divider (the buttons that used to live up here moved into the CTA
+          block above). */}
       <div
-        className="mt-16 flex flex-col gap-3 pt-6 text-xs uppercase tracking-[0.2em] sm:flex-row sm:items-center sm:justify-between"
+        className="mt-10 pt-6 text-xs uppercase tracking-[0.2em]"
         style={{
           borderTop: "1px solid rgba(255,255,255,0.1)",
           color: "rgba(255,255,255,0.55)",
@@ -243,23 +258,14 @@ export default function AboutBody() {
         }}
       >
         <span>{t.footerLeft}</span>
-        <div className="flex items-center gap-6">
-          <a
-            href="/Amber-Xu-CV.pdf"
-            target="_blank"
-            rel="noopener"
-            className="transition-colors hover:text-white"
-          >
-            {t.cvLabel} ↓
-          </a>
-          <a
-            href="mailto:877793893@qq.com"
-            className="text-amber transition-colors hover:text-white"
-          >
-            {t.contactLabel} →
-          </a>
-        </div>
       </div>
+
+      {/* Rolled-parchment-with-wax-seal CTA. v13 per Amber: moved
+          INTO the section, in normal document flow, directly after
+          the Sydney footer line. Its own component supplies the
+          top/bottom margins, hover bob, click-to-unroll animation,
+          and /cv route push. */}
+      <ResumeScroll />
     </section>
   );
 }
