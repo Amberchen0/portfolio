@@ -4262,7 +4262,15 @@ export default function Universe() {
           menuOpen ? (
             <ul
               id="universe-works-menu"
-              className="pointer-events-auto mt-3 flex flex-col gap-1.5 text-[11px] uppercase tracking-[0.15em] border-l border-white/10 pl-3"
+              /* Fixed-width column (w-80 = 320px) so each row's right-
+                 aligned category tag (ml-auto on the <span> inside
+                 the <li>) actually has room to push to the right and
+                 sit close to the name. Without an explicit width the
+                 ul inherits the full-width TopNav wrapper (left-6
+                 right-6) and the categories drift all the way to the
+                 viewport's far-right edge, where they read as missing.
+                 max-w cap protects very narrow phones from overflow. */
+              className="pointer-events-auto mt-3 flex w-80 max-w-[calc(100vw-3rem)] flex-col gap-1.5 text-[11px] uppercase tracking-[0.15em] border-l border-white/10 pl-3 pr-3"
               style={{ fontFamily: 'Times, "Times New Roman", serif' }}
             >
               {/* Flatten planets + moons so HYSTON gets its own <li> and
