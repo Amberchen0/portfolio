@@ -242,22 +242,17 @@ export default function Home() {
                     cursor glow barely registered; now a clearly
                     visible deep purple so the radial follow reads).
                     Everything else from v6 holds. */}
-                {/* v8 per user: switching the dot grid from the bright
-                    purple palette (#8155f7→#d4bbfc + #312549 cursor glow)
-                    to a near-black charcoal one — gradient #292930→#19191c
-                    with a #1f2026 cursor glow. The dots themselves become
-                    nearly invisible against the LiquidChrome backdrop;
-                    only the bulge ripple + faint cursor halo register,
-                    which Amber wanted to compare against the louder
-                    purple version. dotRadius bumped 3.5→3, dotSpacing
-                    10→11 (slightly looser grid), bulgeStrength 30→53
-                    (stronger push so the now-low-contrast dots still
-                    show movement), glowRadius 90→160 (wider halo since
-                    glow colour is darker), cursorRadius 350→600 and
-                    cursorForce 0.3→0.28 (bigger but slightly gentler
-                    interaction area). */}
+                {/* v9 per user: still the charcoal palette from v8 but
+                    with two retunes — dotRadius 3 → 3.5 so the dots
+                    read just barely above the gradient, and glowColor
+                    #1f2026 → #373944 (mid-tone blue-grey, ~80% brighter)
+                    so the cursor halo is properly visible against the
+                    near-black field. All other knobs from v8 hold:
+                    dotSpacing 11, bulgeStrength 53, glowRadius 160,
+                    cursorRadius 600, cursorForce 0.28, gradient
+                    #292930 → #19191c. */}
                 <DotField
-                  dotRadius={3}
+                  dotRadius={3.5}
                   dotSpacing={11}
                   bulgeStrength={53}
                   glowRadius={160}
@@ -268,7 +263,7 @@ export default function Home() {
                   bulgeOnly
                   gradientFrom="#292930"
                   gradientTo="#19191c"
-                  glowColor="#1f2026"
+                  glowColor="#373944"
                 />
               </div>
 
