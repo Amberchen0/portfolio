@@ -148,7 +148,7 @@ const PLANETS: Planet[] = [
   // (game-pano-1.png — pure red nebula with starfield). Mask now wears
   // the red/cyan fire-vs-ice variant; together the two SSS planets pulse
   // in red on opposite sides of the sun, forming a "twin heartbeat" pair.
-  { slug: "game",      name: "Game",            category: "游戏设计", color: "#e60012", iridescenceColor: "#d40010", material: "sss", texturePath: "/game-pano-1.png",
+  { slug: "game",      name: "Gamer",           category: "短篇动画", color: "#e60012", iridescenceColor: "#d40010", material: "sss", texturePath: "/game-pano-1.png",
     size: 0.55, orbitRadius: 8.2, angle: Math.PI / 2 + (10 * Math.PI) / 8,    orbitSpeed: ORBIT_SPEED, orbitTilt: [-0.14, 0.28] },
 
   // Drawing — placeholder (ink-toned)
