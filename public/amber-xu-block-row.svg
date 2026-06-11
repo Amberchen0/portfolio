@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-200 30 2000 560" width="2000" height="560" preserveAspectRatio="xMidYMid meet">
+  <!-- ABOUT-PAGE ONLY single-row variant of the AMBER XU wordmark.
+       The home page still uses /amber-xu-block.svg (2-row Vogue
+       layout) — DO NOT change that file when iterating this one.
+       Drop-initial: A and X at 360, MBER and U at 270 (~25% smaller),
+       all on a single baseline. viewBox 1600×800 (2:1) gives generous
+       top/bottom padding so the rendering doesn't read as a flat
+       banner; the letters themselves keep natural Didot bold vertical
+       proportion. Baseline y=560 vertically centres the cap-line.
+       Fallback font chain: Didot → Bodoni 72 → GFS Didot →
+       Hoefler Text → Times New Roman → generic serif. -->
+  <text x="800" y="560"
+        text-anchor="middle"
+        font-family="'Didot', 'Bodoni 72', 'GFS Didot', 'Hoefler Text', 'Times New Roman', serif"
+        font-weight="bold"
+        letter-spacing="4"
+        fill="#000000"
+        transform="matrix(0.82 0 0 1.4 144 -224)"><!-- v8 per user: 在 v7 的 scaleX 0.82 基础上加 scaleY=1.4（字母纵向拉高 40%，宽度不动）。translateY=-224 (=560*(1-1.4)) 把基线锚回 y=560，确保字母不上移、仅向上"长高"。 -->
+
+    <tspan font-size="360">A</tspan><tspan font-size="270">MBER</tspan><tspan font-size="270">&#160;&#160;</tspan><tspan font-size="360">X</tspan><tspan font-size="270">U</tspan>
+  </text>
+</svg>

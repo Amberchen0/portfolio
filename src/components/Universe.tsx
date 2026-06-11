@@ -1207,23 +1207,18 @@ function PlanetLabel({
   const distance = planetRadius * 1.1 + 0.06;
   return (
     <Billboard>
-      {/* `font` prop removed from all three <Text> layers — the
-          self-hosted /public/fonts/Tinos-Bold.ttf turned out to be a
-          GitHub 404 HTML page mis-saved with a .ttf extension (file
-          header reads `<!DOCTYPE html>` not the TTF magic bytes), so
-          Troika's font parser threw `RangeError: Offset is outside
-          the bounds of the DataView` at request.onload. That error
-          surfaces async during canvas init and silently empties the
-          entire R3F scene (sun + planets + orbit rings all gone,
-          only the StarField rendered behind everything).
-          With no `font`, drei/troika falls back to its bundled
-          Roboto, which renders fine. If we want the Times serif
-          look back, drop a real Tinos-Bold.ttf (download from
-          Google Fonts — verify magic header) into /public/fonts/
-          and re-add font="/fonts/Tinos-Bold.ttf" here. */}
+      {/* Tinos Bold restored. The /public/fonts/Tinos-Bold.ttf file
+          was previously a GitHub 404 HTML page mis-saved with the
+          wrong extension, which blew up Troika's font parser at
+          canvas init and silently emptied the entire R3F scene.
+          Replaced with a clean download from google/fonts (ofl/tinos)
+          — `file Tinos-Bold.ttf` now reports "TrueType Font data".
+          All three chromatic layers share the same TTF so the
+          per-channel offset registration stays pixel-perfect. */}
       {/* magenta-red ghost */}
       <Text
         position={[shift, 0, distance]}
+        font="/fonts/Tinos-Bold.ttf"
         color="#ff2860"
         fontSize={fontSize}
         letterSpacing={0.22}
@@ -1237,6 +1232,7 @@ function PlanetLabel({
       {/* cyan ghost */}
       <Text
         position={[-shift, 0, distance]}
+        font="/fonts/Tinos-Bold.ttf"
         color="#00e0ff"
         fontSize={fontSize}
         letterSpacing={0.22}
@@ -1250,6 +1246,7 @@ function PlanetLabel({
       {/* warm-cream main fill, drawn last on top */}
       <Text
         position={[0, 0, distance + 0.002]}
+        font="/fonts/Tinos-Bold.ttf"
         color={hovered ? "#f0e0c5" : "#c8bca0"}
         fontSize={fontSize}
         letterSpacing={0.22}
@@ -4296,6 +4293,13 @@ export default function Universe() {
                    render as-is; latin names get capitalised. */
                 const itemName = item.name[lang];
                 const itemCategory = item.category?.[lang];
+                /* Published works (HTML detail page shipped) read at full
+                   opacity; placeholders dim to ~65% and tag the category
+                   with a small "· soon" suffix so visitors know the
+                   planet is still WIP before they click and see the
+                   "still forming" modal. */
+                const isPublished = PUBLISHED_WORKS.has(item.slug);
+                const wipLabel = lang === "zh" ? "即将上线" : "soon";
                 return (
                   <li key={item.slug}>
                     <button
@@ -4304,7 +4308,9 @@ export default function Universe() {
                         setMenuOpen(false);
                         handlePlanetClick(item.slug);
                       }}
-                      className="group flex items-center gap-2.5 text-muted hover:text-white transition-colors w-full text-left py-0.5"
+                      className={`group flex items-center gap-2.5 hover:text-white transition-colors w-full text-left py-0.5 ${
+                        isPublished ? "text-muted" : "text-muted/65"
+                      }`}
                     >
                       <svg
                         width="9"
@@ -4328,6 +4334,9 @@ export default function Universe() {
                           className="ml-auto pl-3 text-[10px] tracking-[0.15em] text-muted/55 group-hover:text-muted/80 transition-colors shrink-0"
                         >
                           {itemCategory}
+                          {!isPublished && (
+                            <span className="ml-1 italic text-muted/40">· {wipLabel}</span>
+                          )}
                         </span>
                       )}
                     </button>

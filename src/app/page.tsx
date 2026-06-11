@@ -255,7 +255,9 @@ export default function Home() {
                       into #030322 (slightly more saturated deep navy)
                       → #040422 (a hair more purple). The diagonal
                       fade is back but extremely subtle.
-                    glowColor #323237 unchanged. */}
+                    glowColor #323237 unchanged.
+                    (The brief LiquidGlassPanel experiment is rolled
+                    back per Amber — DotField is the canonical look.) */}
                 <DotField
                   dotRadius={4}
                   dotSpacing={11}

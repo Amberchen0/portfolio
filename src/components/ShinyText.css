@@ -1,0 +1,6 @@
+/* ShinyText — gradient sweep highlight on text. The actual gradient
+   colors / size are applied inline via component props so this file
+   only ensures the base text-fill machinery is set up. */
+.shiny-text {
+  display: inline-block;
+}

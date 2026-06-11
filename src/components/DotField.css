@@ -1,0 +1,14 @@
+/* DotField — wraps a canvas (the dot grid) and an svg (the cursor
+   glow circle), both absolutely positioned to fill this container.
+   The container itself MUST be position:relative so the absolute
+   children anchor to its bounds, and width/height:100% so it
+   stretches to whatever positioned parent the consumer supplies
+   (in this project: the .absolute.inset-0 layer inside the hero
+   motion.div). overflow:hidden prevents the cursor glow circle from
+   leaking outside the slot when the mouse rides the edge. */
+.dot-field-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}

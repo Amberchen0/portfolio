@@ -1,0 +1,17 @@
+/* Lanyard — physics-driven hanging ID card with photo.
+   Wrapper fills its parent (typically a fixed-height hero section
+   at the top of the About page). Canvas paints transparent so the
+   page background shows through. */
+.lanyard-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  touch-action: none;
+}
+
+.lanyard-wrapper canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

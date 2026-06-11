@@ -130,28 +130,46 @@ export default function AboutBody() {
         }}
       >
         <div className="absolute inset-0">
+          {/* v2 per Amber — full prop set replaced with the React Bits
+              "Paper Liquid Metal" demo config Amber pasted. Big
+              differences vs v1 (canonical chrome-blue):
+                • Colours: lightColor #cdc8e1 → #f1f9ff (almost-white
+                  cyan highlights); darkColor #031943 → #3e1bbf
+                  (vibrant violet/purple core); tintColor #a3ccf5 →
+                  #5d91c4 (mid steel-blue tint).
+                • angle 0 → 149° — the metallic flow direction
+                  rotates almost 90° (now bottom-left → top-right).
+                • mouseAnimation off — wordmark no longer responds
+                  to cursor; static animated flow only.
+                • Much slower drift: speed 0.36 → 0.12.
+                • Smoother surface: noiseScale 2 → 0.5,
+                  waveAmplitude 1.3 → 0.3, refraction 0.048 → 0.017,
+                  blur 0.016 → 0.017.
+                • More liquid distortion: distortion 0.45 → 0.9.
+              Home page (src/app/page.tsx) MetallicPaint is NOT
+              touched — these prop changes are scoped to /about only. */}
           <MetallicPaint
             imageSrc="/amber-xu-block-row.svg"
-            seed={37.49}
-            scale={1.7}
-            patternSharpness={0.5}
-            noiseScale={2}
-            speed={0.36}
-            liquid={0.87}
-            mouseAnimation
-            brightness={1.95}
+            seed={27.07}
+            scale={2}
+            patternSharpness={0.4}
+            noiseScale={0.5}
+            speed={0.12}
+            liquid={0.86}
+            mouseAnimation={false}
+            brightness={2}
             contrast={0.5}
-            refraction={0.048}
-            blur={0.016}
-            chromaticSpread={2.3}
-            fresnel={2}
-            angle={0}
-            waveAmplitude={1.3}
-            distortion={0.45}
+            refraction={0.017}
+            blur={0.017}
+            chromaticSpread={2.1}
+            fresnel={1.9}
+            angle={149}
+            waveAmplitude={0.3}
+            distortion={0.9}
             contour={0.8}
-            lightColor="#cdc8e1"
-            darkColor="#031943"
-            tintColor="#a3ccf5"
+            lightColor="#f1f9ff"
+            darkColor="#3e1bbf"
+            tintColor="#5d91c4"
           />
         </div>
       </motion.div>

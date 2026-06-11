@@ -1,0 +1,10 @@
+/* Plasma — fills its positioned parent. The component appends a
+   <canvas> child sized via JS, so this wrapper just needs to provide
+   a stable layout box. width/height: 100% lets it stretch to a parent
+   like .absolute.inset-0 or a sized hero slot. */
+.plasma-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}

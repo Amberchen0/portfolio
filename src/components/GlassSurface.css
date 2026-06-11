@@ -1,0 +1,82 @@
+/* GlassSurface — React Bits Glass Surface CSS
+ *
+ * Two render paths the component picks between:
+ *
+ *   .glass-surface--svg       Chrome / Edge: pipes the per-instance SVG
+ *                             filter into backdrop-filter — that filter
+ *                             *displaces* the R/G/B channels of the
+ *                             backdrop independently, producing the
+ *                             refractive lens look with chromatic
+ *                             fringing at the edges.
+ *
+ *   .glass-surface--fallback  Safari / Firefox: plain blurred backdrop.
+ *
+ * KEY DESIGN RULE: this is REFRACTIVE glass, not frosted.  The base
+ * .glass-surface MUST stay near-transparent so the SVG displacement
+ * can actually show through.  Edge highlights provide the only
+ * always-visible "this is a glass shape" cue on dark backdrops.
+ *
+ * CSS custom properties set inline by the component:
+ *   --glass-frost       background fill opacity (0–1)
+ *   --glass-saturation  saturate() filter amount
+ *   --filter-id         url(#glass-filter-N) for backdrop-filter
+ */
+
+.glass-surface {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  isolation: isolate;
+
+  /* Transparent body — only a hint of white if backgroundOpacity is set. */
+  background: hsla(0, 0%, 100%, var(--glass-frost, 0));
+
+  /* Glass material cues that work over any backdrop (dark or light):
+     - top edge bright highlight (light entering glass from above)
+     - bottom edge faint highlight (light wrapping under)
+     - hairline outline so the shape is always visible
+     - drop shadow for elevation */
+  box-shadow:
+    inset 0 1px 0 hsla(0, 0%, 100%, 0.28),
+    inset 0 -1px 0 hsla(0, 0%, 100%, 0.06),
+    inset 0 0 0 1px hsla(0, 0%, 100%, 0.10),
+    0 8px 28px hsla(0, 0%, 0%, 0.35),
+    0 2px 6px hsla(0, 0%, 0%, 0.18);
+}
+
+.glass-surface__filter {
+  position: absolute;
+  inset: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.glass-surface__content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Chrome/Edge: pure SVG displacement filter — NO extra blur stacked on
+   top, because that would smear the refraction back into a frosted
+   look (which is exactly what we want to avoid). */
+.glass-surface--svg {
+  backdrop-filter: var(--filter-id) saturate(var(--glass-saturation, 1));
+  -webkit-backdrop-filter: var(--filter-id) saturate(var(--glass-saturation, 1));
+}
+
+/* Safari/Firefox: no SVG in backdrop-filter, so settle for a moderate
+   blur — still keep saturation boosted so the backdrop colors come
+   through saturated rather than washed-out. */
+.glass-surface--fallback {
+  backdrop-filter: blur(10px) saturate(var(--glass-saturation, 1.3));
+  -webkit-backdrop-filter: blur(10px) saturate(var(--glass-saturation, 1.3));
+}
