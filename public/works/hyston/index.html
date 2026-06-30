@@ -74,6 +74,37 @@ body::before {
 /* (Custom cursor removed — use system cursor) */
 
 /* ─────────────────────────────────────
+   ← UNIVERSE BACK BUTTON
+   ───────────────────────────────────── */
+/* Sitewide standard chrome on every project page — fixed pill at
+   top-left, click returns to the planet universe at /work. Same
+   visual recipe as /works/concept and friends. */
+.universe-back {
+  position: fixed;
+  top: 28px;
+  left: 28px;
+  z-index: 9999;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: none;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(13, 12, 16, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: color 0.25s, border-color 0.25s, background 0.25s;
+}
+.universe-back:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(13, 12, 16, 0.75);
+}
+
+/* ─────────────────────────────────────
    LANGUAGE TOGGLE  ·  中 / EN
    ───────────────────────────────────── */
 .lang-toggle {
@@ -102,6 +133,15 @@ body[data-lang="cn"] .lang-toggle .lt-cn { color: var(--ink-black); }
 body[data-lang="cn"] .lang-toggle .lt-en { color: var(--ink-faded); }
 body[data-lang="en"] .lang-toggle .lt-cn { color: var(--ink-faded); }
 body[data-lang="en"] .lang-toggle .lt-en { color: var(--ink-black); }
+
+/* When the scroll-revealed top-bar slides in, hide the floating
+   lang-toggle so the two don't stack at the top-right corner.
+   Uses :has() — supported in every modern browser since 2023. */
+body:has(.top-bar.visible) .lang-toggle {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--bezier);
+}
 
 /* Show only the active language */
 body[data-lang="cn"] .lang-en { display: none !important; }
@@ -1665,6 +1705,11 @@ section { position: relative; padding: 140px 8vw; z-index: 2; }
 </style>
 </head>
 <body data-lang="cn">
+
+<!-- ← Universe — sitewide standard back-to-/work pill. Every project
+     page should carry one. Sits above all other chrome (z 9999) so
+     scrolling never hides it; click returns to the planet universe. -->
+<a class="universe-back" href="/work">← Universe</a>
 
 <!-- ── Scroll progress ── -->
 <div class="progress" id="progress"></div>
