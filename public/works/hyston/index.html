@@ -285,6 +285,11 @@ section { position: relative; padding: 140px 8vw; z-index: 2; }
 /* ─────────────────────────────────────
    HERO
    ───────────────────────────────────── */
+/* ── HERO + SYNOPSIS 卡片堆叠容器 ── */
+.hero-synopsis-stack {
+  position: relative;
+}
+
 #hero {
   min-height: 100vh;
   padding-top: calc(14vh + 50px);
@@ -294,10 +299,9 @@ section { position: relative; padding: 140px 8vw; z-index: 2; }
   justify-content: flex-start;
   align-items: center;
   text-align: center;
-  position: relative;   /* 正常文档流，内容随滚动上升 */
-  z-index: 5;           /* 盖在 storyboard 上，淡出后 storyboard 直接露出 */
+  position: relative;   /* 卡片在顶层正常滚动 */
+  z-index: 20;          /* 盖在 Synopsis 之上 */
   overflow: hidden;
-  will-change: opacity;
   /* 天空配色 —— 上紫（穹顶）下蓝（地平线），中间走 periwinkle 桥接 */
   background: linear-gradient(
     to bottom,
@@ -917,23 +921,40 @@ section { position: relative; padding: 140px 8vw; z-index: 2; }
    SYNOPSIS · 序章
    ───────────────────────────────────── */
 #synopsis {
-  min-height: 100vh;
+  box-sizing: border-box;
+  height: 100vh;
   padding: 160px 8vw;
-  background: #0E0C0A;
+  /* 跟 storyboard 一样的底图 */
+  background: url("页面背景图.JPG") center/cover no-repeat fixed;
   color: #EFE7D2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  position: relative;
+  position: sticky;              /* 钉在视口顶：Hero 卡片向上滑离时露出 */
+  top: 0;
+  z-index: 1;
+  margin-top: 0;                 /* JS 改成 -heroH 让它跟 Hero 完全叠放 */
+  overflow: hidden;
 }
+/* spacer 给 Synopsis sticky 留出 Hero 高度的滚动空间 */
+.hero-synopsis-spacer {
+  width: 100%;
+  /* 高度由 JS 设为 heroH */
+  background: transparent;
+  pointer-events: none;
+}
+/* 毛玻璃：模糊底图 + 半透深色让文字可读 */
 #synopsis::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, rgba(168, 120, 138, 0.06) 0%, transparent 60%);
+  background: rgba(14, 12, 10, 0.45);
+  backdrop-filter: blur(24px) saturate(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(1.1);
   pointer-events: none;
+  z-index: 0;
 }
 .synopsis-inner {
   position: relative;
@@ -971,8 +992,7 @@ section { position: relative; padding: 140px 8vw; z-index: 2; }
 }
 
 #storyboard {
-  margin-top: -100vh;   /* 滑到 hero 下面：hero 淡出时 storyboard 自己的底直接透出 */
-  padding-top: calc(100vh + 140px);   /* 内容仍从原位置开始 */
+  padding-top: 140px;
   padding-bottom: 140px;
   position: relative;
   z-index: 1;
@@ -1216,7 +1236,7 @@ section { position: relative; padding: 140px 8vw; z-index: 2; }
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='40' viewBox='0 0 60 40'><rect x='12' y='9' width='36' height='22' fill='%23EFE7D2'/></svg>") bottom center / 60px 40px repeat-x,
     #0E0C0A;
   color: #EFE7D2;
-  padding: 200px 8vw;                  /* 多出 40px 给上下胶卷边 */
+  padding: 90px 8vw;                   /* 40px 给胶卷边 + 50px 内边距 */
   position: relative;
   z-index: 20;                         /* 置于 FIN 之上：滚动时 Film 渐淡，露出底下的 FIN */
   will-change: opacity;
@@ -1230,7 +1250,7 @@ section { position: relative; padding: 140px 8vw; z-index: 2; }
 }
 
 .film-stage {
-  margin-top: 80px;
+  margin-top: 32px;
   position: relative;
   max-width: 1100px;
   margin-left: auto;
@@ -1243,11 +1263,13 @@ section { position: relative; padding: 140px 8vw; z-index: 2; }
   border: 1px solid rgba(168, 120, 138, 0.28);
   overflow: hidden;
 }
-.film-frame video {
+.film-frame video,
+.film-frame iframe {
   width: 100%;
   height: 100%;
   display: block;
   object-fit: cover;
+  border: 0;
 }
 
 .film-poster {
@@ -1259,10 +1281,15 @@ section { position: relative; padding: 140px 8vw; z-index: 2; }
   justify-content: center;
   gap: 28px;
   z-index: 2;
-  background: radial-gradient(ellipse at center, rgba(110, 81, 112, 0.25) 0%, transparent 70%);
+  /* 自定义封面图 + 中央径向暗化让播放按钮更显眼 */
+  background:
+    radial-gradient(ellipse at center, rgba(0, 0, 0, 0.45) 0%, transparent 65%),
+    url("截屏2026-06-30 下午10.21.47.png") center/cover no-repeat;
   transition: opacity 0.6s;
 }
 .film-poster.gone { opacity: 0; pointer-events: none; }
+/* 封面图自带 "/ Welcome to Hyston's World"，原文字层隐藏避免重复 */
+.poster-mark, .poster-title, .poster-sub { display: none; }
 .poster-mark {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -1675,6 +1702,9 @@ section { position: relative; padding: 140px 8vw; z-index: 2; }
   <a href="#fin"       data-section="fin"><span>04</span> <span>Fin</span></a>
 </nav>
 
+<!-- ───────── HERO + SYNOPSIS 卡片堆叠 ───────── -->
+<div class="hero-synopsis-stack">
+
 <!-- ───────── HERO ───────── -->
 <section id="hero">
 
@@ -1727,12 +1757,25 @@ section { position: relative; padding: 140px 8vw; z-index: 2; }
       <span class="lang-en"><em>Synopsis</em>.</span>
     </h2>
     <div class="synopsis-body">
-      <p>This documentary records how and why Hyston developed slash careers in Melbourne.</p>
-      <p>There is a concept of game setting for this documentary, thus, it mainly filmed from the first perspective. &ldquo;I&rdquo; am a game player login the game called &ldquo;/&rdquo; world, as Hyston&rsquo;s friend to experience her different roles and explore her motivation for slash careers.</p>
-      <p>We&rsquo;d love to convey that everyone can choose a lifestyle they like, and there is no need to follow others&rsquo; step. You can try some different careers and develop different hobbies, but if you feel tired about this, just stop, logout the &ldquo;game&rdquo; and back to your own track. <em>The pace of life that suits you is the best.</em></p>
+      <div class="lang-cn">
+        <p>本片记录了 Hyston 在墨尔本如何以及为何走上"斜杠"职业之路。</p>
+        <p>影片采用游戏化的概念设定，主要以第一人称视角拍摄。&ldquo;我&rdquo;是一位登录了名为&ldquo;/世界&rdquo;游戏的玩家，以 Hyston 朋友的身份，体验她不同的角色，探索她从事斜杠职业的动机。</p>
+        <p>我们想传达的是：每个人都可以选择自己喜欢的生活方式，无需追随他人的脚步。你可以尝试不同的职业，发展不同的爱好；但若感到疲惫，那就停下来，登出&ldquo;游戏&rdquo;,回到属于自己的轨道。<em>适合你的节奏，才是最好的节奏。</em></p>
+      </div>
+      <div class="lang-en">
+        <p>This documentary records how and why Hyston developed slash careers in Melbourne.</p>
+        <p>There is a concept of game setting for this documentary, thus, it mainly filmed from the first perspective. &ldquo;I&rdquo; am a game player login the game called &ldquo;/&rdquo; world, as Hyston&rsquo;s friend to experience her different roles and explore her motivation for slash careers.</p>
+        <p>We&rsquo;d love to convey that everyone can choose a lifestyle they like, and there is no need to follow others&rsquo; step. You can try some different careers and develop different hobbies, but if you feel tired about this, just stop, logout the &ldquo;game&rdquo; and back to your own track. <em>The pace of life that suits you is the best.</em></p>
+      </div>
     </div>
   </div>
 </section>
+
+<!-- spacer 给 sticky Synopsis 留出 Hero 滑离的范围 -->
+<div class="hero-synopsis-spacer" aria-hidden="true"></div>
+
+</div>
+<!-- ───────── /HERO + SYNOPSIS 卡片堆叠 ───────── -->
 
 
 <!-- ───────── STORYBOARD ───────── -->
@@ -2074,29 +2117,16 @@ section { position: relative; padding: 140px 8vw; z-index: 2; }
 <section id="film">
   <div class="reveal">
     <div class="section-tag">CHAPTER 03 · THE FILM</div>
-    <h2 class="section-h1">
-      <span class="lang-cn">三十格<em>动起来</em>。</span>
-      <span class="lang-en">30 Panels <em>in Motion</em>.</span>
-    </h2>
   </div>
 
   <div class="film-stage reveal">
     <div class="film-frame">
-      <!-- Video hosted on YouTube (unlisted) instead of self-hosted —
-           the original hyston.mov was 568 MB which blows past GitHub's
-           100 MB single-file limit and would balloon the Vercel
-           deployment. YouTube's adaptive bitrate also gives better
-           playback on mobile / slow connections than a single MP4. -->
-      <iframe
-        id="hyston-video"
-        src="https://www.youtube.com/embed/ShEUvSqB_Ok?rel=0&modestbranding=1"
-        title="HYSTON — Personal Documentary by Amber Xu"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        referrerpolicy="strict-origin-when-cross-origin"
-        allowfullscreen
-        style="position:absolute; inset:0; width:100%; height:100%; border:0;"
-      ></iframe>
+      <iframe id="hyston-video"
+              src="https://www.youtube.com/embed/Pl-dmb0Ez8E?rel=0&modestbranding=1"
+              title="Hyston's Life"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen></iframe>
       <div class="film-poster" id="film-poster">
         <div class="poster-mark">▸ NOW SHOWING</div>
         <div class="poster-title">Hyston's Life.</div>
@@ -2165,11 +2195,25 @@ window.addEventListener('load', () => {
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.side-nav a');
 
-const sideNav = document.querySelector('.side-nav');
-const topBar  = document.querySelector('.top-bar');
-const hero    = document.getElementById('hero');
-const film    = document.getElementById('film');
-const fin     = document.getElementById('fin');
+const sideNav  = document.querySelector('.side-nav');
+const topBar   = document.querySelector('.top-bar');
+const hero     = document.getElementById('hero');
+const synopsis = document.getElementById('synopsis');
+const heroSynopsisSpacer = document.querySelector('.hero-synopsis-spacer');
+const film     = document.getElementById('film');
+const fin      = document.getElementById('fin');
+
+/* Hero/Synopsis 卡片堆叠 sync：
+   - synopsis margin-top = -heroH，让 Synopsis 流位置贴到 Hero 头
+   - spacer 高度 = heroH，给 sticky Synopsis 留出 Hero 滑离的滚动范围 */
+function syncHeroSynopsis() {
+  const h = hero.offsetHeight;
+  synopsis.style.marginTop = `-${h}px`;
+  heroSynopsisSpacer.style.height = `${h}px`;
+}
+syncHeroSynopsis();
+window.addEventListener('load',   syncHeroSynopsis);
+window.addEventListener('resize', syncHeroSynopsis);
 
 /* sticky FIN 跟 Film 完全叠放 + spacer 给 Film 留滚出视口的滚动空间：
    - FIN margin-top = -filmH → FIN 自然位置贴到 Film_start
@@ -2200,12 +2244,6 @@ window.addEventListener('scroll', () => {
   sideNav.classList.toggle('visible', pastHero);
   topBar.classList.toggle('visible', pastHero);
 
-  // 整页随滚动渐渐淡出（scrollY=0 完全不透明 → heroH 时完全透明）
-  const heroH = hero.offsetHeight;
-  const sY = window.scrollY;
-  const op = Math.max(0, 1 - sY / heroH);
-  hero.style.opacity = op;
-  hero.style.pointerEvents = op < 0.05 ? 'none' : '';
 
 
   // progress
@@ -2250,24 +2288,13 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); }
    ───────────────────────────────────── */
 const poster  = document.getElementById('film-poster');
 const playBtn = document.getElementById('poster-play');
-const video   = document.getElementById('hyston-video'); // YouTube iframe
+const ytFrame = document.getElementById('hyston-video');
 
-/* iframe-friendly play handoff. The original code called
-   video.play() directly + listened for the 'pause' event — both are
-   HTMLVideoElement APIs that don't exist on iframe. With YouTube as
-   the player we just hide the poster on click and append
-   `autoplay=1` to the iframe src so the playback starts as soon as
-   it's revealed. YouTube's own controls handle play/pause from then
-   on. (Could upgrade to the YT IFrame Player API later if we ever
-   want the poster to come back on natural pause.) */
 playBtn.addEventListener('click', () => {
   poster.classList.add('gone');
-  try {
-    const url = new URL(video.src, window.location.href);
-    url.searchParams.set('autoplay', '1');
-    video.src = url.toString();
-  } catch (_) {
-    /* malformed src — leave the iframe alone, user can click play */
+  /* 给 iframe src 追加 autoplay=1，YouTube 播放器立刻自动播放 */
+  if (!/autoplay=1/.test(ytFrame.src)) {
+    ytFrame.src = ytFrame.src + '&autoplay=1';
   }
 });
 
