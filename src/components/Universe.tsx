@@ -4140,6 +4140,9 @@ const PUBLISHED_WORKS = new Set([
   "model",
   "concept",
   "mask",
+  "hyston",  /* Amber's personal documentary; static page at
+                public/works/hyston/index.html, video hosted on
+                YouTube (ShEUvSqB_Ok) and embedded via iframe. */
 ]);
 
 export default function Universe() {
