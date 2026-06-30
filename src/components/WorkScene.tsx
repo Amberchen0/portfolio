@@ -31,36 +31,44 @@ void Aurora;
  * its final state on the first frame so going "back" feels instant.
  */
 export default function WorkScene() {
-  // Detect navigation back from a project page. document.referrer is a
-  // client-only API, so on first render we don't yet know — we play the
-  // full entry animation. Once useEffect runs we flip the transitions to
-  // duration 0, which framer-motion treats as "snap to target", and the
-  // half-played animation completes instantly.
-  const [isReturn, setIsReturn] = useState(false);
+  // Detect navigation back from a project page SYNCHRONOUSLY at component
+  // init — both via useState lazy initializers — so the value is correct
+  // on the very first render. The previous setup put both reads inside
+  // useEffect, which fires AFTER first render: by then framer-motion has
+  // already kicked off the 4.8s entry animation with shouldSnap=false,
+  // and flipping `transition` mid-flight doesn't cancel the in-progress
+  // motion. Result: returning visitors waited ~5s of fade-in every time
+  // they clicked back from a project page, which is what Amber flagged
+  // as "near-1-minute black screen".
+  const [isReturn] = useState<boolean>(() => {
+    if (typeof document === "undefined") return false; // SSR guard
+    try {
+      const ref = document.referrer;
+      if (!ref) return false;
+      const refPath = new URL(ref).pathname;
+      return refPath.startsWith("/works/");
+    } catch {
+      return false;
+    }
+  });
+
   // Honour OS-level "reduce motion" preference. Anyone with vestibular
   // sensitivity, motion sickness, or who's simply set the OS toggle
   // gets the same instant-snap treatment as a returning visitor — no
-  // 4.8s fade-in choreography.
-  const [reduceMotion, setReduceMotion] = useState(false);
+  // 4.8s fade-in choreography. Read synchronously at init like isReturn
+  // above; a follow-up listener inside useEffect catches the (rare)
+  // case where the preference flips while the page is open.
+  const [reduceMotion, setReduceMotion] = useState<boolean>(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return false;
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  });
 
   useEffect(() => {
-    try {
-      if (document.referrer) {
-        const refPath = new URL(document.referrer).pathname;
-        if (refPath.startsWith("/works/")) {
-          setIsReturn(true);
-        }
-      }
-    } catch {
-      // Malformed referrer URL — treat as first visit. No-op.
-    }
-    if (typeof window !== "undefined" && window.matchMedia) {
-      const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
-      const update = () => setReduceMotion(mql.matches);
-      update();
-      mql.addEventListener("change", update);
-      return () => mql.removeEventListener("change", update);
-    }
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduceMotion(mql.matches);
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
   }, []);
 
   // Single boolean drives every transition below: snap immediately when
@@ -169,7 +177,11 @@ export default function WorkScene() {
         aria-hidden
         className="pointer-events-none fixed inset-0 z-[1]"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 0.65 }}
+        /* v5 per Amber ("极光背景特效太实在了"): 0.65 → 0.35.
+           "极光" 在用户语境里是 Grainient gradient — Aurora 那两层早
+           就被注释禁用了。Grainient 现在淡到只占 35%，Galaxy 星空和
+           行星本身成为画面的主角。 */
+        animate={{ opacity: 0.35 }}
         transition={
           shouldSnap
             ? snap
