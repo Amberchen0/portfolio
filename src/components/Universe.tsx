@@ -4143,6 +4143,9 @@ const PUBLISHED_WORKS = new Set([
   "hyston",  /* Amber's personal documentary; static page at
                 public/works/hyston/index.html, video hosted on
                 YouTube (ShEUvSqB_Ok) and embedded via iframe. */
+  "drawing", /* Long-form drawing archive — portraits, landscapes,
+                still lifes, decorative studies. 7 MB of static
+                gallery images at public/works/drawing/. */
 ]);
 
 export default function Universe() {

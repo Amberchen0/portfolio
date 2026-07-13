@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drawing — Amber Xu</title>
+<meta name="description" content="Amber Xu's drawing archive — portraits, landscapes, still lifes, and decorative studies. Long-form draftsmanship, the discipline behind every other project.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://amberxu.vercel.app/works/drawing/">
+<meta property="og:title" content="Drawing — Amber Xu">
+<meta property="og:description" content="Portraits, landscapes, still lifes, decorative studies. The long-form draftsmanship behind Amber Xu's practice.">
+<meta property="og:image" content="https://amberxu.vercel.app/og-default.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Drawing — Amber Xu">
+<meta name="twitter:description" content="Portraits, landscapes, still lifes, decorative studies. The long-form draftsmanship behind Amber Xu's practice.">
+<meta name="twitter:image" content="https://amberxu.vercel.app/og-default.jpg">
+<style>
+  :root {
+    --bg: #fbfaf7;
+    --ink: #1a1a1a;
+    --gray: #767065;
+    --hairline: rgba(0, 0, 0, .1);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; overflow-x: clip; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "PingFang SC", "Helvetica Neue", "Hiragino Sans GB", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+  ::selection { background: var(--ink); color: var(--bg); }
+  img { display: block; max-width: 100%; height: auto; }
+
+  .serif { font-family: "Cochin", "Didot", "Songti SC", "Times New Roman", serif; }
+  .caps {
+    font-family: "Futura", "Avenir Next", "Century Gothic", "PingFang SC", sans-serif;
+    text-transform: uppercase;
+  }
+
+  /* ─────── 门楣 ─────── */
+  .masthead {
+    text-align: center;
+    padding: clamp(44px, 7vh, 76px) 24px 0;
+  }
+  .logotype {
+    font-size: clamp(40px, 7vw, 84px);
+    font-weight: 400;
+    letter-spacing: .34em; text-indent: .34em;
+    color: var(--ink);
+  }
+  .masthead .tag {
+    margin-top: 16px;
+    font-size: 11px; letter-spacing: .5em; text-indent: .5em;
+    color: var(--gray);
+  }
+
+  /* ─────── 导航 ─────── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    margin-top: clamp(26px, 4vh, 44px);
+    display: flex; justify-content: center; align-items: center;
+    gap: clamp(22px, 4.5vw, 64px);
+    padding: 17px 18px;
+    background: var(--bg);
+    transition: box-shadow .4s;
+  }
+  nav.stuck { box-shadow: 0 1px 0 var(--hairline); }
+  nav a {
+    color: var(--ink); text-decoration: none;
+    font-size: 11px; letter-spacing: .3em;
+    padding-bottom: 4px;
+    border-bottom: 1px solid transparent;
+    transition: border-color .35s;
+    white-space: nowrap;
+  }
+  nav a:hover { border-color: var(--ink); }
+
+  /* ─────── 章节 ─────── */
+  .chapter {
+    text-align: center;
+    padding: clamp(90px, 15vh, 170px) 24px clamp(56px, 9vh, 100px);
+    scroll-margin-top: 60px;
+  }
+  .chapter .label {
+    font-size: 10px; letter-spacing: .5em; text-indent: .5em;
+    color: var(--gray);
+  }
+  .chapter h2 {
+    margin-top: 20px;
+    font-weight: 400;
+    font-size: clamp(34px, 5vw, 60px);
+    letter-spacing: .4em; text-indent: .4em;
+  }
+  .chapter .sub {
+    margin-top: 18px;
+    font-size: 10.5px; letter-spacing: .34em; text-indent: .34em;
+    color: var(--gray);
+  }
+
+  /* ─────── 作品 ─────── */
+  .row {
+    display: flex; justify-content: center; align-items: flex-start;
+    gap: clamp(26px, 4.5vw, 72px);
+    padding: 0 6vw;
+    margin-bottom: clamp(84px, 13vh, 150px);
+  }
+  .piece { position: relative; }
+  .halo {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, .07);
+    background: #f1efe9;
+  }
+  .piece.round .halo { border: none; border-radius: 50%; background: none; }
+  .piece img {
+    transition: transform 1.4s cubic-bezier(.19, .6, .22, 1);
+  }
+  .piece:hover img { transform: scale(1.033); }
+  .piece.round img { border-radius: 50%; aspect-ratio: 1/1; object-fit: cover; }
+
+  .solo .piece img { max-height: 78vh; width: auto; max-width: min(860px, 86vw); }
+  .solo.wide .piece img { max-width: min(1080px, 90vw); max-height: none; }
+  .duo .piece { flex: 0 0 auto; }
+  .duo .piece img { height: min(62vh, 560px, 40vw); width: auto; max-width: none; }
+
+  .piece figcaption {
+    margin-top: 20px; text-align: center;
+    font-size: 10.5px; letter-spacing: .3em; text-indent: .3em;
+    color: var(--gray);
+  }
+
+  /* ─────── 签名 ─────── */
+  .sig {
+    position: absolute; right: 4.5%; bottom: 3%;
+    z-index: 3; pointer-events: none;
+    font-family: "Snell Roundhand", "Apple Chancery", "Savoye LET", "Brush Script MT", cursive;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1; white-space: nowrap;
+    color: rgba(30, 25, 20, .78);
+    transform: rotate(-3deg);
+  }
+  .sig-light .sig {
+    color: rgba(245, 241, 234, .88);
+    text-shadow: 0 1px 14px rgba(0, 0, 0, .5);
+  }
+  .piece.round .sig { right: 20%; bottom: 11%; }
+
+  /* ─────── 页脚 ─────── */
+  footer {
+    margin-top: clamp(70px, 11vh, 130px);
+    border-top: 1px solid var(--hairline);
+    text-align: center;
+    padding: clamp(54px, 9vh, 90px) 24px clamp(44px, 7vh, 70px);
+  }
+  footer .logotype { font-size: clamp(26px, 3.4vw, 40px); }
+  footer .links {
+    margin-top: 30px;
+    display: flex; justify-content: center; gap: clamp(20px, 4vw, 52px); flex-wrap: wrap;
+  }
+  footer .links a {
+    color: var(--ink); text-decoration: none;
+    font-size: 10.5px; letter-spacing: .3em;
+    padding-bottom: 3px; border-bottom: 1px solid transparent;
+    transition: border-color .35s;
+  }
+  footer .links a:hover { border-color: var(--ink); }
+  footer .fine {
+    margin-top: 30px;
+    font-size: 10px; letter-spacing: .4em; text-indent: .4em;
+    color: var(--gray);
+  }
+
+  /* ─────── 入场 ─────── */
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity .9s ease, transform .9s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* ─────── 移动端 ─────── */
+  @media (max-width: 720px) {
+    .logotype { letter-spacing: .22em; text-indent: .22em; }
+    nav { gap: 16px; flex-wrap: wrap; padding: 13px 12px; }
+    .row { flex-direction: column; align-items: center; gap: 72px; }
+    .duo .piece { flex: none; width: 100%; max-width: 480px; }
+    .duo .piece img { height: auto; width: 100%; max-width: 100%; }
+    .solo .piece img { max-height: none; max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ← Universe — sitewide standard back-to-/work pill. Light-theme
+     variant styled for this page's cream #fbfaf7 background (rather
+     than the dark cosmic pages' frosted glass on black). -->
+<a href="/work" style="position:fixed;top:1.25rem;left:1.25rem;z-index:9999;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(26,26,26,0.75);text-decoration:none;padding:0.55rem 0.95rem;border:1px solid rgba(26,26,26,0.20);border-radius:999px;background:rgba(251,250,247,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:color 0.25s,border-color 0.25s,background 0.25s;" onmouseover="this.style.color='#1a1a1a';this.style.borderColor='rgba(26,26,26,0.5)';this.style.background='rgba(251,250,247,0.95)';" onmouseout="this.style.color='rgba(26,26,26,0.75)';this.style.borderColor='rgba(26,26,26,0.2)';this.style.background='rgba(251,250,247,0.75)';">← Universe</a>
+
+<header class="masthead">
+  <div class="logotype serif">AMBER XU</div>
+  <div class="tag caps">绘画作品集 · Selected Works</div>
+</header>
+
+<nav id="nav" class="caps">
+  <a href="#c1">素描 Sketches</a>
+  <a href="#c2">油画 Paintings</a>
+  <a href="#c3">数码插画 Digital</a>
+</nav>
+
+<!-- ═════ 01 素描 ═════ -->
+<section class="chapter reveal" id="c1">
+  <div class="label caps">Chapter 01</div>
+  <h2 class="serif">素描</h2>
+  <div class="sub caps">Sketches — Ten Works / 铅笔 · 炭笔</div>
+</section>
+
+<div class="row solo">
+  <figure class="piece reveal" data-med="炭笔素描">
+    <div class="halo"><img src="images/portrait-bearded.jpg" alt="炭笔素描"><div class="sig">Amber Xu</div></div>
+    <figcaption class="caps">N°01 — 炭笔素描</figcaption>
+  </figure>
+</div>
+
+<div class="row duo">
+  <figure class="piece reveal" data-med="铅笔素描">
+    <div class="halo"><img src="images/portrait-roman-lady.jpg" alt="铅笔素描"><div class="sig">Amber Xu</div></div>
+    <figcaption class="caps">N°02 — 铅笔素描</figcaption>
+  </figure>
+  <figure class="piece reveal" data-med="铅笔素描">
+    <div class="halo"><img src="images/portrait-curly-youth.jpg" alt="铅笔素描"><div class="sig">Amber Xu</div></div>
+    <figcaption class="caps">N°03 — 铅笔素描</figcaption>
+  </figure>
+</div>
+
+<div class="row duo">
+  <figure class="piece reveal" data-med="铅笔素描 · 2017">
+    <div class="halo"><img src="images/portrait-voltaire.jpg" alt="铅笔素描"><div class="sig">Amber Xu</div></div>
+    <figcaption class="caps">N°04 — 铅笔素描 · 2017</figcaption>
+  </figure>
+  <figure class="piece reveal" data-med="炭笔素描">
+    <div class="halo"><img src="images/portrait-girl.jpg" alt="炭笔素描"><div class="sig">Amber Xu</div></div>
+    <figcaption class="caps">N°05 — 炭笔素描</figcaption>
+  </figure>
+</div>
+
+<div class="row duo">
+  <figure class="piece reveal" data-med="铅笔静物">
+    <div class="halo"><img src="images/still-bottle-apple.jpg" alt="铅笔静物"><div class="sig">Amber Xu</div></div>
+    <figcaption class="caps">N°06 — 铅笔静物</figcaption>
+  </figure>
+  <figure class="piece sig-light reveal" data-med="铅笔静物">
+    <div class="halo"><img src="images/still-hydrant-hammer.jpg" alt="铅笔静物"><div class="sig">Amber Xu</div></div>
+    <figcaption class="caps">N°07 — 铅笔静物</figcaption>
+  </figure>
+</div>
+
+<div class="row duo">
+  <figure class="piece sig-light reveal" data-med="炭笔风景">
+    <div class="halo"><img src="images/land-charcoal-clouds.jpg" alt="炭笔风景"><div class="sig">Amber Xu</div></div>
+    <figcaption class="caps">N°08 — 炭笔风景</figcaption>
+  </figure>
+  <figure class="piece reveal" data-med="铅笔素描">
+    <div class="halo"><img src="images/portrait-capped.jpg" alt="铅笔素描"><div class="sig">Amber Xu</div></div>
+    <figcaption class="caps">N°09 — 铅笔素描</figcaption>
+  </figure>
+</div>
+
+<div class="row solo wide">
+  <figure class="piece reveal" data-med="铅笔静物 · 2017">
+    <div class="halo"><img src="images/still-tiger-horn.jpg" alt="铅笔静物"><div class="sig">Amber Xu</div></div>
+    <figcaption class="caps">N°10 — 铅笔静物 · 2017</figcaption>
+  </figure>
+</div>
+
+<!-- ═════ 02 油画 ═════ -->
+<section class="chapter reveal" id="c2">
+  <div class="label caps">Chapter 02</div>
+  <h2 class="serif">油画</h2>
+  <div class="sub caps">Paintings — Three Works / 油彩 · 彩绘</div>
+</section>
+
+<div class="row solo wide">
+  <figure class="piece sig-light reveal" data-med="布面油画">
+    <div class="halo"><img src="images/land-sunset-lake.jpg" alt="布面油画"><div class="sig">Amber Xu</div></div>
+    <figcaption class="caps">N°11 — 布面油画</figcaption>
+  </figure>
+</div>
+
+<div class="row solo">
+  <figure class="piece round sig-light reveal" data-med="装饰彩绘">
+    <div class="halo"><img src="images/deco-koi.jpg" alt="装饰彩绘"><div class="sig">Amber Xu</div></div>
+    <figcaption class="caps">N°12 — 装饰彩绘</figcaption>
+  </figure>
+</div>
+
+<div class="row solo">
+  <figure class="piece round sig-light reveal" data-med="装饰绘画">
+    <div class="halo"><img src="images/deco-whales.jpg" alt="装饰绘画"><div class="sig">Amber Xu</div></div>
+    <figcaption class="caps">N°13 — 装饰绘画</figcaption>
+  </figure>
+</div>
+
+<!-- ═════ 03 数码插画 ═════ -->
+<section class="chapter reveal" id="c3">
+  <div class="label caps">Chapter 03</div>
+  <h2 class="serif">数码插画</h2>
+  <div class="sub caps">Digital Illustration — One Work</div>
+</section>
+
+<div class="row solo wide">
+  <figure class="piece reveal" data-med="数码插画">
+    <div class="halo"><img src="images/deco-fishmarket.jpg" alt="数码插画"><div class="sig">Amber Xu</div></div>
+    <figcaption class="caps">N°14 — 数码插画</figcaption>
+  </figure>
+</div>
+
+<footer>
+  <div class="logotype serif">AMBER XU</div>
+  <div class="links caps">
+    <a href="#c1">素描 Sketches</a>
+    <a href="#c2">油画 Paintings</a>
+    <a href="#c3">数码插画 Digital</a>
+  </div>
+  <div class="fine caps">绘画作品集 — Selected Works · Fourteen Pieces</div>
+</footer>
+
+<script>
+  /* 吸顶导航阴影（按门楣高度判定，sticky 吸附后 offsetTop 不可靠） */
+  const nav = document.getElementById('nav');
+  const mast = document.querySelector('.masthead');
+  function navShadow() {
+    nav.classList.toggle('stuck', scrollY >= mast.offsetTop + mast.offsetHeight + 20);
+  }
+  addEventListener('scroll', navShadow, { passive: true });
+  navShadow();
+
+  /* 入场动画（rootMargin 向上放宽，避免锚点跳转/滚动恢复后元素滞留隐藏） */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.06, rootMargin: '4000px 0px 0px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  /* 签名大小随画面宽度缩放 */
+  function sizeSigs() {
+    document.querySelectorAll('.halo').forEach(h => {
+      const img = h.querySelector('img'), sig = h.querySelector('.sig');
+      if (img && sig && img.clientWidth) {
+        sig.style.fontSize = Math.max(12, Math.min(30, img.clientWidth * 0.052)) + 'px';
+      }
+    });
+  }
+  addEventListener('load', sizeSigs);
+  addEventListener('resize', sizeSigs);
+  document.querySelectorAll('.halo img').forEach(img => img.addEventListener('load', sizeSigs));
+  sizeSigs();
+</script>
+
+</body>
+</html>
