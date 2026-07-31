@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const SITE_URL = "https://amberxu.vercel.app";
+const SITE_URL = "https://amber-xu.com";
 const SITE_DESC =
   "Portfolio of Amber Xu — visual design, motion, illustration, and crafted interaction. Based in Sydney.";
 
