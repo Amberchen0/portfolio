@@ -72,10 +72,15 @@ export default function WorkScene() {
     return () => mql.removeEventListener("change", update);
   }, []);
 
-  // Single boolean drives every transition below: snap immediately when
-  // returning from a project page OR when the user has asked for less
-  // motion at the OS level.
-  const shouldSnap = isReturn || reduceMotion;
+  // Single boolean drives every transition below.
+  // v3 per Amber 2026-08-04 ("直接一起出现吧不要那个等待时间了" — mentor
+  // feedback said /work took ~8s to reveal, and recruiters don't have 8s):
+  // shouldSnap is now hard-forced to true on every visit. Everything —
+  // Galaxy, Grainient, LiquidEther, Universe, VersionSwitcher, and the
+  // black-overlay fade-out — happens instantly on paint. The isReturn /
+  // reduceMotion computations above are kept in case Amber wants to
+  // restore the 4.8s choreography later (flip to `isReturn || reduceMotion`).
+  const shouldSnap = true;
   const snap: Transition = { duration: 0, delay: 0 };
 
   return (

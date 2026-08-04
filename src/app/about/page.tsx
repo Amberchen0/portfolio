@@ -33,7 +33,7 @@ void Silk;
  */
 
 const ABOUT_DESC =
-  "About Amber Xu — Visual Artist · Content Creator · Concept Designer. " +
+  "About Amber Xu — Creative Strategist · Brand Communication · AI-Enhanced Visual Design. " +
   "Drawing is my way of understanding the world.";
 
 export const metadata: Metadata = {

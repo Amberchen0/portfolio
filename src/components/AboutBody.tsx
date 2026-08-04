@@ -43,17 +43,23 @@ const copy = {
       "我相信，技术可以通过练习获得，而认知决定创作能够抵达的高度。社会让我从一个有天赋的人，成长为一个懂得如何使用天赋的人。我依然是那个热爱创作的人，只是看待世界的坐标系变得更加丰富与复杂。",
     ],
     disciplines: [
+      /* v3 per Amber 2026-08-04 ("以简历为准"): retagged the three
+         disciplines from the old art-side identity (视觉艺术家 · 内容创作者
+         · 概念设计师) to match the résumé's positioning line (创意策略师 ·
+         品牌传播 · AI 增强视觉设计). Descriptions rewritten from the
+         résumé's skills section verbatim so About + CV agree on the
+         same practice areas. */
       {
-        label: "视觉艺术家",
-        body: "绘画、色彩、跨媒介——以传统手作为根基。",
+        label: "创意策略师",
+        body: "品牌统筹、活动策划、内容传播——将复杂想法转化为清晰而有感染力的表达。",
       },
       {
-        label: "内容创作者",
-        body: "图像、影像、编辑式叙事——让作品在信息流、画面与情绪中流动。",
+        label: "品牌传播",
+        body: "跨媒介多媒体制作——2D / MG / 3D 动画、视频剪辑、视觉设计与编辑式影像。",
       },
       {
-        label: "概念设计师",
-        body: "世界观、角色与视觉系统——面向影视、游戏与思辨项目。",
+        label: "AI 增强视觉设计",
+        body: "AI 工具与传统工作流深度融合——视觉生成、角色一致性、创作流水线。",
       },
     ],
     footerLeft: "悉尼 · 接受精选合作",
@@ -71,17 +77,19 @@ const copy = {
       "I believe craft can be earned through practice — but cognition decides how high a piece of work can reach. The working world took someone with raw ability and slowly turned her into someone who knows how to use it. I am still the person who loves to create — only the coordinate system through which I see the world has grown richer, more layered.",
     ],
     disciplines: [
+      /* Matches the ZH disciplines block above — see comment there
+         for the "以简历为准" rationale. */
       {
-        label: "Visual Artist",
-        body: "Drawing, painting, mixed-media — built on a foundation of traditional craft.",
+        label: "Creative Strategist",
+        body: "Brand direction, campaign planning, content strategy — translating complex ideas into work that lands.",
       },
       {
-        label: "Content Creator",
-        body: "Photo, video, editorial narrative — work that lives in feed, frame, and feeling.",
+        label: "Brand Communication",
+        body: "Cross-medium multimedia — 2D / motion graphics / 3D animation, video editing, editorial imagery.",
       },
       {
-        label: "Concept Designer",
-        body: "Worlds, characters, and visual systems for film, game, and speculative projects.",
+        label: "AI-Enhanced Visual Design",
+        body: "Deep integration of AI into visual workflows — generation, character consistency, creative pipelines.",
       },
     ],
     footerLeft: "Sydney · Available for select collaborations",
@@ -174,11 +182,42 @@ export default function AboutBody() {
         </div>
       </motion.div>
 
-      {/* Contact strip — email + phone (and Instagram once Amber
-          provides the handle), set above the self-portrait essay per
-          her note. Mono small-caps with vertical pipe separators,
-          centred in the column; visually quiet so it doesn't compete
-          with the wordmark above or the essay below. */}
+      {/* Hard-info block — added 2026-08-04 per mentor feedback that
+          the essay below is too literary to answer the three concrete
+          questions a recruiter opens About to answer: what she can do,
+          what she has done, and what she is looking for right now.
+          Three lines sit above the contact strip in a quiet mono/serif
+          voice; each line pairs cleanly with the corresponding page
+          section further down (education → essay → collab footer). */}
+      <div
+        className="mb-6 flex flex-col items-center gap-y-1 text-center text-xs sm:text-sm"
+        style={{
+          color: "rgba(255,255,255,0.75)",
+          fontFamily: 'Times, "Times New Roman", serif',
+          lineHeight: 1.85,
+        }}
+      >
+        {lang === "zh" ? (
+          <>
+            <span>悉尼 · 全球媒体传播硕士（墨尔本大学）· 动画制作学士（悉尼科技大学）</span>
+            <span>创意策略 · 品牌传播 · AI 增强视觉设计</span>
+            <span>接受全职 / 合约 / 委托 · 拥有澳洲工作权限</span>
+          </>
+        ) : (
+          <>
+            <span>Sydney-based · Master of Global Media Communication (UniMelb) · Bachelor of Animation (UTS)</span>
+            <span>Creative strategy · brand communication · AI-enhanced visual design</span>
+            <span>Open to full-time, contract, and commission · full working rights in Australia</span>
+          </>
+        )}
+      </div>
+
+      {/* Contact strip — email + phone + downloadable CV. Mono small-
+          caps with vertical pipe separators, centred in the column;
+          visually quiet so it doesn't compete with the wordmark above
+          or the essay below. Instagram slot parked below for when the
+          handle is confirmed. Download-CV chip added 2026-08-04 per
+          mentor feedback ("没有可下载 CV 是一级问题"). */}
       <div
         className="mb-12 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs sm:text-sm"
         style={{
@@ -197,7 +236,15 @@ export default function AboutBody() {
           href="tel:+61424943415"
           className="transition-colors hover:text-white"
         >
-          +61 4249 43415
+          +61 424 943 415
+        </a>
+        <span style={{ color: "rgba(255,255,255,0.25)" }}>|</span>
+        <a
+          href={lang === "zh" ? "/Amber-Xu-CV-zh.pdf" : "/Amber-Xu-CV-en.pdf"}
+          download={lang === "zh" ? "Amber-Xu-CV-zh.pdf" : "Amber-Xu-CV-en.pdf"}
+          className="transition-colors hover:text-white"
+        >
+          {lang === "zh" ? "下载 CV (PDF)" : "Download CV (PDF)"}
         </a>
         {/* Instagram slot — uncomment + fill the handle once Amber
             confirms the @username. Keeping the markup parked here so

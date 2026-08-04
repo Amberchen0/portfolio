@@ -19,24 +19,20 @@ const copy = {
     // Visual Designer" line. Each tag covers a distinct axis of the
     // practice: artist (eye/hand/craft) · content creator (reach &
     // distribution) · concept designer (worlds & narrative).
-    subtitle: "Visual Artist · Content Creator · Concept Designer",
+    subtitle: "Creative Strategist · Brand Communication · AI-Enhanced Visual Design",
     // Manifesto, per user direction (post-GPT-feedback session).
     // The previous tagline was generic; this two-sentence statement
     // anchors the home with the core thesis: creation as the
     // expansion of perception, emotion, and modes of expression
     // — not a display of technique.
     body: "A creator who began with drawing — growing continuously across visual expression and cross-disciplinary practice. For me, creation isn't a display of technique; it's the continuous expansion of perception, emotion, and the ways of telling.",
-    soon: "The full archive is being assembled.",
-    cta: "Selected works arriving soon.",
     footer: "Sydney · Available for select collaborations",
   },
   zh: {
     eyebrow: "作品集 · 2026",
     title: ["Amber", "Xu"],
-    subtitle: "视觉艺术家 · 内容创作者 · 概念设计师",
+    subtitle: "创意策略师 · 品牌传播 · AI 增强视觉设计",
     body: "我是一个以绘画为起点，在视觉表达与跨领域创作之间持续生长的创造者。对我而言，创作不是技术的展示，而是认知、情感与表达方式的不断扩展。",
-    soon: "完整作品归档正在装配中。",
-    cta: "精选作品即将上线。",
     footer: "悉尼 · 接受精选合作",
   },
 } as const;
@@ -230,9 +226,13 @@ export default function Home() {
               <div
                 className="absolute"
                 style={{
-                  top: "150px",
-                  bottom: "150px",
-                  /* v7: -185 → -165, pulled in another 20px each side. */
+                  /* v13 per Amber 2026-08-04 ("高度增加，上下增加 20px"):
+                     top/bottom insets pulled in 150 → 130 each side so
+                     the dot field extends 20px further above and below
+                     the AMBER XU wordmark. Horizontal insets untouched
+                     (Amber "长度不变"). */
+                  top: "130px",
+                  bottom: "130px",
                   left: "-165px",
                   right: "-165px",
                 }}
@@ -258,11 +258,24 @@ export default function Home() {
                     glowColor #323237 unchanged.
                     (The brief LiquidGlassPanel experiment is rolled
                     back per Amber — DotField is the canonical look.) */}
+                {/* v13 per Amber 2026-08-04:
+                    • dotRadius 4 → 6 ("圆点扩大 1.5 倍"). Grid spacing
+                      stayed at 11 — Amber acknowledged the density
+                      would visually tighten a bit and accepted it
+                      ("面积增加所以密度会稍微减少" — describing what
+                      naturally happens, not requesting a spacing bump).
+                    • glowRadius 160 → 0 ("鼠标在这块区域的时候不会出现
+                      任何颜色，只会出现变形") — kills the cursor-follow
+                      radial glow entirely so hovering the AMBER XU
+                      area produces ONLY the bulge/wave distortion, no
+                      colour halo. glowColor left in place (unused when
+                      radius = 0) so the rollback is a single-value
+                      revert if she changes her mind. */}
                 <DotField
-                  dotRadius={4}
+                  dotRadius={6}
                   dotSpacing={11}
                   bulgeStrength={53}
-                  glowRadius={160}
+                  glowRadius={0}
                   sparkle={false}
                   waveAmplitude={2}
                   cursorRadius={600}
@@ -360,14 +373,18 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.9 }}
             className="mt-8 flex items-center gap-6 font-mono text-xs uppercase tracking-[0.2em] text-muted"
           >
-            <span className="flex items-center">
-              <span className="mr-3 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-amber" />
-              {t.soon}
-            </span>
+            {/* v2 per Amber 2026-08-04 (mentor feedback: "作品集不该显示未
+                完成状态"): removed the "· soon" pulsing-dot span that used
+                to sit before this link. Left the animated dot on the
+                Enter Universe link itself so the "alive" cue survives. */}
             <a
               href="/work"
-              className="text-amber transition-colors hover:text-foreground"
+              className="flex items-center text-amber transition-colors hover:text-foreground"
             >
+              <span
+                aria-hidden
+                className="mr-3 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-amber"
+              />
               Enter Universe →
             </a>
           </motion.div>
@@ -379,9 +396,10 @@ export default function Home() {
         <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
           {t.footer}
         </span>
-        <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
-          {t.cta}
-        </span>
+        {/* v2 per Amber 2026-08-04: removed the second footer span
+            that said "Selected works arriving soon" / "精选作品即将上线".
+            Same rationale as the CTA-row soon-span removal — the site
+            shouldn't announce its own incompleteness. */}
       </footer>
 
       {/* Scroll-darkening overlay — sits ABOVE all home content

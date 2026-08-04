@@ -1403,11 +1403,17 @@ function Planet({
               stays in latin script regardless of the EN/中 toggle —
               that's a deliberate split from the INDEX dropdown +
               modal, which both swap language. */}
-          <PlanetLabel
-            name={planet.name.en}
-            planetRadius={planet.size}
-            hovered={hovered}
-          />
+          {/* v2 per Amber 2026-08-04: HIDDEN_SLUGS planets (gamer /
+              photography currently) skip the floating 3D name so
+              they read as pure decorative bodies until their detail
+              pages ship. Sphere geometry + shader + orbit stay untouched. */}
+          {!HIDDEN_SLUGS.has(planet.slug) && (
+            <PlanetLabel
+              name={planet.name.en}
+              planetRadius={planet.size}
+              hovered={hovered}
+            />
+          )}
 
           {/* moons — orbit the planet's center independently */}
           {planet.moons?.map((m) => (
@@ -4148,6 +4154,17 @@ const PUBLISHED_WORKS = new Set([
                 gallery images at public/works/drawing/. */
 ]);
 
+// Slugs that are visually PRESENT in the universe as decorative spheres
+// but do NOT participate in the "work" navigation flow:
+//   • no chromatic name label floats near their orbit
+//   • no INDEX-menu entry
+//   • click is a no-op (neither routes nor opens the "still forming" modal)
+// Amber's decision 2026-08-04 (mentor feedback: "作品集不该显示未完成状态"):
+// keep gamer/photography as silent decorative planets until their detail
+// pages ship — at that point move the slug from HIDDEN_SLUGS to
+// PUBLISHED_WORKS and they re-join the navigation naturally.
+const HIDDEN_SLUGS = new Set(["gamer", "photography"]);
+
 export default function Universe() {
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -4162,9 +4179,13 @@ export default function Universe() {
   // PlanetSystem in useFrame to gate mouse-driven rotation
   const cursorInsideRef = useRef(true);
 
-  // Click handler: published works → navigate to their static detail page;
-  // placeholder works → show the "still forming" modal as before.
+  // Click handler:
+  //   • Slug in HIDDEN_SLUGS  → no-op (decorative-only planets, per Amber
+  //                              2026-08-04: no coming-soon flow at all).
+  //   • Slug in PUBLISHED_WORKS → navigate to /works/<slug>/ static page.
+  //   • Otherwise               → show the "still forming" modal.
   const handlePlanetClick = (slug: string) => {
+    if (HIDDEN_SLUGS.has(slug)) return;
     if (PUBLISHED_WORKS.has(slug)) {
       // Clean URL — next.config rewrites /works/<slug>/ to
       // /public/works/<slug>/index.html behind the scenes.
@@ -4290,7 +4311,18 @@ export default function Universe() {
                   category: m.category,
                   color: m.iridescenceColor,
                 }))),
-              ]).map((item) => {
+              ])
+                /* v2 per Amber 2026-08-04: HIDDEN_SLUGS items (currently
+                   gamer / photography) are silently filtered OUT of the
+                   INDEX menu entirely — they still exist as decorative
+                   spheres in the 3D scene, but they don't participate
+                   in the text directory. Consequence: no "· soon" label
+                   appears anywhere on the site anymore. When the detail
+                   page for one of them ships, move the slug from
+                   HIDDEN_SLUGS to PUBLISHED_WORKS and the entry re-
+                   appears here automatically. */
+                .filter((item) => !HIDDEN_SLUGS.has(item.slug))
+                .map((item) => {
                 /* Both `name` and `category` are bilingual dicts ({zh,en}).
                    Pick the side matching the site-wide language store, so
                    when Amber flips EN/中 in the TopNav the directory
@@ -4305,7 +4337,15 @@ export default function Universe() {
                    planet is still WIP before they click and see the
                    "still forming" modal. */
                 const isPublished = PUBLISHED_WORKS.has(item.slug);
-                const wipLabel = lang === "zh" ? "即将上线" : "soon";
+                /* v2 per Amber 2026-08-04: killed the "· 即将上线 / · soon"
+                   suffix on placeholder items. Combined with the
+                   HIDDEN_SLUGS filter above the .map, this means the
+                   INDEX menu now only lists published works — nothing
+                   in the visitor's field of view says "coming soon"
+                   anywhere on the site anymore. Kept the `wipLabel`
+                   constant computation deleted; kept `isPublished` in
+                   case future logic wants to dim opacity for still-
+                   placeholder-but-visible items. */
                 return (
                   <li key={item.slug}>
                     <button
@@ -4340,9 +4380,14 @@ export default function Universe() {
                           className="ml-auto pl-3 text-[10px] tracking-[0.15em] text-muted/55 group-hover:text-muted/80 transition-colors shrink-0"
                         >
                           {itemCategory}
-                          {!isPublished && (
-                            <span className="ml-1 italic text-muted/40">· {wipLabel}</span>
-                          )}
+                          {/* v2 per Amber 2026-08-04: removed the
+                              "· soon / · 即将上线" suffix that used to
+                              render here for !isPublished. See the
+                              HIDDEN_SLUGS comment above the filter —
+                              non-published items are now filtered
+                              entirely out of this list, so nothing
+                              reaches this branch anyway; the wipLabel
+                              reference was also deleted. */}
                         </span>
                       )}
                     </button>
