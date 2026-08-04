@@ -294,8 +294,8 @@ export default function Home() {
                   cursorRadius={600}
                   cursorForce={0.28}
                   bulgeOnly
-                  gradientFrom="rgba(0, 0, 0, 0.8)"
-                  gradientTo="rgba(0, 0, 0, 0.8)"
+                  gradientFrom="rgba(0, 0, 0, 0.68)"
+                  gradientTo="rgba(0, 0, 0, 0.68)"
                   glowColor="#323237"
                 />
               </div>
