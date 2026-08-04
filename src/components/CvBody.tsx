@@ -27,12 +27,16 @@ export default function CvBody() {
   const [arrivedViaScroll, setArrivedViaScroll] = useState(false);
 
   /* Action labels — bilingual to match the EN/中 toggle. The download
-     anchor uses the `download` attribute pointing at the PDF (HTML
-     pages can't be triggered to download nicely; the PDF in
-     /public/Amber-Xu-CV.pdf is the canonical artefact). Close routes
-     back to /about, which is where this page is reached from. */
+     anchor points at the language-matched PDF: /Amber-Xu-CV-{lang}.pdf.
+     Both PDFs are re-generated from public/cv/resume.html via headless
+     Chrome print-to-pdf whenever the résumé HTML changes (see the 2.0
+     update commit). A third file — /Amber-Xu-CV.pdf — is kept as an
+     alias for the EN version, so any pre-existing external links to
+     that URL still resolve. Close routes back to /about. */
   const closeLabel = lang === "zh" ? "关闭" : "Close";
   const downloadLabel = lang === "zh" ? "下载 PDF" : "Download PDF";
+  const cvPdfHref = `/Amber-Xu-CV-${lang}.pdf`;
+  const cvPdfName = `Amber-Xu-CV-${lang}.pdf`;
 
   useEffect(() => {
     try {
@@ -117,8 +121,8 @@ export default function CvBody() {
             matches the TopNav vocabulary used elsewhere on the site. */}
         <div className="pointer-events-none absolute right-3 top-3 z-10 flex gap-2 sm:right-4 sm:top-4">
           <a
-            href="/Amber-Xu-CV.pdf"
-            download="Amber-Xu-CV.pdf"
+            href={cvPdfHref}
+            download={cvPdfName}
             className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/55 px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] text-white/85 backdrop-blur-sm transition-colors hover:bg-black/75 hover:text-white sm:text-xs"
             style={{ fontFamily: 'Times, "Times New Roman", serif' }}
             aria-label={downloadLabel}
