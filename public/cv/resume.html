@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>徐晨 — 简历</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans SC', 'Inter', sans-serif;
+    color: #2c2c2c;
+    background: #f5f5f0;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== 语言切换：默认中文 ===== */
+  body[data-lang="zh"] .t-en { display: none; }
+  body[data-lang="en"] .t-zh { display: none; }
+
+  .lang-toggle {
+    position: fixed; top: 22px; right: 22px; z-index: 999;
+    display: flex; background: #fff; border: 1px solid #b08d57;
+    border-radius: 999px; overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    font-family: 'Inter', sans-serif;
+  }
+  .lang-toggle button {
+    border: none; background: transparent; cursor: pointer;
+    padding: 7px 16px; font-size: 13px; letter-spacing: 1px;
+    color: #b08d57; transition: all .18s;
+  }
+  .lang-toggle button.active { background: #b08d57; color: #fff; }
+
+  .page {
+    max-width: 860px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 56px 64px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.08);
+  }
+
+  .header { margin-bottom: 28px; }
+  .header h1 {
+    font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+    font-weight: 600; font-size: 36px; letter-spacing: 12px;
+    text-transform: uppercase; color: #1a1a1a; margin-bottom: 2px;
+  }
+  .header h1 .zh {
+    font-family: 'Noto Serif SC', serif; letter-spacing: 14px; font-size: 28px;
+  }
+  .header .subtitle {
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    color: #b08d57; font-weight: 400; margin: 8px 0 10px;
+  }
+  .header .contact { font-size: 13px; color: #555; }
+  .header .contact span.sep { margin: 0 6px; color: #ccc; }
+
+  .summary {
+    font-size: 13.5px; color: #3a3a3a; line-height: 1.85;
+    margin-bottom: 32px; text-align: justify;
+  }
+
+  .section-title {
+    font-size: 11px; letter-spacing: 6px; text-transform: uppercase;
+    color: #b08d57; border-bottom: 1px solid #b08d57;
+    padding-bottom: 6px; margin-bottom: 20px; margin-top: 32px; font-weight: 500;
+  }
+
+  .edu-item { margin-bottom: 16px; }
+  .edu-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; gap: 12px; }
+  .edu-header h3 { font-family: 'Noto Serif SC', 'Cormorant Garamond', serif; font-size: 16px; font-weight: 600; color: #1a1a1a; }
+  .edu-header h3 .wam { font-family: 'Inter', sans-serif; font-size: 13px; color: #b08d57; font-weight: 500; }
+  .edu-header .date { font-size: 13px; color: #888; letter-spacing: 2px; white-space: nowrap; }
+  .edu-school { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #777; margin-bottom: 4px; }
+  .edu-courses { font-size: 12px; color: #666; font-style: italic; }
+
+  .exp-item { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+  .exp-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .exp-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; gap: 12px; }
+  .exp-header h3 { font-family: 'Noto Serif SC', 'Cormorant Garamond', serif; font-size: 17px; font-weight: 600; color: #1a1a1a; }
+  .exp-header .duration { font-size: 13px; color: #888; font-style: italic; white-space: nowrap; }
+  .exp-company { font-size: 13px; color: #777; margin-bottom: 10px; }
+
+  .exp-bullets { list-style: none; padding: 0; }
+  .exp-bullets li { position: relative; padding-left: 16px; font-size: 13px; color: #3a3a3a; line-height: 1.8; margin-bottom: 6px; }
+  .exp-bullets li::before { content: ''; position: absolute; left: 0; top: 10px; width: 5px; height: 5px; background: #b08d57; border-radius: 1px; }
+  .exp-bullets li strong { font-weight: 600; color: #1a1a1a; }
+
+  .act-item { margin-bottom: 18px; }
+  .act-item h3 { font-family: 'Noto Serif SC', 'Cormorant Garamond', serif; font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 6px; }
+
+  .skill-category { margin-bottom: 20px; }
+  .skill-category h3 { font-family: 'Noto Serif SC', 'Cormorant Garamond', serif; font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+
+  @media print {
+    body { background: #fff; }
+    .page { box-shadow: none; margin: 0; padding: 40px 48px; max-width: 100%; }
+    .lang-toggle { display: none; }
+  }
+</style>
+</head>
+<body data-lang="zh">
+
+<div class="lang-toggle">
+  <button data-set="zh" class="active">中文</button>
+  <button data-set="en">EN</button>
+</div>
+
+<div class="page">
+
+  <div class="header">
+    <div class="header-text">
+      <h1>Xu Chen&nbsp;&nbsp;<span class="zh t-zh">徐&nbsp;&nbsp;晨</span></h1>
+      <div class="subtitle"><span class="t-zh">创意策略师 · 品牌传播 · AI 增强视觉设计</span><span class="t-en">Creative Strategist · Brand Communication · AI-Enhanced Visual Design</span></div>
+      <div class="contact">877793893@qq.com <span class="sep">|</span> 04249 43415 <span class="sep">|</span> <a href="https://amber-xu.com" style="color:#b08d57;text-decoration:none;"><span class="t-zh">作品集</span><span class="t-en">Portfolio</span> amber-xu.com</a> <span class="sep">|</span> <a href="https://linkedin.com/in/chen-xu-77a7462b7" style="color:#b08d57;text-decoration:none;">LinkedIn</a></div>
+    </div>
+  </div>
+
+  <div class="summary">
+    <span class="t-zh">拥有墨尔本大学全球媒体传播硕士背景的复合型创意人才。深耕品牌传播、AI 辅助视觉构建与独立商业运营，具备「前期统筹策划 - 多维视觉创作 - 后期转化闭环」的全链路实战能力。在跨界研发协同、大型公共活动统筹及跨平台获客变现项目中，均展现出敏锐的商业嗅觉与卓越的复杂项目执行力。</span>
+    <span class="t-en">A versatile creative professional holding a Master of Global Media Communication from the University of Melbourne. Specialised in brand communication, AI-enhanced visual production and independent business operations, with proven end-to-end capability across the full pipeline — upfront strategy and planning, multi-dimensional visual creation, and back-end conversion. Across cross-disciplinary R&D collaboration, large-scale public-event coordination and cross-platform acquisition-and-monetisation projects, has consistently shown sharp commercial instinct and strong execution on complex projects.</span>
+  </div>
+
+  <div class="section-title"><span class="t-zh">教育背景</span><span class="t-en">Education</span></div>
+
+  <div class="edu-item">
+    <div class="edu-header">
+      <h3><span class="t-zh">全球媒体传播硕士</span><span class="t-en">Master of Global Media Communication</span> <span class="wam">(WAM 82)</span></h3>
+      <div class="date">2023 — 2024</div>
+    </div>
+    <div class="edu-school">The University of Melbourne</div>
+    <div class="edu-courses">Mobility, Culture and Communication (H1) · Researching Media &amp; Communications (H1) · Creative Economy, Policy, and Power (H1) · Global Communication: Theory &amp; Research (H1)</div>
+  </div>
+
+  <div class="edu-item">
+    <div class="edu-header">
+      <h3><span class="t-zh">动画制作学士</span><span class="t-en">Bachelor of Animation Production</span> <span class="wam">(WAM 78)</span></h3>
+      <div class="date">2018 — 2022</div>
+    </div>
+    <div class="edu-school">University of Technology Sydney</div>
+    <div class="edu-courses">Context: 2D and 3D Animation (Distinction) · Animation Studio (Distinction) · Life Drawing (Distinction) · Introduction to Photography (Distinction)</div>
+  </div>
+
+  <div class="section-title"><span class="t-zh">工作经历</span><span class="t-en">Experience</span></div>
+
+  <div class="exp-item">
+    <div class="exp-header">
+      <h3><span class="t-zh">创意设计师</span><span class="t-en">Creative Designer</span></h3>
+      <div class="duration">2025.07 — 2025.09</div>
+    </div>
+    <div class="exp-company"><span class="t-zh">杭州营简智联科技有限公司 · OperEase Intelligent AI</span><span class="t-en">OperEase Intelligent AI · Hangzhou, China</span></div>
+    <ul class="exp-bullets">
+      <li class="t-zh"><strong>产品 UI 体验设计：</strong>主导「AI 辅助个体企业经营」软件系统的核心 UI 设计，流程中创新引入 AI 工具生成视觉素材，大幅提效并增强表现力。</li>
+      <li class="t-en"><strong>Product UI/UX design:</strong> Led the core UI design for an AI-assisted small-business management platform, innovatively bringing in AI tools to generate visual assets — sharply improving efficiency and visual impact.</li>
+      <li class="t-zh"><strong>跨部门协同与商业落地：</strong>与工程师紧密配合，将 UI/UX 概念高速转化为高质量界面并持续跟进前端优化，积累了跨领域协同与新技术落地的实战经验。</li>
+      <li class="t-en"><strong>Cross-functional delivery:</strong> Worked closely with engineers to rapidly turn UI/UX concepts into high-quality interfaces and follow through on front-end refinement, building hands-on experience in cross-disciplinary collaboration and shipping new technology.</li>
+      <li class="t-zh"><strong>项目初审与荣誉背书：</strong>主导该产品核心路演的初审设计并奠定视觉基调。该产品后于杭州余杭区斩获 AI「优秀项目」及政府扶持，验证了设计的商业价值。</li>
+      <li class="t-en"><strong>Pitch design &amp; recognition:</strong> Led the design for the product's key pitch and set its visual tone. The product went on to win an AI "Outstanding Project" award and government backing in Yuhang District, Hangzhou — validating the commercial value of the design.</li>
+    </ul>
+  </div>
+
+  <div class="exp-item">
+    <div class="exp-header">
+      <h3><span class="t-zh">售前软装设计师</span><span class="t-en">Pre-sale Home Staging Designer</span></h3>
+      <div class="duration"><span class="t-zh">2026.03 — 2026.05 · 2 个月</span><span class="t-en">Mar 2026 — May 2026 · 2 mos</span></div>
+    </div>
+    <div class="exp-company"><span class="t-zh">澳洲 · 房产售前软装 / 样板房陈设</span><span class="t-en">Australia · Property Home Staging / Display-home Styling</span></div>
+    <ul class="exp-bullets">
+      <li class="t-zh"><strong>空间设计与软装布置：</strong>负责售前房屋的整体空间规划与软装陈设，依据户型结构与目标客群定位完成家具搭配、色彩协调与氛围营造，全面提升房屋的视觉吸引力与成交转化。</li>
+      <li class="t-en"><strong>Space &amp; styling design:</strong> Planned overall space layout and soft-furnishing styling for pre-sale properties; delivered furniture pairing, colour coordination and atmosphere-building based on floor plans and target buyers, lifting visual appeal and sales conversion.</li>
+      <li class="t-zh"><strong>AI 辅助效果呈现：</strong>创新运用 AI 工具快速生成预期软装效果图，将设计构想高效可视化，便于与客户沟通确认方案，大幅缩短前期方案打样与决策周期。</li>
+      <li class="t-en"><strong>AI-assisted visualisation:</strong> Used AI tools to quickly generate styling renders, visualising design concepts for fast client sign-off and greatly shortening the prototyping and decision cycle.</li>
+      <li class="t-zh"><strong>现场执行与落地：</strong>统筹软装物料的选品与采购，把控现场布置进度与最终呈现效果，确保实际落地与设计方案高度一致。</li>
+      <li class="t-en"><strong>On-site execution:</strong> Coordinated selection and procurement of styling materials, and managed on-site setup and final presentation to ensure delivery matched the design intent.</li>
+    </ul>
+  </div>
+
+  <div class="exp-item">
+    <div class="exp-header">
+      <h3><span class="t-zh">执行美术助理</span><span class="t-en">Art Department Assistant</span></h3>
+      <div class="duration"><span class="t-zh">自由职业 · 1 个月</span><span class="t-en">Freelance · 1 mo</span></div>
+    </div>
+    <div class="exp-company"><span class="t-zh">澳洲短剧剧组 · 影视制作现场</span><span class="t-en">Australia · Short-drama Film Set</span></div>
+    <ul class="exp-bullets">
+      <li class="t-zh"><strong>场景构建：</strong>负责场景搭建与置景美化，精准还原美术指导的视觉设计方案，保障画面呈现效果。</li>
+      <li class="t-en"><strong>Set construction:</strong> Built and dressed sets, accurately realising the art director's visual design to safeguard on-screen presentation.</li>
+      <li class="t-zh"><strong>物料统筹：</strong>统筹各拍摄日的道具分发与耗材管理，确保物资周转流畅与镜头间的视觉连贯性。</li>
+      <li class="t-en"><strong>Props &amp; materials:</strong> Managed props distribution and consumables across shooting days, ensuring smooth turnaround and visual continuity between shots.</li>
+      <li class="t-zh"><strong>部门协作：</strong>协调跨组资源对接，在紧凑拍摄周期中保障转场节奏与整体进度稳定推进。</li>
+      <li class="t-en"><strong>Cross-team coordination:</strong> Coordinated resources across departments to keep transitions and overall schedule on track within a tight shooting window.</li>
+    </ul>
+  </div>
+
+  <div class="exp-item">
+    <div class="exp-header">
+      <h3><span class="t-zh">客户经理</span><span class="t-en">Client Relationship Manager</span></h3>
+      <div class="duration"><span class="t-zh">6 个月</span><span class="t-en">6 mos</span></div>
+    </div>
+    <div class="exp-company"><span class="t-zh">EC Markets / Vatee Capital · 证券公司</span><span class="t-en">EC Markets / Vatee Capital · Securities Brokerage</span></div>
+    <ul class="exp-bullets">
+      <li class="t-zh">负责客户对接与关系维护，为客户提供专业咨询与定制化解决方案。</li>
+      <li class="t-en">Managed client engagement and relationships, providing professional advice and tailored solutions.</li>
+      <li class="t-zh">通过 Instagram、微信、LinkedIn 等社交媒体精准发力，平均每月成功获客约 90 人，并持续达成每月 1 万美元的业务入金指标。</li>
+      <li class="t-en">Drove targeted acquisition via Instagram, WeChat and LinkedIn — averaging ~90 new clients per month and consistently meeting a monthly deposit target of US$10,000.</li>
+      <li class="t-zh">参与策划 CFD 交易大赛活动，全面负责活动的前期策划、宣发推广及视觉海报设计，通过高质量的宣发内容有效提升客户触达与整体转化率。</li>
+      <li class="t-en">Helped plan a CFD trading competition, owning the upfront planning, promotion and poster design; high-quality campaign content lifted client reach and overall conversion.</li>
+    </ul>
+  </div>
+
+  <div class="exp-item">
+    <div class="exp-header">
+      <h3><span class="t-zh">商业模特</span><span class="t-en">Commercial Model</span></h3>
+      <div class="duration"><span class="t-zh">2023 — 至今</span><span class="t-en">2023 — Present</span></div>
+    </div>
+    <div class="exp-company"><span class="t-zh">品牌广告拍摄 · 商业走秀 · 摄影工作室</span><span class="t-en">Brand Advertising · Runway Shows · Photography Studios</span></div>
+    <ul class="exp-bullets">
+      <li class="t-zh">参与服装等品牌广告拍摄及商业走秀，并多次受邀担任摄影工作室专属样片与打版模特；能快速契合品牌调性并精准把握情绪，凭借丰富的经验实现高效出片与高成品率。</li>
+      <li class="t-en">Featured in brand advertising shoots and commercial runway shows for fashion and other brands, and repeatedly engaged as a sample and fit model for photography studios; quickly matches brand tone and captures the right mood, delivering efficient shoots with a high keeper rate.</li>
+      <li class="t-zh">具备在大型公共活动及大量游客面前的表演与抗压经验，曾参与墨尔本春节公益演出等大型户外活动，与团队默契配合并完美完成走秀任务。</li>
+      <li class="t-en">Experienced performing under pressure before large public crowds — including runway at major outdoor events such as the Melbourne Lunar New Year charity celebration — working in sync with the team to deliver flawlessly.</li>
+    </ul>
+  </div>
+
+  <div class="exp-item">
+    <div class="exp-header">
+      <h3><span class="t-zh">画室助教</span><span class="t-en">Art Studio Teaching Assistant</span></h3>
+      <div class="duration"><span class="t-zh">兼职 · 1 年</span><span class="t-en">Part-time · 1 yr</span></div>
+    </div>
+    <div class="exp-company"><span class="t-zh">少儿美术教育</span><span class="t-en">Children's Art Education</span></div>
+    <ul class="exp-bullets">
+      <li class="t-zh"><strong>教学协助与客情维护：</strong>负责前期教案准备与日常后勤工作；针对 4-5 岁低龄儿童采取个性化沟通策略，迅速建立信任以安抚情绪，并与家长保持密切沟通与反馈，有效提升家长的信任度与满意度。</li>
+      <li class="t-en"><strong>Teaching support &amp; parent relations:</strong> Prepared lesson plans and handled daily logistics; used personalised communication with children aged 4–5 to build trust and ease emotions, and kept close feedback loops with parents to raise trust and satisfaction.</li>
+      <li class="t-zh"><strong>活动统筹与后勤规划：</strong>多次与主讲教师联合策划并组织「少儿野外过夜写生」活动，全面统筹行程中的酒店预订、餐食安排及现场突发状况处理，展现了出色的活动执行力与后勤保障能力。</li>
+      <li class="t-en"><strong>Event &amp; logistics planning:</strong> Co-planned and ran overnight children's outdoor sketching trips with lead teachers, managing hotel bookings, catering and on-site contingencies with strong execution.</li>
+    </ul>
+  </div>
+
+  <div class="exp-item">
+    <div class="exp-header">
+      <h3><span class="t-zh">独立电商运营</span><span class="t-en">Independent E-commerce Operator</span></h3>
+      <div class="duration"><span class="t-zh">副业自营</span><span class="t-en">Self-run side business</span></div>
+    </div>
+    <div class="exp-company"><span class="t-zh">斗鱼品牌（5 个月）· 线上服装店（1 年）</span><span class="t-en">Betta Fish Brand (5 mos) · Online Fashion Store (1 yr)</span></div>
+    <ul class="exp-bullets">
+      <li class="t-zh"><strong>斗鱼品牌：</strong>统筹品牌建设与视频剪辑，独立引进货源、日常繁殖及选品。实际售卖的 2 个月内，通过多元化宣传与精细化客服，成功达成约 300 条销售转化。</li>
+      <li class="t-en"><strong>Betta fish brand:</strong> Ran brand-building and video editing, and independently handled sourcing, daily breeding and selection of ornamental betta fish. Within two months of active selling, converted ~300 sales through diversified promotion and attentive customer service.</li>
+      <li class="t-zh"><strong>线上服装店：</strong>利用业余时间经营品牌，坚持每日发布与内容维护，独立统筹选品与摄影搭配。通过微信、闲鱼及小红书精准引流与客户沟通，单年实现约五万元转化。</li>
+      <li class="t-en"><strong>Online fashion store:</strong> Ran the store in spare time with daily posting and content upkeep, independently handling product selection and styling photography. Drove targeted traffic and engagement via WeChat, Xianyu and Xiaohongshu (RED), reaching ~RMB 50,000 in sales within a year.</li>
+    </ul>
+  </div>
+
+  <div class="exp-item">
+    <div class="exp-header">
+      <h3><span class="t-zh">话剧演员 · 女主角</span><span class="t-en">Stage Actor · Lead Role</span></h3>
+      <div class="duration"><span class="t-zh">墨大中华文化节</span><span class="t-en">UniMelb Chinese Culture Festival</span></div>
+    </div>
+    <div class="exp-company"><span class="t-zh">公益演出话剧《如愿》</span><span class="t-en">Charity Stage Play — "As You Wish"</span></div>
+    <ul class="exp-bullets">
+      <li class="t-zh">参演墨尔本大学中华文化节重点话剧项目《如愿》并担任女主角，展现了出色的舞台表现力与现场把控能力。凭借扎实的表演功底与强烈的情感共鸣，该剧目最终被评为此次公益演出的「最佳节目」。</li>
+      <li class="t-en">Played the female lead in "As You Wish", a flagship stage play at the University of Melbourne Chinese Culture Festival, showing strong stage presence and command of the live setting. Backed by solid acting and emotional resonance, the play was named "Best Programme" of the charity showcase.</li>
+    </ul>
+  </div>
+
+  <div class="section-title"><span class="t-zh">社团活动</span><span class="t-en">Activities</span></div>
+
+  <div class="act-item">
+    <h3><span class="t-zh">墨尔本大学中华文化社 · 文宣部成员</span><span class="t-en">UniMelb Chinese Culture Society · Media &amp; Publicity Team</span></h3>
+    <ul class="exp-bullets">
+      <li class="t-zh">独立主导社团品牌视觉设计，包括设计并制作社团全新品牌标志 (Logo)。</li>
+      <li class="t-en">Independently led the society's brand visual design, including designing and producing a new society logo.</li>
+      <li class="t-zh">负责各类文化活动的线上宣发视觉支持，持续制作高质量的社交媒体宣传海报，有效提升社团的视觉识别度与活动影响力。</li>
+      <li class="t-en">Provided online promotional visuals for cultural events, producing high-quality social-media posters that strengthened the society's visual identity and event impact.</li>
+    </ul>
+  </div>
+
+  <div class="act-item">
+    <h3><span class="t-zh">墨尔本汉服社</span><span class="t-en">Melbourne Hanfu Society</span></h3>
+    <ul class="exp-bullets">
+      <li class="t-zh">多次作为出镜模特参与汉文化宣传视频及大片的策划与视觉呈现，有效提升社团的公众曝光度与文化影响力。</li>
+      <li class="t-en">Featured as an on-camera model in Han-culture promotional videos and photo shoots, contributing to planning and visual presentation and boosting the society's public exposure and cultural influence.</li>
+      <li class="t-zh">参与并协助策划线下「中国风集市」活动，负责前期的创意宣发、摊位视觉规划与现场协调，全面助力传统文化的海外推广与传播。</li>
+      <li class="t-en">Co-planned an offline "Chinese-style Market" event, handling upfront creative promotion, stall visual planning and on-site coordination to support the overseas promotion of traditional culture.</li>
+    </ul>
+  </div>
+
+  <div class="section-title"><span class="t-zh">专业技能</span><span class="t-en">Skills</span></div>
+
+  <div class="skill-category">
+    <h3><span class="t-zh">品牌传播与活动策划</span><span class="t-en">Brand Communication &amp; Event Planning</span></h3>
+    <ul class="exp-bullets">
+      <li class="t-zh"><strong>品牌视觉统筹：</strong>具备出色的设计能力与独到审美，能提供图片、多媒体、动画等多维视觉制作方案，以高统一性的视觉风格提升品牌表达力。</li>
+      <li class="t-en"><strong>Brand visual direction:</strong> Strong design ability and a distinctive aesthetic, delivering multi-dimensional visual solutions across imagery, multimedia and animation to lift brand expression with a highly consistent style.</li>
+      <li class="t-zh"><strong>活动策划与内容传播：</strong>拥有丰富的品牌活动与内容运营实操经验，能精准把握各平台特性制定针对性推广策略，并成功运用活动策划与账号运营实现有效转化。</li>
+      <li class="t-en"><strong>Event planning &amp; content:</strong> Extensive hands-on experience in brand events and content operations; tailors platform-specific promotion strategies and converts effectively through campaign planning and account operations.</li>
+      <li class="t-zh"><strong>视传协同策略：</strong>擅长将视觉表现力与传播策略深度结合，在大型项目中推动内容创作与推广节奏的高效协同，全面放大品牌整体传播效率与影响力。</li>
+      <li class="t-en"><strong>Integrated comms strategy:</strong> Skilled at fusing visual expression with communication strategy, driving efficient coordination between content creation and promotion cadence on large projects to amplify overall reach and impact.</li>
+    </ul>
+  </div>
+
+  <div class="skill-category">
+    <h3><span class="t-zh">多媒体与动画制作</span><span class="t-en">Multimedia &amp; Animation</span></h3>
+    <ul class="exp-bullets">
+      <li class="t-zh"><strong>跨媒介动画表达：</strong>深刻理解 2D、MG 及 3D 动画间的视觉逻辑，能精准匹配项目需求与最适宜的视觉形式，以实现视觉传达与内容传播的最优效果。</li>
+      <li class="t-en"><strong>Cross-medium animation:</strong> Deep grasp of the visual logic across 2D, motion graphics and 3D, matching project needs to the most suitable form for optimal communication.</li>
+      <li class="t-zh"><strong>2D 动画制作与公展经验：</strong>熟练掌握从剧本创作、分镜设计到角色开发的完整流程（Harmony、Procreate）。个人 2D 动画作品曾于悉尼 Spice Alley 文化节展出，并应用于公共空间的视觉特效显示屏投放。</li>
+      <li class="t-en"><strong>2D animation &amp; exhibited work:</strong> Proficient across the full pipeline from scriptwriting and storyboarding to character development (Harmony, Procreate). Personal 2D animation work was exhibited at Sydney's Spice Alley cultural festival and shown on public-space visual-effects screens.</li>
+      <li class="t-zh"><strong>MG 动画（Motion Graphics）：</strong>熟练使用 After Effects 制作高质量动态图形与视觉特效，并将其应用于广告宣传、品牌推广及信息可视化领域，以强化视觉传播力。</li>
+      <li class="t-en"><strong>Motion graphics:</strong> Proficient in After Effects for high-quality motion graphics and visual effects, applied to advertising, brand promotion and data visualisation.</li>
+      <li class="t-zh"><strong>3D 制作与空间设计：</strong>具备扎实的 3D 场景建模与渲染能力，擅长构建高质量的空间环境与视觉元素，大幅提升视觉作品的空间感与沉浸感。</li>
+      <li class="t-en"><strong>3D &amp; spatial design:</strong> Solid 3D scene modelling and rendering; builds high-quality spatial environments and visual elements that add depth and immersion.</li>
+    </ul>
+  </div>
+
+  <div class="skill-category">
+    <h3><span class="t-zh">后期制作与视觉设计</span><span class="t-en">Post-production &amp; Visual Design</span></h3>
+    <ul class="exp-bullets">
+      <li class="t-zh"><strong>全链路视觉创作：</strong>兼具图像创作、修图处理与视频制作的复合能力，能够从概念构建到后期优化，独立完成「创作 + 修图 + 视频表达」端到端的内容生产，具备显著的视觉内容综合优势。</li>
+      <li class="t-en"><strong>End-to-end visual creation:</strong> Combines image creation, retouching and video production — independently taking content from concept to post, a strong all-round visual-content advantage.</li>
+      <li class="t-zh"><strong>视频剪辑与编导：</strong>熟练运用 Premiere Pro、DaVinci Resolve、剪映等主流软件，擅长纪录片及 Vlog 等类型内容的剪辑制作，能精准把握叙事节奏完成影像表达与视觉包装。</li>
+      <li class="t-en"><strong>Video editing &amp; direction:</strong> Proficient in Premiere Pro, DaVinci Resolve and CapCut; skilled at documentary and vlog editing, with precise control of narrative pacing and visual packaging.</li>
+      <li class="t-zh"><strong>绘画设计与后期精修：</strong>具备扎实的绘画美术功底与专业级修图能力（Photoshop 等），在创作初期即构建高质量视觉基础，并于后期进行色彩与细节的深度优化，实现视觉项目的高效落地。</li>
+      <li class="t-en"><strong>Illustration &amp; retouching:</strong> Solid fine-art foundation and professional-grade retouching (Photoshop); builds a high-quality visual base early and deep-optimises colour and detail in post.</li>
+    </ul>
+  </div>
+
+  <div class="skill-category">
+    <h3><span class="t-zh">AI 创意生产力与技术习惯</span><span class="t-en">AI Creative Productivity &amp; Tech Habits</span></h3>
+    <ul class="exp-bullets">
+      <li class="t-zh"><strong>视觉与图文生成：</strong>精通 Nano Banana 等多款 AI 图像工具与高阶 Prompt 设计，熟练运用 LoRA 技术实现人物一致性与风格稳定化；能够将扎实的个人审美与 AI 结合，高效构建具备统一视觉逻辑的内容作品。</li>
+      <li class="t-en"><strong>Visual &amp; content generation:</strong> Proficient with AI image tools such as Nano Banana and advanced prompt design; uses LoRA for character consistency and style stabilisation, pairing a solid personal aesthetic with AI to build visually coherent content efficiently.</li>
+      <li class="t-zh"><strong>编程与工作流自动化：</strong>熟练运用 Claude Code、OpenClaw 等 AI 助手辅助开发与脚本编写，将其应用于网页开发、前端设计及工作流程优化环节，实现高效的数字化生产流程。</li>
+      <li class="t-en"><strong>Coding &amp; workflow automation:</strong> Uses AI assistants such as Claude Code and OpenClaw for development and scripting, applied to web development, front-end design and workflow optimisation.</li>
+      <li class="t-zh"><strong>辅助多媒体制作：</strong>深度结合 AI 与传统视频工作流，在创意构思、素材生成、剪辑及视觉呈现等全环节引入 AI，大幅提升多媒体视频内容的生产效率与动态表现力。</li>
+      <li class="t-en"><strong>AI-assisted multimedia:</strong> Integrates AI deeply into traditional video workflows — ideation, asset generation, editing and presentation — to boost production efficiency and dynamic expression.</li>
+      <li class="t-zh"><strong>技术学习与迭代思考：</strong>乐于尝试和学习新技术，善于识别工作流程中可被优化的环节，并利用 AI 工具进行自动化与效率提升，在实践中持续迭代工作方式与创作流程。</li>
+      <li class="t-en"><strong>Continuous learning &amp; iteration:</strong> Keen to try and learn new technology; spots optimisable steps in workflows and uses AI to automate and improve, continually iterating on ways of working.</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+  function setLang(l){
+    document.body.setAttribute('data-lang', l);
+    document.documentElement.lang = (l === 'zh' ? 'zh-CN' : 'en');
+    document.title = (l === 'zh' ? '徐晨 — 简历' : 'Xu Chen — Resume');
+    document.querySelectorAll('.lang-toggle button').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-set') === l);
+    });
+  }
+  document.querySelectorAll('.lang-toggle button').forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.getAttribute('data-set')); });
+  });
+  // 支持 ?lang=en 直接以英文打开（用于导出英文 PDF）
+  var _p = new URLSearchParams(location.search);
+  setLang(_p.get('lang') === 'en' ? 'en' : 'zh');
+
+  // 内嵌到 amber-xu.com 的 /cv 页面（iframe）时，主站已有 EN/中 语言开关，
+  // 这里再显示自带的 toggle 会重复。检测 iframe 环境后隐藏。
+  // 直接访问 /cv/resume.html 时（window.self === window.top）toggle 保留可用。
+  if (window.self !== window.top) {
+    var _t = document.querySelector('.lang-toggle');
+    if (_t) _t.style.display = 'none';
+  }
+</script>
+
+</body>
+</html>

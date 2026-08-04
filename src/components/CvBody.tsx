@@ -48,7 +48,14 @@ export default function CvBody() {
     }
   }, []);
 
-  const cvHref = lang === "zh" ? "/cv/zh.html" : "/cv/en.html";
+  /* v2 per Amber (2026-08-01 resume 2.0 update): switched from two
+     separate files (zh.html / en.html) to a single bilingual file
+     resume.html that flips language via a ?lang= URL param — Amber's
+     new résumé authors both languages in one document with `.t-zh` /
+     `.t-en` toggle classes, so maintaining two forks of it doesn't
+     make sense. The iframe still reloads on lang change (because src
+     changes), so the résumé re-runs its init and reads the new param. */
+  const cvHref = lang === "zh" ? "/cv/resume.html" : "/cv/resume.html?lang=en";
 
   /* Entry animation: pure CSS @keyframes auto-plays on mount, no
      React state involved. The earlier framer-motion path was stuck
