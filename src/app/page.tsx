@@ -271,19 +271,20 @@ export default function Home() {
                       colour halo. glowColor left in place (unused when
                       radius = 0) so the rollback is a single-value
                       revert if she changes her mind. */}
-                {/* v14 per Amber 2026-08-04:
-                    • shape "circle" → "square" — markers are now small
-                      squares instead of dots. Same footprint (rad=6 →
-                      12×12 px squares). Grid, bulge, wave interaction
-                      stay identical.
-                    • gradientFrom #030322 → #060626 and gradientTo
-                      #040422 → #070726 — bumped each RGB channel by ~3
-                      units (≈1% of 255) so the markers read one notch
-                      lifted from pure black ("黑度减少 1%"). Still very
-                      dark against the LiquidChrome background, just no
-                      longer bordering-on-invisible. */}
+                {/* v15 per Amber 2026-08-04 — reverted v14:
+                    • shape "square" → back to "circle". Amber said the
+                      squares didn't read the way she hoped; small round
+                      dots feel right. (shape prop still supported on
+                      DotField for future use.)
+                    • gradientFrom/To back to pure black BUT with alpha
+                      0.8 — "纯黑，但透明度可以降到 80%". Using rgba()
+                      instead of hex so the alpha channel takes effect
+                      (hex #000 would render fully opaque). Both stops
+                      identical so the gradient is a flat colour.
+                    Everything else — rad=6, spacing=11, bulge, wave,
+                    no cursor glow — stays from v13. */}
                 <DotField
-                  shape="square"
+                  shape="circle"
                   dotRadius={6}
                   dotSpacing={11}
                   bulgeStrength={53}
@@ -293,8 +294,8 @@ export default function Home() {
                   cursorRadius={600}
                   cursorForce={0.28}
                   bulgeOnly
-                  gradientFrom="#060626"
-                  gradientTo="#070726"
+                  gradientFrom="rgba(0, 0, 0, 0.8)"
+                  gradientTo="rgba(0, 0, 0, 0.8)"
                   glowColor="#323237"
                 />
               </div>
