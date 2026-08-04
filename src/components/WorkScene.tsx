@@ -10,6 +10,7 @@ import Galaxy from "@/components/Galaxy";
 import Grainient from "@/components/Grainient";
 import LiquidEther from "@/components/LiquidEther";
 import Universe from "@/components/Universe";
+import VersionSwitcher from "@/components/VersionSwitcher";
 
 // Aurora is still imported so it appears as "used" to TypeScript and
 // also so the rollback path stays warm in the bundler graph. Silence
@@ -292,6 +293,25 @@ export default function WorkScene() {
             : { duration: 1.5, delay: 0.5, ease: "easeInOut" }
         }
       />
+
+      {/* Layer 20 (chrome): Version 1 / Version 2 pill at bottom
+          centre. Fades in on the same curve as the Universe (delay
+          1.8, duration 3.0) so it lands as part of the same reveal
+          rather than popping in cold. Kept OUT of the Universe
+          motion.div wrapper so its own pointer-events / z-index
+          rules stay clean and it doesn't inherit any transform from
+          a shared parent. */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={
+          shouldSnap
+            ? snap
+            : { duration: 3.0, delay: 1.8, ease: "easeInOut" }
+        }
+      >
+        <VersionSwitcher />
+      </motion.div>
     </>
   );
 }
