@@ -271,7 +271,19 @@ export default function Home() {
                       colour halo. glowColor left in place (unused when
                       radius = 0) so the rollback is a single-value
                       revert if she changes her mind. */}
+                {/* v14 per Amber 2026-08-04:
+                    • shape "circle" → "square" — markers are now small
+                      squares instead of dots. Same footprint (rad=6 →
+                      12×12 px squares). Grid, bulge, wave interaction
+                      stay identical.
+                    • gradientFrom #030322 → #060626 and gradientTo
+                      #040422 → #070726 — bumped each RGB channel by ~3
+                      units (≈1% of 255) so the markers read one notch
+                      lifted from pure black ("黑度减少 1%"). Still very
+                      dark against the LiquidChrome background, just no
+                      longer bordering-on-invisible. */}
                 <DotField
+                  shape="square"
                   dotRadius={6}
                   dotSpacing={11}
                   bulgeStrength={53}
@@ -281,8 +293,8 @@ export default function Home() {
                   cursorRadius={600}
                   cursorForce={0.28}
                   bulgeOnly
-                  gradientFrom="#030322"
-                  gradientTo="#040422"
+                  gradientFrom="#060626"
+                  gradientTo="#070726"
                   glowColor="#323237"
                 />
               </div>

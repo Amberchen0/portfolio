@@ -68,6 +68,16 @@ export interface DotFieldProps extends Omit<ComponentPropsWithoutRef<"div">, "re
   gradientFrom?: string;
   gradientTo?: string;
   glowColor?: string;
+  /**
+   * Marker geometry for each grid point.
+   * - "circle" (default) keeps the original ctx.arc() rendering.
+   * - "square" swaps to ctx.rect() with the same "radius" reinterpreted
+   *   as half-side; a square with rad=6 is a 12×12 px marker occupying
+   *   roughly the same visual footprint as a rad=6 circle.
+   * Grid layout, bulge, wave, and cursor interaction stay identical
+   * between shapes — this only changes what each marker looks like.
+   */
+  shape?: "circle" | "square";
 }
 
 const DotField = memo(({
@@ -83,6 +93,7 @@ const DotField = memo(({
   gradientFrom = "rgba(168, 85, 247, 0.35)",
   gradientTo = "rgba(180, 151, 207, 0.25)",
   glowColor = "#120F17",
+  shape = "circle",
   ...rest
 }: DotFieldProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -105,11 +116,12 @@ const DotField = memo(({
     waveAmplitude: number;
     gradientFrom: string;
     gradientTo: string;
+    shape: "circle" | "square";
   }>({
-    dotRadius, dotSpacing, cursorRadius, cursorForce, bulgeOnly, bulgeStrength, sparkle, waveAmplitude, gradientFrom, gradientTo,
+    dotRadius, dotSpacing, cursorRadius, cursorForce, bulgeOnly, bulgeStrength, sparkle, waveAmplitude, gradientFrom, gradientTo, shape,
   });
   propsRef.current = {
-    dotRadius, dotSpacing, cursorRadius, cursorForce, bulgeOnly, bulgeStrength, sparkle, waveAmplitude, gradientFrom, gradientTo,
+    dotRadius, dotSpacing, cursorRadius, cursorForce, bulgeOnly, bulgeStrength, sparkle, waveAmplitude, gradientFrom, gradientTo, shape,
   };
   const rebuildRef = useRef<(() => void) | null>(null);
   /* useId() guarantees a deterministic, SSR-safe unique ID per
@@ -279,15 +291,21 @@ const DotField = memo(({
           drawX += Math.cos(d.ay * 0.03 + t * 0.7) * p.waveAmplitude * 0.5;
         }
 
+        /* Shape branch: circle uses ctx.arc(), square uses ctx.rect().
+           `rad` is reused verbatim as "half-side" for square so a rad=6
+           square ends up 12×12 px — same footprint as a rad=6 circle. */
+        const isSquare = p.shape === "square";
         if (p.sparkle) {
           const hash = ((i * 2654435761) ^ (frameCount >> 3)) >>> 0;
-          if ((hash % 100) < 3) {
-            ctx.moveTo(drawX + rad * 1.8, drawY);
-            ctx.arc(drawX, drawY, rad * 1.8, 0, TWO_PI);
+          const r = (hash % 100) < 3 ? rad * 1.8 : rad;
+          if (isSquare) {
+            ctx.rect(drawX - r, drawY - r, r * 2, r * 2);
           } else {
-            ctx.moveTo(drawX + rad, drawY);
-            ctx.arc(drawX, drawY, rad, 0, TWO_PI);
+            ctx.moveTo(drawX + r, drawY);
+            ctx.arc(drawX, drawY, r, 0, TWO_PI);
           }
+        } else if (isSquare) {
+          ctx.rect(drawX - rad, drawY - rad, rad * 2, rad * 2);
         } else {
           ctx.moveTo(drawX + rad, drawY);
           ctx.arc(drawX, drawY, rad, 0, TWO_PI);
